@@ -8,6 +8,7 @@
 - [Full Reproducible Benchmarks](BENCHMARKS.md): Complete v0.2.0 tables, 5-stage optimization ladder, SHA-256 provenance across all 8 frozen JSONs, 645-case `RCAEval` RE1+RE2 breakdowns, Agent BPE Token & Adversarial Blackboard benchmark, and Tier-2 `D=4,096` firehose (`75.7M obs/s`, `100%` AC@1 vs `0%` baselines).
 - [Full Technical Reference](llms-full.txt): Single-file Markdown reference covering math specifications, Python API, CLI, JSON-RPC 2.0 MCP server schemas, C99 ABI, and honest limits.
 - [CausalSieve vs statsmodels, tigramite, sklearn & river](docs/vs-statsmodels-tigramite.md): Drop-in migration code, complexity analysis, and honest crossovers.
+- [Runnable Prometheus incident example](examples/prometheus_incident.py) accepts a saved `/api/v1/query_range` matrix or generates an offline fixture. Its JSON output contains the tick count, series count and ranked metric names.
 - [Kubernetes, Prometheus, OpenTelemetry & Streaming RCA Cookbook](docs/kubernetes-prometheus-rca.md): Recipes for Prometheus `/api/v1/query_range`, OpenTelemetry OTLP/JSON, NDJSON/JSONL, live `causalsieve watch`, and `RCAEval`.
 - [LLM & Multi-Agent Telemetry Compression Guide](docs/llm-agent-telemetry-compression.md): Zero-install `uvx` MCP setup, `SKILL.md`, 99.90%–99.98% token reduction with `0.0` FP64 `slice://` recovery, and `CausalBlackboard`.
 - [Agent Skill](skills/causalsieve/SKILL.md): Drop-in `agentskills.io` / `skills.sh` / Claude Code / Codex / Cursor skill (also mirrored at `SKILL.md`).

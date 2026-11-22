@@ -1,26 +1,42 @@
 # CausalSieve
 
-[![PyPI version](https://img.shields.io/pypi/v/causalsieve?color=22d3ee&label=PyPI)](https://pypi.org/project/causalsieve/)
-[![CI](https://github.com/pgg898200-ship-it/causalsieve/actions/workflows/ci.yml/badge.svg)](https://github.com/pgg898200-ship-it/causalsieve/actions/workflows/ci.yml)
-[![Python 3.10+](https://img.shields.io/pypi/pyversions/causalsieve?color=10b981)](https://pypi.org/project/causalsieve/)
-[![Zero Dependencies](https://img.shields.io/badge/runtime%20deps-0-10b981)](pyproject.toml)
-[![Interactive Explorer](https://img.shields.io/badge/live-explorer%20%26%20llms.txt-a78bfa)](https://pgg898200-ship-it.github.io/causalsieve/)
-[![Agent Skill](https://img.shields.io/badge/skills.sh-causalsieve-f59e0b)](https://skills.sh/pgg898200-ship-it/causalsieve/causalsieve)
-[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+**Which service should you investigate first?** CausalSieve ranks possible sources of an incident from time series that change together. Feed it a Prometheus range query after an alert. It returns the metric names to inspect first, keeping their service labels so you can find them in your dashboard.
 
-**Find the upstream root cause in live multivariate streams in microseconds — not minutes. Compress 899,000 raw telemetry tokens down to ~900 with `0.0` FP64 error recovery.**
+An API slowdown can start at the database. CausalSieve learns how each metric usually follows the others, then looks for changes that the earlier measurements fail to explain. An on-call engineer can check the ranked candidates against traces and deployments. An incident agent can read the same results as structured data.
 
-Zero runtime Python dependencies. Zero GPU required. Single-binary C++20 SIMD core with **runtime CPUID dispatch (`AVX2+FMA` + scalar on x86-64 Linux/macOS/Windows, native `NEON` on Apple Silicon & ARM64)** (`1.34 µs/tick`), C99 ABI, Pandas/Polars/Prometheus/OpenTelemetry OTLP/JSONL/RCAEval adapters, live streaming `causalsieve watch` CLI, zero-install `uvx` JSON-RPC 2.0 MCP server, and drop-in Agent Skill (`SKILL.md` + `skills.sh` + `.claude-plugin`).
+[Try the interactive explorer](https://pgg898200-ship-it.github.io/causalsieve/) · [Python package](https://pypi.org/project/causalsieve/) · [Benchmark results](BENCHMARKS.md) · [Agent reference](llms.txt)
 
-<p align="center">
-  <img src="https://raw.githubusercontent.com/pgg898200-ship-it/causalsieve/main/docs/assets/speed_frontier.svg" alt="CausalSieve v0.2.0 Speed Frontier vs statsmodels, tigramite, NumPy" width="100%" />
-</p>
+## Try a Prometheus incident
 
-> **Why CausalSieve exists:** When service `A` breaks and cascades `A -> B -> C` with amplification, raw Z-scores and univariate detectors flag downstream victim `C`, batch causal tools (`statsmodels`, `tigramite`, `CIRCA`) take seconds to minutes, and pasting raw CSV/JSON telemetry into LLM agents overflows even 128k context windows (`100%` overflow rate across real Kubernetes outages).
->
-> **CausalSieve** solves all three in one pass: exact online Block-Schur conditional Granger (`< 1.9e-12` vs batch FP64 SVD refits), innovation precision whitening, online non-Gaussian LiNGAM contemporaneous orientation, anytime-valid Ville E-process alarms, and a **99.90%–99.98%** token-compressed `CausalDigest` with bit-exact `0.0`-error FP64 `slice://` recovery.
+This example runs locally without a Prometheus server. It generates 600 five-second samples for a database and an API. A delay starts at the database and reaches the API one sample later.
 
----
+```sh
+git clone https://github.com/pgg898200-ship-it/causalsieve.git
+cd causalsieve
+python -m pip install causalsieve
+python examples/prometheus_incident.py
+```
+
+The example prints the two candidates in investigation order.
+
+```json
+{
+  "ticks": 600,
+  "series": 2,
+  "candidates": [
+    "latency_seconds{service=db}",
+    "latency_seconds{service=api}"
+  ]
+}
+```
+
+To investigate your own incident, save the JSON response from a Prometheus `/api/v1/query_range` request covering a baseline and the incident. Pass the file to the same script.
+
+```sh
+python examples/prometheus_incident.py query_range.json
+```
+
+The adapter accepts a Prometheus matrix of timestamp/value pairs. It aligns samples by time and carries each series’ last value forward across gaps. [Prometheus and Kubernetes integration guide](docs/kubernetes-prometheus-rca.md) · [Example source](examples/prometheus_incident.py)
 
 ## Headline Verified Results (`v0.2.0`)
 
