@@ -21,7 +21,7 @@
 
 ## Quickstart Commands
 
-- One-command install (auto-compiles native AVX2/NEON core): `pip install .` (or `pip install causalsieve` once published)
+- One-command install (zero runtime deps, prebuilt wheels for Linux/macOS/Windows): `pip install causalsieve` (or `pip install --no-binary causalsieve causalsieve` for native x86-64 AVX2+FMA)
 - Check SIMD ISA & library path: `causalsieve info`
 - Run root-cause analysis on CSV: `causalsieve rca metrics.csv --lag 2 --top-k 5`
 - Emit token-budgeted digest: `causalsieve digest metrics.csv --tokens-budget 400`

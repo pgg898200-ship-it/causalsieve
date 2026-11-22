@@ -34,8 +34,10 @@ Measured live on **1× Intel Xeon @ 2.30 GHz (`avx2+fma`)** against frozen binar
 
 ### One-Command Install (Zero Python Runtime Dependencies)
 ```sh
-pip install git+https://github.com/pgg898200-ship-it/causalsieve.git   # auto-compiles & bundles native AVX2/NEON C++20 core (zero runtime deps)
-causalsieve info                                                       # verify active SIMD ISA (avx2+fma / neon / scalar)
+pip install causalsieve                              # instant 115 KB prebuilt wheel (Linux x86_64/ARM64 NEON, macOS Apple Silicon NEON/Intel, Windows x64)
+# Optional on AVX2 x86-64 CPUs for full AVX2+FMA native peak throughput:
+pip install --no-binary causalsieve causalsieve
+causalsieve info                                     # verify active SIMD ISA (avx2+fma / neon / scalar)
 ```
 
 ### CLI: Compress a 130k-Token Incident CSV into a ~300-Token Causal Digest
