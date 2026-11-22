@@ -3,7 +3,7 @@
   "name": "io.github.pgg898200-ship-it/causalsieve-mcp",
   "title": "CausalSieve MCP Server",
   "description": "Zero-dependency SIMD online multivariate causal discovery, root-cause analysis, counterfactual do-interventions, and lossless telemetry slice recovery.",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "repository": {
     "url": "https://github.com/pgg898200-ship-it/causalsieve",
     "source": "github"
@@ -14,7 +14,7 @@
       "registryType": "pypi",
       "registryBaseUrl": "https://pypi.org",
       "identifier": "causalsieve",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "runtimeHint": "uvx",
       "transport": {
         "type": "stdio"
@@ -23,7 +23,7 @@
         {
           "type": "named",
           "name": "--from",
-          "value": "causalsieve==0.1.0",
+          "value": "causalsieve==0.2.0",
           "isRequired": false
         }
       ],

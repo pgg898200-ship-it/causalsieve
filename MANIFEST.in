@@ -9,6 +9,9 @@ include CITATION.cff
 include SECURITY.md
 include CONTRIBUTING.md
 include server.json
+include context7.json
+include smithery.yaml
+include glama.json
 include pyproject.toml
 include setup.py
 include Makefile
@@ -16,6 +19,7 @@ include Makefile
 recursive-include csrc *.h *.hpp *.cpp
 recursive-include python/causalsieve *.py *.pyi py.typed
 recursive-include skills *.md
+recursive-include docs *.md *.svg
 recursive-include .claude-plugin *.json
 
 prune build

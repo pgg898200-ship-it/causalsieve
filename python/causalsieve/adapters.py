@@ -8,6 +8,10 @@ clients):
     ``Mapping[str, Sequence[float]]`` dict-of-lists -> ``(sieve, digest)``
   - :func:`analyze_prometheus`: Prometheus HTTP API ``/api/v1/query_range``
     matrix JSON (dict or string) -> ``(sieve, digest)``
+  - :func:`analyze_otlp_metrics`: OpenTelemetry OTLP/JSON
+    ``ExportMetricsServiceRequest`` (gauge, sum, histogram) -> ``(sieve, digest)``
+  - :func:`analyze_jsonl`: NDJSON / JSONL metric streams (file path, raw
+    multiline string, or iterable of JSON lines / dicts) -> ``(sieve, digest)``
   - :func:`rcaeval_rca`: Drop-in ``RCAEval`` microservice root-cause interface
     supporting both symmetric ``inject_time`` and blind (``inject_time=None``)
     localization -> ``{"ranks", "scores", "metric_top_k", "digest"}``
@@ -19,7 +23,8 @@ import array
 import hashlib
 import json
 import math
-from collections.abc import Callable, Mapping, Sequence
+from collections.abc import Callable, Iterable, Mapping, Sequence
+from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 from causalsieve._native import (
@@ -1061,3 +1066,544 @@ def rcaeval_rca(
         "metric_top_k": metric_top_k,
         "digest": digest,
     }
+
+
+# =========================================================================
+# 4. OpenTelemetry OTLP/JSON Metrics Adapter
+# =========================================================================
+
+
+def _otlp_attr_value(raw_val: Any) -> str:
+    """Extract a concise string representation from an OTLP ``AnyValue`` object."""
+    if isinstance(raw_val, Mapping):
+        for key in (
+            "stringValue",
+            "string_value",
+            "intValue",
+            "int_value",
+            "doubleValue",
+            "double_value",
+            "boolValue",
+            "bool_value",
+            "bytesValue",
+            "bytes_value",
+        ):
+            if key in raw_val:
+                return str(raw_val[key])
+        return json.dumps(dict(raw_val), sort_keys=True, separators=(",", ":"))
+    return str(raw_val)
+
+
+def _otlp_extract_attrs(raw_attrs: Any) -> dict[str, str]:
+    """Convert an OTLP attributes array ``[{"key": ..., "value": ...}]`` into a flat dict."""
+    out: dict[str, str] = {}
+    if isinstance(raw_attrs, Mapping):
+        for k, v in raw_attrs.items():
+            key = str(k).strip()
+            if key:
+                out[key] = _otlp_attr_value(v)
+        return out
+    if not isinstance(raw_attrs, Sequence) or isinstance(raw_attrs, (str, bytes, bytearray)):
+        return out
+    for item in raw_attrs:
+        if not isinstance(item, Mapping):
+            continue
+        key = str(item.get("key", "")).strip()
+        if not key:
+            continue
+        out[key] = _otlp_attr_value(item.get("value", ""))
+    return out
+
+
+def _parse_otlp_timestamp(dp: Mapping[str, Any]) -> int | float | None:
+    """Parse OTLP ``timeUnixNano`` (preserving exact 64-bit integer precision)."""
+    raw_ts: Any = None
+    for key in ("timeUnixNano", "time_unix_nano", "startTimeUnixNano", "start_time_unix_nano"):
+        if key in dp and dp[key] is not None:
+            raw_ts = dp[key]
+            break
+    if raw_ts is None or isinstance(raw_ts, bool):
+        return None
+    if isinstance(raw_ts, int):
+        return raw_ts
+    if isinstance(raw_ts, float):
+        return raw_ts if math.isfinite(raw_ts) else None
+    if isinstance(raw_ts, (str, bytes, bytearray)):
+        s = (
+            raw_ts.decode("utf-8", errors="ignore").strip()
+            if not isinstance(raw_ts, str)
+            else raw_ts.strip()
+        )
+        if not s:
+            return None
+        try:
+            return int(s)
+        except ValueError:
+            try:
+                f = float(s)
+            except ValueError:
+                return None
+            return f if math.isfinite(f) else None
+    return None
+
+
+def _extract_otlp_datapoint_value(dp: Mapping[str, Any], kind: str) -> float | None:
+    """Extract a finite numeric scalar from an OTLP gauge, sum, or histogram datapoint."""
+    if kind in ("gauge", "sum"):
+        for key in ("asDouble", "as_double", "asInt", "as_int"):
+            if key in dp and dp[key] is not None:
+                return _parse_prom_float(dp[key])
+        return None
+
+    if kind in ("histogram", "exponentialHistogram", "exponential_histogram"):
+        sum_val = _parse_prom_float(dp.get("sum")) if "sum" in dp else None
+        cnt_val = _parse_prom_float(dp.get("count")) if "count" in dp else None
+        if sum_val is not None and cnt_val is not None and cnt_val > 0.0:
+            ratio = sum_val / cnt_val
+            return ratio if math.isfinite(ratio) else None
+        if sum_val is not None:
+            return sum_val
+        if cnt_val is not None:
+            return cnt_val
+        return None
+
+    return None
+
+
+def analyze_otlp_metrics(
+    payload: Mapping[str, Any] | str | bytes,
+    *,
+    lag: int = 2,
+    forgetting: float = 0.995,
+    warmup_ticks: int = 0,
+    top_k: int = 5,
+    token_budget: int | None = 400,
+    ridge: float = 1e-2,
+    precision_ridge: float = 1e-2,
+    shock_threshold: float = 4.0,
+    e_alpha: float = 0.01,
+    refresh_interval: int = 0,
+    nonlinear_hinge: bool = False,
+    raw_ring_capacity: int = 0,
+    normalize_scale: bool = True,
+    screened_threshold: int = 128,
+    use_screened: bool | None = None,
+    active_m: int = 32,
+    lookback: int = 0,
+    max_edges: int = 8,
+    min_granger_f: float = 3.0,
+    min_partial_r2: float = 0.02,
+    min_pcorr: float = 0.25,
+    max_err: float = 0.05,
+    tokens_budget: int | None = None,
+    stream_id: str | None = None,
+    store: StreamStore | None = None,
+) -> tuple[CausalSieve | ScreenedSieve, CausalDigest]:
+    """Parse an OpenTelemetry OTLP/JSON ``ExportMetricsServiceRequest`` and run CausalSieve.
+
+    Supports ``resourceMetrics[].scopeMetrics[].metrics[]`` containing ``gauge``,
+    ``sum``, ``histogram`` (``sum/count`` when ``count > 0``, else ``sum``), or
+    ``exponentialHistogram`` datapoints with ``timeUnixNano`` and
+    ``asDouble``/``asInt``.
+
+    Channels are named ``<service.name>_<metric.name>`` (using ``service.name``
+    from ``resource.attributes``), appending sorted datapoint attributes
+    ``{k=v,...}`` only when needed to disambiguate duplicate series. Timestamps
+    across series are aligned onto the sorted union timeline using strict causal
+    forward-fill (zero look-ahead).
+
+    Returns ``(sieve, digest)``.
+    """
+    raw_bytes: int | None = None
+    parsed: Any
+    if isinstance(payload, (bytes, bytearray)):
+        raw_bytes = len(payload)
+        parsed = json.loads(payload.decode("utf-8"))
+    elif isinstance(payload, str):
+        raw_bytes = len(payload.encode("utf-8"))
+        parsed = json.loads(payload)
+    elif isinstance(payload, Mapping):
+        parsed = payload
+    else:
+        raise TypeError(
+            f"Expected OTLP JSON mapping, str, or bytes; got {type(payload).__name__}"
+        )
+
+    if not isinstance(parsed, Mapping):
+        raise ValueError("OTLP metrics payload must decode to a JSON object")
+
+    resource_metrics = parsed.get("resourceMetrics")
+    if resource_metrics is None:
+        resource_metrics = parsed.get("resource_metrics")
+    if not isinstance(resource_metrics, Sequence) or isinstance(
+        resource_metrics, (str, bytes, bytearray)
+    ):
+        raise ValueError("OTLP payload missing 'resourceMetrics' list")
+    if not resource_metrics:
+        raise ValueError("OTLP payload contains zero resourceMetrics entries")
+
+    all_timestamps: set[int | float] = set()
+    # Each entry: (base_name, dp_attrs_tuple, extra_res_attrs_tuple, ts_to_val)
+    raw_series: list[
+        tuple[str, tuple[tuple[str, str], ...], tuple[tuple[str, str], ...], dict[int | float, float]]
+    ] = []
+    metric_counter = 0
+
+    for rm in resource_metrics:
+        if not isinstance(rm, Mapping):
+            continue
+        resource = rm.get("resource")
+        res_attrs = (
+            _otlp_extract_attrs(resource.get("attributes"))
+            if isinstance(resource, Mapping)
+            else {}
+        )
+        service_name = res_attrs.get("service.name", "").strip()
+        extra_res_attrs = tuple(
+            sorted((k, v) for k, v in res_attrs.items() if k != "service.name")
+        )
+
+        scope_list = (
+            rm.get("scopeMetrics")
+            or rm.get("scope_metrics")
+            or rm.get("instrumentationLibraryMetrics")
+            or ()
+        )
+        if not isinstance(scope_list, Sequence) or isinstance(
+            scope_list, (str, bytes, bytearray)
+        ):
+            continue
+
+        for sm in scope_list:
+            if not isinstance(sm, Mapping):
+                continue
+            metrics_list = sm.get("metrics") or ()
+            if not isinstance(metrics_list, Sequence) or isinstance(
+                metrics_list, (str, bytes, bytearray)
+            ):
+                continue
+
+            for metric in metrics_list:
+                if not isinstance(metric, Mapping):
+                    continue
+                metric_name = str(metric.get("name", "")).strip()
+                if service_name and metric_name:
+                    base_name = f"{service_name}_{metric_name}"
+                elif metric_name:
+                    base_name = metric_name
+                elif service_name:
+                    base_name = f"{service_name}_metric_{metric_counter}"
+                else:
+                    base_name = f"metric_{metric_counter}"
+                metric_counter += 1
+
+                for kind in (
+                    "gauge",
+                    "sum",
+                    "histogram",
+                    "exponentialHistogram",
+                    "exponential_histogram",
+                ):
+                    container = metric.get(kind)
+                    if not isinstance(container, Mapping):
+                        continue
+                    data_points = container.get("dataPoints")
+                    if data_points is None:
+                        data_points = container.get("data_points")
+                    if not isinstance(data_points, Sequence) or isinstance(
+                        data_points, (str, bytes, bytearray)
+                    ):
+                        continue
+
+                    grouped: dict[tuple[tuple[str, str], ...], dict[int | float, float]] = {}
+                    group_order: list[tuple[tuple[str, str], ...]] = []
+                    for dp in data_points:
+                        if not isinstance(dp, Mapping):
+                            continue
+                        ts = _parse_otlp_timestamp(dp)
+                        if ts is None:
+                            continue
+                        all_timestamps.add(ts)
+                        dp_attrs = tuple(sorted(_otlp_extract_attrs(dp.get("attributes")).items()))
+                        val = _extract_otlp_datapoint_value(dp, kind)
+                        if dp_attrs not in grouped:
+                            grouped[dp_attrs] = {}
+                            group_order.append(dp_attrs)
+                        if val is not None:
+                            grouped[dp_attrs][ts] = val
+
+                    for dp_attrs in group_order:
+                        ts_to_val = grouped[dp_attrs]
+                        if ts_to_val:
+                            raw_series.append((base_name, dp_attrs, extra_res_attrs, ts_to_val))
+
+    if not raw_series or not all_timestamps:
+        raise ValueError("OTLP payload contains no finite numeric metric datapoints")
+
+    base_counts: dict[str, int] = {}
+    for base_name, _, _, _ in raw_series:
+        base_counts[base_name] = base_counts.get(base_name, 0) + 1
+
+    channel_names: list[str] = []
+    seen_names: dict[str, int] = {}
+    for base_name, dp_attrs, extra_res_attrs, _ in raw_series:
+        if base_counts[base_name] == 1:
+            candidate = base_name
+        elif dp_attrs:
+            attr_str = ",".join(f"{k}={v}" for k, v in dp_attrs)
+            candidate = f"{base_name}{{{attr_str}}}"
+        elif extra_res_attrs:
+            attr_str = ",".join(f"{k}={v}" for k, v in extra_res_attrs)
+            candidate = f"{base_name}{{{attr_str}}}"
+        else:
+            candidate = base_name
+
+        occ = seen_names.get(candidate, 0) + 1
+        seen_names[candidate] = occ
+        channel_names.append(candidate if occ == 1 else f"{candidate}#{occ}")
+
+    timeline = sorted(all_timestamps)
+    dim = len(channel_names)
+    n_rows = len(timeline)
+
+    flat = array.array("d")
+    last_valid = [0.0] * dim
+    for ts in timeline:
+        for j in range(dim):
+            sample = raw_series[j][3].get(ts)
+            if sample is not None:
+                last_valid[j] = sample
+                flat.append(sample)
+            else:
+                flat.append(last_valid[j])
+
+    eff_budget = tokens_budget if tokens_budget is not None else token_budget
+    return _run_matrix_analysis(
+        flat,
+        n_rows,
+        channel_names,
+        lag=lag,
+        forgetting=forgetting,
+        top_k=top_k,
+        ridge=ridge,
+        precision_ridge=precision_ridge,
+        shock_threshold=shock_threshold,
+        e_alpha=e_alpha,
+        warmup_ticks=warmup_ticks,
+        refresh_interval=refresh_interval,
+        nonlinear_hinge=nonlinear_hinge,
+        raw_ring_capacity=raw_ring_capacity,
+        normalize_scale=normalize_scale,
+        screened_threshold=screened_threshold,
+        use_screened=use_screened,
+        active_m=active_m,
+        lookback=lookback,
+        max_edges=max_edges,
+        min_granger_f=min_granger_f,
+        min_partial_r2=min_partial_r2,
+        min_pcorr=min_pcorr,
+        max_err=max_err,
+        tokens_budget=eff_budget,
+        stream_id=stream_id,
+        raw_bytes=raw_bytes,
+        store=store,
+    )
+
+
+# =========================================================================
+# 5. NDJSON / JSONL Metric Stream Adapter
+# =========================================================================
+
+
+def _iter_jsonl_records(
+    source: str | Path | bytes | bytearray | Iterable[str | Mapping[str, Any]],
+) -> tuple[list[Mapping[str, Any]], int | None]:
+    """Load JSONL records from a file path, raw JSONL text, or iterable of lines/dicts."""
+    raw_bytes: int | None = None
+    items: Iterable[str | bytes | bytearray | Mapping[str, Any]]
+
+    if isinstance(source, Path):
+        if not source.is_file():
+            raise FileNotFoundError(f"JSONL file not found: {source}")
+        raw_bytes = source.stat().st_size
+        text = source.read_text(encoding="utf-8")
+        items = text.splitlines()
+    elif isinstance(source, (bytes, bytearray)):
+        raw_bytes = len(source)
+        items = source.decode("utf-8").splitlines()
+    elif isinstance(source, str):
+        stripped = source.lstrip()
+        if not stripped:
+            raise ValueError("JSONL source contains zero records")
+        if "\n" in source or "\r" in source or stripped.startswith("{"):
+            raw_bytes = len(source.encode("utf-8"))
+            items = source.splitlines()
+        else:
+            candidate = Path(source)
+            if not candidate.is_file():
+                raise FileNotFoundError(f"JSONL file not found: {source!r}")
+            raw_bytes = candidate.stat().st_size
+            items = candidate.read_text(encoding="utf-8").splitlines()
+    elif isinstance(source, Mapping):
+        raise TypeError(
+            "Expected a file path, JSONL string, or iterable of JSON lines/dicts; got a single Mapping"
+        )
+    elif isinstance(source, Iterable):
+        items = source
+    else:
+        raise TypeError(
+            f"Expected a file path, JSONL string, or iterable of JSON lines/dicts; got {type(source).__name__}"
+        )
+
+    records: list[Mapping[str, Any]] = []
+    byte_total = 0
+    for idx, item in enumerate(items, start=1):
+        if isinstance(item, Mapping):
+            records.append(item)
+            continue
+        if isinstance(item, (str, bytes, bytearray)):
+            line = item.decode("utf-8") if not isinstance(item, str) else item
+            s = line.strip()
+            if not s:
+                continue
+            byte_total += len(line.encode("utf-8")) + 1
+            try:
+                obj = json.loads(s)
+            except json.JSONDecodeError as exc:
+                raise ValueError(f"Malformed JSON on line {idx}: {exc.msg}") from exc
+            if not isinstance(obj, Mapping):
+                raise ValueError(
+                    f"JSONL line {idx} must decode to a JSON object, got {type(obj).__name__}"
+                )
+            records.append(obj)
+            continue
+        raise TypeError(
+            f"JSONL item {idx} must be a JSON string or dict mapping, got {type(item).__name__}"
+        )
+
+    if not records:
+        raise ValueError("JSONL source contains zero records")
+    if raw_bytes is None and byte_total > 0:
+        raw_bytes = byte_total
+    return records, raw_bytes
+
+
+def analyze_jsonl(
+    source: str | Path | bytes | bytearray | Iterable[str | Mapping[str, Any]],
+    *,
+    time_col: str | None = None,
+    lag: int = 2,
+    forgetting: float = 0.995,
+    warmup_ticks: int = 0,
+    top_k: int = 5,
+    token_budget: int | None = 400,
+    columns: Sequence[str] | None = None,
+    ridge: float = 1e-2,
+    precision_ridge: float = 1e-2,
+    shock_threshold: float = 4.0,
+    e_alpha: float = 0.01,
+    refresh_interval: int = 0,
+    nonlinear_hinge: bool = False,
+    raw_ring_capacity: int = 0,
+    normalize_scale: bool = True,
+    screened_threshold: int = 128,
+    use_screened: bool | None = None,
+    active_m: int = 32,
+    lookback: int = 0,
+    max_edges: int = 8,
+    min_granger_f: float = 3.0,
+    min_partial_r2: float = 0.02,
+    min_pcorr: float = 0.25,
+    max_err: float = 0.05,
+    tokens_budget: int | None = None,
+    stream_id: str | None = None,
+    store: StreamStore | None = None,
+) -> tuple[CausalSieve | ScreenedSieve, CausalDigest]:
+    """Parse an NDJSON / JSONL metric stream and run CausalSieve.
+
+    Accepts a file path (``str`` or ``Path``), a raw multiline JSONL string or
+    bytes payload, or any iterable of JSON strings / record dicts. Automatically
+    discovers numeric metric columns (excluding timestamps, booleans, strings,
+    and nested objects), enforces finiteness via strict causal forward-fill with
+    zero look-ahead, and switches to Tier-2 :class:`ScreenedSieve` when
+    ``D >= screened_threshold``.
+
+    Returns ``(sieve, digest)``.
+    """
+    records, raw_bytes = _iter_jsonl_records(source)
+
+    col_names: list[str] = []
+    seen_cols: set[str] = set()
+    for rec in records:
+        for raw_key in rec:
+            name = str(raw_key)
+            if name not in seen_cols:
+                seen_cols.add(name)
+                col_names.append(name)
+
+    if not col_names:
+        raise ValueError("JSONL records contain zero fields")
+
+    cols: dict[str, list[Any]] = {name: [] for name in col_names}
+    for rec in records:
+        for name in col_names:
+            cols[name].append(rec.get(name, None))
+
+    detected_ts = time_col
+    if detected_ts is None and columns is None:
+        # Also auto-skip timestamp columns placed after metric keys in 2-column JSONL objects.
+        for name in col_names:
+            if name.strip().lower() in _TIMESTAMP_HEADER_NAMES:
+                vals = cols[name]
+                if not _column_is_numeric(vals):
+                    detected_ts = name
+                    break
+                sample_floats = [
+                    f for f in (_coerce_finite_float(v) for v in vals[:32]) if f is not None
+                ]
+                has_other_num = any(
+                    other != name and _column_is_numeric(cols[other]) for other in col_names
+                )
+                if has_other_num and _is_monotonic_nondecreasing(sample_floats):
+                    detected_ts = name
+                    break
+
+    numeric_cols, _ = _select_columns(
+        col_names,
+        cols,
+        timestamp_col=detected_ts,
+        columns=columns,
+    )
+    flat, n_rows = _pack_causal_ffill_matrix([cols[c] for c in numeric_cols])
+
+    eff_budget = tokens_budget if tokens_budget is not None else token_budget
+    return _run_matrix_analysis(
+        flat,
+        n_rows,
+        numeric_cols,
+        lag=lag,
+        forgetting=forgetting,
+        top_k=top_k,
+        ridge=ridge,
+        precision_ridge=precision_ridge,
+        shock_threshold=shock_threshold,
+        e_alpha=e_alpha,
+        warmup_ticks=warmup_ticks,
+        refresh_interval=refresh_interval,
+        nonlinear_hinge=nonlinear_hinge,
+        raw_ring_capacity=raw_ring_capacity,
+        normalize_scale=normalize_scale,
+        screened_threshold=screened_threshold,
+        use_screened=use_screened,
+        active_m=active_m,
+        lookback=lookback,
+        max_edges=max_edges,
+        min_granger_f=min_granger_f,
+        min_partial_r2=min_partial_r2,
+        min_pcorr=min_pcorr,
+        max_err=max_err,
+        tokens_budget=eff_budget,
+        stream_id=stream_id,
+        raw_bytes=raw_bytes,
+        store=store,
+    )

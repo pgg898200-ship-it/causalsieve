@@ -3,12 +3,130 @@
 #include <algorithm>
 #include <cmath>
 #include <cstdint>
+#include <cstdlib>
 #include <cstring>
 #include <limits>
 #include <numeric>
 #include <vector>
 
+#if defined(CAUSALSIEVE_HAS_AVX2_TU) && !defined(CAUSALSIEVE_FORCE_SCALAR)
+#if defined(_MSC_VER) && (defined(_M_X64) || defined(_M_AMD64))
+#include <intrin.h>
+#elif defined(__x86_64__) || defined(__amd64__)
+#include <cpuid.h>
+#endif
+#endif
+
 using namespace causalsieve;
+
+namespace causalsieve::kernels {
+
+namespace {
+
+#if !defined(CAUSALSIEVE_FORCE_SCALAR)
+bool env_is_truthy(const char* raw) noexcept {
+    if (!raw) return false;
+    const char* p = raw;
+    while (*p == ' ' || *p == '\t' || *p == '\r' || *p == '\n') ++p;
+    const char* end = p + std::strlen(p);
+    while (end > p && (end[-1] == ' ' || end[-1] == '\t' || end[-1] == '\r' || end[-1] == '\n')) --end;
+    const size_t len = static_cast<size_t>(end - p);
+    if (len == 1 && p[0] == '1') return true;
+    auto eq_ci = [](const char* s, size_t n, const char* lit) noexcept -> bool {
+        for (size_t i = 0; i < n; ++i) {
+            char c = s[i];
+            if (c >= 'A' && c <= 'Z') c = static_cast<char>(c - 'A' + 'a');
+            if (c != lit[i]) return false;
+        }
+        return lit[n] == '\0';
+    };
+    if (len == 4 && eq_ci(p, 4, "true")) return true;
+    if (len == 3 && eq_ci(p, 3, "yes")) return true;
+    if (len == 2 && eq_ci(p, 2, "on")) return true;
+    return false;
+}
+
+bool env_force_scalar() noexcept {
+#if defined(_MSC_VER)
+    char* val = nullptr;
+    size_t len = 0;
+    if (_dupenv_s(&val, &len, "CAUSALSIEVE_FORCE_SCALAR") != 0 || !val) {
+        return false;
+    }
+    const bool res = env_is_truthy(val);
+    std::free(val);
+    return res;
+#else
+    return env_is_truthy(std::getenv("CAUSALSIEVE_FORCE_SCALAR"));
+#endif
+}
+#endif
+
+#if defined(CAUSALSIEVE_HAS_AVX2_TU) && !defined(CAUSALSIEVE_FORCE_SCALAR)
+bool cpu_supports_avx2_fma() noexcept {
+#if defined(_MSC_VER) && (defined(_M_X64) || defined(_M_AMD64))
+    int info[4] = {0, 0, 0, 0};
+    __cpuidex(info, 0, 0);
+    if (info[0] < 7) return false;
+    __cpuidex(info, 1, 0);
+    const uint32_t ecx1 = static_cast<uint32_t>(info[2]);
+    const bool has_osxsave = (ecx1 & (1u << 27)) != 0;
+    const bool has_avx     = (ecx1 & (1u << 28)) != 0;
+    const bool has_fma     = (ecx1 & (1u << 12)) != 0;
+    if (!(has_osxsave && has_avx && has_fma)) return false;
+    const uint64_t xcr0 = _xgetbv(0);
+    if ((xcr0 & 0x6ULL) != 0x6ULL) return false;
+    __cpuidex(info, 7, 0);
+    const uint32_t ebx7 = static_cast<uint32_t>(info[1]);
+    return (ebx7 & (1u << 5)) != 0;
+#elif defined(__x86_64__) || defined(__amd64__)
+    unsigned int eax = 0, ebx = 0, ecx = 0, edx = 0;
+    if (__get_cpuid_max(0, nullptr) < 7) return false;
+    __cpuid_count(1, 0, eax, ebx, ecx, edx);
+    const bool has_osxsave = (ecx & (1u << 27)) != 0;
+    const bool has_avx     = (ecx & (1u << 28)) != 0;
+    const bool has_fma     = (ecx & (1u << 12)) != 0;
+    if (!(has_osxsave && has_avx && has_fma)) return false;
+    uint32_t xcr0_lo = 0, xcr0_hi = 0;
+    __asm__ volatile("xgetbv" : "=a"(xcr0_lo), "=d"(xcr0_hi) : "c"(0u));
+    (void)xcr0_hi;
+    if ((xcr0_lo & 0x6u) != 0x6u) return false;
+    __cpuid_count(7, 0, eax, ebx, ecx, edx);
+    return (ebx & (1u << 5)) != 0;
+#else
+    return false;
+#endif
+}
+#endif
+
+const KernelOps* resolve_active_ops() noexcept {
+#if defined(CAUSALSIEVE_FORCE_SCALAR)
+    return &get_scalar_ops();
+#else
+    if (env_force_scalar()) {
+        return &get_scalar_ops();
+    }
+#if defined(CAUSALSIEVE_HAS_AVX2_TU)
+    if (cpu_supports_avx2_fma()) {
+        return &get_avx2_ops();
+    }
+    return &get_scalar_ops();
+#elif defined(__aarch64__) || defined(_M_ARM64)
+    return &get_neon_ops();
+#else
+    return &get_scalar_ops();
+#endif
+#endif
+}
+
+} /* namespace */
+
+const KernelOps& active_ops() noexcept {
+    static const KernelOps* const kActive = resolve_active_ops();
+    return *kActive;
+}
+
+} /* namespace causalsieve::kernels */
 
 namespace {
 
@@ -20,10 +138,7 @@ inline uint64_t splitmix64(uint64_t& x) noexcept {
 }
 
 inline bool validate_finite(const double* ptr, size_t n) noexcept {
-    for (size_t i = 0; i < n; ++i) {
-        if (!std::isfinite(ptr[i])) return false;
-    }
-    return true;
+    return causalsieve::kernels::active_ops().all_finite_pd(ptr, n);
 }
 
 } /* namespace */
@@ -32,6 +147,7 @@ inline bool validate_finite(const double* ptr, size_t n) noexcept {
  * cs_engine Member Implementations
  * ========================================================================= */
 void cs_engine::init_buffers() {
+    kops = &causalsieve::kernels::active_ops();
     D_pad = pad4(D);
     K_pad = pad4(K);
 
@@ -56,6 +172,7 @@ void cs_engine::init_buffers() {
     J_exact.resize(D_pad);
 
     S_u_tilde.resize(static_cast<size_t>(D) * D_pad);
+    S_u_diag.resize(D_pad);
     Theta_tilde.resize(static_cast<size_t>(D) * D_pad);
 
     u_mean.resize(D_pad);
@@ -63,6 +180,16 @@ void cs_engine::init_buffers() {
     M_u2v_tilde.resize(static_cast<size_t>(D) * D_pad);
     M_utanhv_tilde.resize(static_cast<size_t>(D) * D_pad);
     M_uv_tilde.resize(static_cast<size_t>(D) * D_pad);
+
+    var_z_slab.resize(kSlabBatchSize * K_pad);
+    var_x_slab.resize(kSlabBatchSize * D_pad);
+    var_w_slab.resize(kSlabBatchSize);
+    su_u_slab.resize(kSlabBatchSize * D_pad);
+    su_w_slab.resize(kSlabBatchSize);
+    lin_s_slab.resize(kSlabBatchSize * D_pad);
+    lin_s2_slab.resize(kSlabBatchSize * D_pad);
+    lin_ts_slab.resize(kSlabBatchSize * D_pad);
+    lin_w_slab.resize(kSlabBatchSize);
 
     raw_ring.resize(static_cast<size_t>(ring_cap) * D);
     exo_z_ring.resize(static_cast<size_t>(ring_cap) * D);
@@ -155,6 +282,7 @@ void cs_engine::reset_state() {
     J_exact.zero();
 
     S_u_tilde.zero();
+    S_u_diag.zero();
     Theta_tilde.zero();
     const double inv_pridge = 1.0 / cfg.precision_ridge;
     for (uint32_t j = 0; j < D; ++j) {
@@ -169,6 +297,19 @@ void cs_engine::reset_state() {
     M_u2v_tilde.zero();
     M_utanhv_tilde.zero();
     M_uv_tilde.zero();
+
+    var_slab_len = 0;
+    su_slab_len = 0;
+    lin_slab_len = 0;
+    var_z_slab.zero();
+    var_x_slab.zero();
+    var_w_slab.zero();
+    su_u_slab.zero();
+    su_w_slab.zero();
+    lin_s_slab.zero();
+    lin_s2_slab.zero();
+    lin_ts_slab.zero();
+    lin_w_slab.zero();
 
     raw_ring.zero();
     exo_z_ring.zero();
@@ -232,7 +373,39 @@ void cs_engine::build_feature_z(double* out_z) const noexcept {
     for (size_t i = K; i < K_pad; ++i) out_z[i] = 0.0;
 }
 
+void cs_engine::flush_var_slab() noexcept {
+    if (var_slab_len == 0) return;
+    kops->sym_rankk_update_upper(
+        G_tilde.data(), var_z_slab.data(), var_w_slab.data(), var_slab_len, K, K_pad);
+    kops->gemm_update_rect(
+        C_tilde.data(), var_z_slab.data(), var_x_slab.data(), var_w_slab.data(), var_slab_len, K, K_pad, D_pad);
+    var_slab_len = 0;
+}
+
+void cs_engine::flush_su_slab() noexcept {
+    if (su_slab_len == 0) return;
+    kops->sym_rankk_update_upper(
+        S_u_tilde.data(), su_u_slab.data(), su_w_slab.data(), su_slab_len, D, D_pad);
+    su_slab_len = 0;
+}
+
+void cs_engine::flush_lingam_slab() noexcept {
+    if (lin_slab_len == 0) return;
+    kops->lingam_batch_update(
+        M_u2v_tilde.data(), M_utanhv_tilde.data(), M_uv_tilde.data(),
+        lin_s_slab.data(), lin_s2_slab.data(), lin_ts_slab.data(),
+        lin_w_slab.data(), lin_slab_len, D, D_pad);
+    lin_slab_len = 0;
+}
+
+void cs_engine::flush_all_slabs() noexcept {
+    flush_var_slab();
+    flush_su_slab();
+    flush_lingam_slab();
+}
+
 void cs_engine::rescale_var_stats() noexcept {
+    flush_var_slab();
     if (g_scale != 1.0) {
         const double s = g_scale;
         for (uint32_t i = 0; i < K; ++i) {
@@ -256,18 +429,25 @@ void cs_engine::rescale_var_stats() noexcept {
 }
 
 void cs_engine::rescale_su_stats() noexcept {
+    flush_su_slab();
     if (su_scale != 1.0) {
         const double s = su_scale;
         for (uint32_t i = 0; i < D; ++i) {
             double* row = S_u_tilde.data() + static_cast<size_t>(i) * D_pad;
             for (size_t j = (i & ~size_t(3u)); j < D_pad; ++j) row[j] *= s;
+            S_u_diag[i] = row[i];
         }
         W_u_tilde *= s;
         su_scale = 1.0;
+    } else {
+        for (uint32_t i = 0; i < D; ++i) {
+            S_u_diag[i] = S_u_tilde[static_cast<size_t>(i) * D_pad + i];
+        }
     }
 }
 
 void cs_engine::rescale_lingam_stats() noexcept {
+    flush_lingam_slab();
     if (lin_scale != 1.0) {
         const double s = lin_scale;
         const size_t dd = static_cast<size_t>(D) * D_pad;
@@ -300,19 +480,6 @@ void cs_engine::update_lingam_moments(const double* u) noexcept {
 
     if (lingam_warm_count < 10) return;
 
-    for (uint32_t j = 0; j < D; ++j) {
-        const double sd = std::sqrt(std::max(1e-18, u_var[j]));
-        const double sv = std::clamp((u[j] - u_mean[j]) / sd, -8.0, 8.0);
-        s_buf[j] = sv;
-        s2_buf[j] = sv * sv;
-        ts_buf[j] = std::tanh(sv);
-    }
-    for (size_t j = D; j < D_pad; ++j) {
-        s_buf[j] = 0.0;
-        s2_buf[j] = 0.0;
-        ts_buf[j] = 0.0;
-    }
-
     lin_scale *= cfg.forgetting;
     if (lin_scale < 1e-100) {
         rescale_lingam_stats();
@@ -320,25 +487,42 @@ void cs_engine::update_lingam_moments(const double* u) noexcept {
     const double w_lin = 1.0 / lin_scale;
     lin_W_tilde += w_lin;
 
-    simd::outer_update_rect(M_u2v_tilde.data(), s2_buf.data(), s_buf.data(), w_lin, D, D_pad);
-    simd::outer_update_rect(M_utanhv_tilde.data(), s_buf.data(), ts_buf.data(), w_lin, D, D_pad);
-    simd::sym_rank1_update_upper(M_uv_tilde.data(), s_buf.data(), w_lin, D, D_pad);
+    const size_t row_off = lin_slab_len * D_pad;
+    double* s_row  = lin_s_slab.data()  + row_off;
+    double* s2_row = lin_s2_slab.data() + row_off;
+    double* ts_row = lin_ts_slab.data() + row_off;
+    for (uint32_t j = 0; j < D; ++j) {
+        const double sd = std::sqrt(std::max(1e-18, u_var[j]));
+        const double sv = std::clamp((u[j] - u_mean[j]) / sd, -8.0, 8.0);
+        s_row[j]  = sv;
+        s2_row[j] = sv * sv;
+        ts_row[j] = std::tanh(sv);
+    }
+    for (size_t j = D; j < D_pad; ++j) {
+        s_row[j]  = 0.0;
+        s2_row[j] = 0.0;
+        ts_row[j] = 0.0;
+    }
+    lin_w_slab[lin_slab_len] = w_lin;
+    if (++lin_slab_len == kSlabBatchSize) {
+        flush_lingam_slab();
+    }
 }
 
 bool cs_engine::refresh_var_cholesky() noexcept {
     rescale_var_stats();
 
     const double r_var = eff_var_ridge();
-    if (!linalg::cholesky_factor_scaled_upper(
+    if (!kops->cholesky_factor_scaled_upper(
             G_tilde.data(), 1.0, r_var, chol_L_K.data(), K, K_pad)) {
         return false;
     }
 
-    linalg::cholesky_invert_to_upper(
+    kops->cholesky_invert_to_upper(
         chol_L_K.data(), P_tilde.data(), chol_U_K.data(), K, K_pad);
     p_scale = 1.0;
 
-    linalg::cholesky_solve_multi(
+    kops->cholesky_solve_multi(
         chol_L_K.data(), C_tilde.data(), 1.0, B.data(), chol_Y_KD.data(), K, D, K_pad, D_pad);
 
     for (uint32_t j = 0; j < D; ++j) {
@@ -362,12 +546,12 @@ bool cs_engine::refresh_theta_cholesky() noexcept {
 
     const double inv_w = (W_u_tilde > 1.0) ? (1.0 / W_u_tilde) : 1.0;
     const double r_prec = eff_precision_ridge();
-    if (!linalg::cholesky_factor_scaled_upper(
+    if (!kops->cholesky_factor_scaled_upper(
             S_u_tilde.data(), inv_w, r_prec, chol_L_D.data(), D, D_pad)) {
         return false;
     }
 
-    linalg::cholesky_invert_to_upper(
+    kops->cholesky_invert_to_upper(
         chol_L_D.data(), Theta_tilde.data(), chol_U_D.data(), D, D_pad);
     theta_scale = 1.0;
     theta_dirty = false;
@@ -375,14 +559,16 @@ bool cs_engine::refresh_theta_cholesky() noexcept {
 }
 
 double cs_engine::compute_freivalds_err() noexcept {
+    flush_var_slab();
+
     for (uint32_t i = 0; i < K; ++i) {
         probe_v[i] = (splitmix64(rng_state) & 1ULL) ? 1.0 : -1.0;
     }
     for (size_t i = K; i < K_pad; ++i) probe_v[i] = 0.0;
 
-    simd::sym_matvec_upper(P_tilde.data(), probe_v.data(), probe_Pv.data(), K, K_pad);
-    simd::scale_vec(probe_Pv.data(), p_scale, probe_Pv.data(), K_pad);
-    simd::sym_matvec_upper(G_tilde.data(), probe_Pv.data(), probe_GPv.data(), K, K_pad);
+    kops->sym_matvec_upper(P_tilde.data(), probe_v.data(), probe_Pv.data(), K, K_pad);
+    kops->scale_vec(probe_Pv.data(), p_scale, probe_Pv.data(), K_pad);
+    kops->sym_matvec_upper(G_tilde.data(), probe_Pv.data(), probe_GPv.data(), K, K_pad);
 
     const double r_var = eff_var_ridge();
     double num_sq = 0.0;
@@ -444,14 +630,19 @@ void cs_engine::finalize_warmup_replay() noexcept {
             W_eff_tilde += w_tilde;
             ++n_samples;
             ++n_var_updates;
-            simd::sym_rank1_update_upper(G_tilde.data(), z_buf.data(), w_tilde, K, K_pad);
-            simd::outer_update_rect(C_tilde.data(), z_buf.data(), x_work_buf.data(), w_tilde, K, D_pad);
+            std::memcpy(var_z_slab.data() + var_slab_len * K_pad, z_buf.data(), K_pad * sizeof(double));
+            std::memcpy(var_x_slab.data() + var_slab_len * D_pad, x_work_buf.data(), D_pad * sizeof(double));
+            var_w_slab[var_slab_len] = w_tilde;
+            if (++var_slab_len == kSlabBatchSize) {
+                flush_var_slab();
+            }
             for (uint32_t j = 0; j < D; ++j) {
                 S_yy_tilde[j] += w_tilde * x_work_buf[j] * x_work_buf[j];
             }
         }
         push_lag_hist(x_work_buf.data());
     }
+    flush_var_slab();
     if (avail > 0) {
         const double inv_av = 1.0 / static_cast<double>(avail);
         for (uint32_t j = 0; j < D; ++j) {
@@ -488,18 +679,22 @@ void cs_engine::finalize_warmup_replay() noexcept {
 
                 if (dof_ratio > 0.0) {
                     build_feature_z(z_buf.data());
-                    simd::matvec_BT_z(B.data(), z_buf.data(), y_hat_buf.data(), K, D, D_pad);
-                    simd::sub_vec(x_work_buf.data(), y_hat_buf.data(), u_buf.data(), D_pad);
+                    kops->matvec_BT_z(B.data(), z_buf.data(), y_hat_buf.data(), K, D, D_pad);
+                    kops->sub_vec(x_work_buf.data(), y_hat_buf.data(), u_buf.data(), D_pad);
 
-                    simd::sym_matvec_upper(P_tilde.data(), z_buf.data(), Pz_tilde_buf.data(), K, K_pad);
-                    const double lev = std::clamp(p_scale * simd::dot_pd(z_buf.data(), Pz_tilde_buf.data(), K_pad), 0.0, 0.90);
+                    kops->sym_matvec_upper(P_tilde.data(), z_buf.data(), Pz_tilde_buf.data(), K, K_pad);
+                    const double lev = std::clamp(p_scale * kops->dot_pd(z_buf.data(), Pz_tilde_buf.data(), K_pad), 0.0, 0.90);
                     const double inv_1mh = 1.0 / std::max(0.10, 1.0 - lev);
                     for (uint32_t j = 0; j < D; ++j) {
                         u_buf[j] = std::clamp(u_buf[j] * inv_1mh, -5.0, 5.0);
                     }
                     for (size_t j = D; j < D_pad; ++j) u_buf[j] = 0.0;
 
-                    simd::sym_rank1_update_upper(S_u_tilde.data(), u_buf.data(), wu_tilde, D, D_pad);
+                    std::memcpy(su_u_slab.data() + su_slab_len * D_pad, u_buf.data(), D_pad * sizeof(double));
+                    su_w_slab[su_slab_len] = wu_tilde;
+                    if (++su_slab_len == kSlabBatchSize) {
+                        flush_su_slab();
+                    }
                     update_lingam_moments(u_buf.data());
                 }
             }
@@ -514,6 +709,7 @@ void cs_engine::finalize_warmup_replay() noexcept {
                     row[j] *= dof_ratio;
                 }
                 row[i] += (1.0 - dof_ratio) * W_u_tilde * diag_var_x[i];
+                S_u_diag[i] = row[i];
             }
         }
         refresh_theta_cholesky();
@@ -642,23 +838,25 @@ int cs_engine::push_single_validated(const double* x,
     /* =====================================================================
      * STEP 1: Strictly Causal Scoring Using t-1 Parameters (B, Theta)
      * ===================================================================== */
+    const auto& ops = *kops;
     build_feature_z(z_buf.data());
 
     /* y_hat = B_{t-1}^T * z_t, u_t = x_work_t - y_hat */
-    simd::matvec_BT_z(B.data(), z_buf.data(), y_hat_buf.data(), K, D, D_pad);
-    simd::sub_vec(x_work_buf.data(), y_hat_buf.data(), u_buf.data(), D_pad);
+    ops.matvec_BT_z(B.data(), z_buf.data(), y_hat_buf.data(), K, D, D_pad);
+    ops.sub_vec(x_work_buf.data(), y_hat_buf.data(), u_buf.data(), D_pad);
     for (size_t j = D; j < D_pad; ++j) u_buf[j] = 0.0;
 
     /* Precision whitening: q = Theta_{t-1} * u_t */
-    simd::sym_matvec_upper(Theta_tilde.data(), u_buf.data(), q_tilde_buf.data(), D, D_pad);
-    simd::scale_vec(q_tilde_buf.data(), theta_scale, q_buf.data(), D_pad);
-    double mahal_sq = simd::dot_pd(u_buf.data(), q_buf.data(), D_pad);
+    ops.sym_matvec_upper(Theta_tilde.data(), u_buf.data(), q_tilde_buf.data(), D, D_pad);
+    ops.scale_vec(q_tilde_buf.data(), theta_scale, q_buf.data(), D_pad);
+    double mahal_sq = ops.dot_pd(u_buf.data(), q_buf.data(), D_pad);
     if (!std::isfinite(mahal_sq) || mahal_sq < 0.0) {
         mahal_sq = std::isfinite(mahal_sq) ? 0.0 : 1e300;
     }
 
     const double W_u_cur_pre = su_scale * W_u_tilde;
     const double inv_wu_pre = (W_u_cur_pre > 1.0) ? (1.0 / W_u_cur_pre) : 1.0;
+    const double su_fac_pre = su_scale * inv_wu_pre;
     const double r_prec_pre = eff_precision_ridge();
 
     double max_exo_z = 0.0;
@@ -676,7 +874,7 @@ int cs_engine::push_single_validated(const double* x,
         if (!std::isfinite(uqj)) uqj = 0.0;
         uq_slot[j] = uqj;
 
-        const double var_uj = std::max(1e-12, su_scale * S_u_tilde[static_cast<size_t>(j) * D_pad + j] * inv_wu_pre + r_prec_pre);
+        const double var_uj = std::max(1e-12, su_fac_pre * S_u_diag[j] + r_prec_pre);
         double izj = std::fabs(u_buf[j]) / std::sqrt(var_uj);
         if (!std::isfinite(izj)) izj = 0.0;
         iz_slot[j] = izj;
@@ -698,8 +896,8 @@ int cs_engine::push_single_validated(const double* x,
     if (out_innov) std::memcpy(out_innov, u_buf.data(), D * sizeof(double));
 
     /* Precompute strictly t-1 leverage P_{t-1} * z_t (reused directly in Step 3a for zero extra flops!) */
-    simd::sym_matvec_upper(P_tilde.data(), z_buf.data(), Pz_tilde_buf.data(), K, K_pad);
-    const double zPz_tilde = simd::dot_pd(z_buf.data(), Pz_tilde_buf.data(), K_pad);
+    ops.sym_matvec_upper(P_tilde.data(), z_buf.data(), Pz_tilde_buf.data(), K, K_pad);
+    const double zPz_tilde = ops.dot_pd(z_buf.data(), Pz_tilde_buf.data(), K_pad);
     const double zPz = std::max(0.0, p_scale * zPz_tilde);
 
     /* =====================================================================
@@ -822,13 +1020,13 @@ int cs_engine::push_single_validated(const double* x,
 
         if (denom > 1e-18 && std::isfinite(denom)) {
             const double gain_coef = (w_t * p_scale) / denom;
-            simd::scale_vec(Pz_tilde_buf.data(), gain_coef, g_buf.data(), K_pad);
+            ops.scale_vec(Pz_tilde_buf.data(), gain_coef, g_buf.data(), K_pad);
 
             /* B += g * u^T */
-            simd::outer_update_rect(B.data(), g_buf.data(), u_buf.data(), 1.0, K, D_pad);
+            ops.outer_update_rect(B.data(), g_buf.data(), u_buf.data(), 1.0, K, D_pad);
 
             /* P_tilde -= gain_coef * Pz_tilde * Pz_tilde^T; p_scale /= lam */
-            simd::sym_rank1_update_upper(P_tilde.data(), Pz_tilde_buf.data(), -gain_coef, K, K_pad);
+            ops.sym_rank1_update_upper(P_tilde.data(), Pz_tilde_buf.data(), -gain_coef, K, K_pad);
             p_scale /= lam;
 
             /* Strictly nonnegative recursive ridge objective RSS_j */
@@ -838,7 +1036,7 @@ int cs_engine::push_single_validated(const double* x,
             }
         }
 
-        /* 3b. Exact exponentially-weighted sufficient statistics (G, C, S_yy, W_eff) */
+        /* 3b. Exact exponentially-weighted sufficient statistics (deferred L1 micro-batch slab) */
         g_scale *= lam;
         if (g_scale < 1e-100 || p_scale > 1e100) {
             rescale_var_stats();
@@ -846,8 +1044,12 @@ int cs_engine::push_single_validated(const double* x,
         const double w_tilde = w_t / g_scale;
         W_eff_tilde += w_tilde;
         ++n_var_updates;
-        simd::sym_rank1_update_upper(G_tilde.data(), z_buf.data(), w_tilde, K, K_pad);
-        simd::outer_update_rect(C_tilde.data(), z_buf.data(), x_work_buf.data(), w_tilde, K, D_pad);
+        std::memcpy(var_z_slab.data() + var_slab_len * K_pad, z_buf.data(), K_pad * sizeof(double));
+        std::memcpy(var_x_slab.data() + var_slab_len * D_pad, x_work_buf.data(), D_pad * sizeof(double));
+        var_w_slab[var_slab_len] = w_tilde;
+        if (++var_slab_len == kSlabBatchSize) {
+            flush_var_slab();
+        }
         for (uint32_t j = 0; j < D; ++j) {
             S_yy_tilde[j] += w_tilde * x_work_buf[j] * x_work_buf[j];
         }
@@ -869,7 +1071,7 @@ int cs_engine::push_single_validated(const double* x,
             ++refresh_count;
         }
 
-        /* 3c. Innovation covariance S_u & precision Theta rank-1 update (reusing q_tilde!) */
+        /* 3c. Innovation covariance S_u (deferred slab + live diagonal) & precision Theta rank-1 update */
         const double W_u_old = su_scale * W_u_tilde;
         su_scale *= lam;
         if (su_scale < 1e-100) {
@@ -878,7 +1080,14 @@ int cs_engine::push_single_validated(const double* x,
         const double wu_tilde = w_t / su_scale;
         W_u_tilde += wu_tilde;
         ++n_u_updates;
-        simd::sym_rank1_update_upper(S_u_tilde.data(), u_buf.data(), wu_tilde, D, D_pad);
+        for (uint32_t j = 0; j < D; ++j) {
+            S_u_diag[j] += wu_tilde * u_buf[j] * u_buf[j];
+        }
+        std::memcpy(su_u_slab.data() + su_slab_len * D_pad, u_buf.data(), D_pad * sizeof(double));
+        su_w_slab[su_slab_len] = wu_tilde;
+        if (++su_slab_len == kSlabBatchSize) {
+            flush_su_slab();
+        }
         const double W_u_new = su_scale * W_u_tilde;
 
         if (W_u_old < 1.0 && W_u_new > 1.0) {
@@ -889,7 +1098,7 @@ int cs_engine::push_single_validated(const double* x,
             const double denom_th = decay_th + coef_th * mahal_sq;
             if (denom_th > 1e-15 && decay_th > 1e-15 && std::isfinite(denom_th)) {
                 const double alpha_th = (coef_th * theta_scale) / denom_th;
-                simd::sym_rank1_update_upper(Theta_tilde.data(), q_tilde_buf.data(), -alpha_th, D, D_pad);
+                ops.sym_rank1_update_upper(Theta_tilde.data(), q_tilde_buf.data(), -alpha_th, D, D_pad);
                 theta_scale /= decay_th;
                 theta_dirty = true;
 
@@ -1201,13 +1410,7 @@ void cs_reset(cs_engine_t* eng) {
 }
 
 const char* cs_simd_isa(void) {
-#if CAUSALSIEVE_USE_AVX2
-    return "avx2+fma";
-#elif CAUSALSIEVE_USE_NEON
-    return "neon";
-#else
-    return "scalar";
-#endif
+    return causalsieve::kernels::active_ops().isa_name;
 }
 
 const char* cs_last_error(const cs_engine_t* eng) {
@@ -1296,6 +1499,7 @@ int cs_granger_matrix(cs_engine_t* eng,
     }
 
     /* Guarantee exact (G_t + ridge*I)^{-1} on forgetting streams, adaptive ridge, or numerical drift */
+    eng->flush_var_slab();
     if (eng->var_dirty_since_refresh) {
         if (eng->cfg.forgetting < 1.0 || eng->cfg.normalize_scale == 1 || eng->compute_freivalds_err() > 1e-9) {
             eng->refresh_var_cholesky();
@@ -1383,6 +1587,7 @@ int cs_precision_matrix(cs_engine_t* eng,
                         double* out_theta,
                         double* out_pcorr) {
     if (!eng) return -1;
+    eng->flush_su_slab();
     if (eng->theta_dirty) {
         eng->refresh_theta_cholesky();
     }
@@ -1420,6 +1625,7 @@ int cs_precision_matrix(cs_engine_t* eng,
 
 int cs_contemporaneous_orientation(cs_engine_t* eng, double* out_lingam_r) {
     if (!eng || !out_lingam_r) return -1;
+    eng->flush_lingam_slab();
     const uint32_t D = eng->D;
     const size_t D_pad = eng->D_pad;
 
@@ -1463,6 +1669,7 @@ int cs_root_attribution(cs_engine_t* eng,
                         int64_t* out_onset_tick,
                         int32_t* out_ranked_channels) {
     if (!eng) return -1;
+    eng->flush_all_slabs();
     const uint32_t D = eng->D;
     const uint64_t t_end = eng->tick;
     const uint64_t avail = std::min<uint64_t>(t_end, eng->ring_cap);
@@ -1851,6 +2058,7 @@ int cs_inspect_state(cs_engine_t* eng,
                      double* out_B,
                      double* out_freivalds_rel_err) {
     if (!eng) return -1;
+    eng->flush_var_slab();
 
     if ((eng->cfg.forgetting < 1.0 || eng->cfg.normalize_scale == 1) && eng->var_dirty_since_refresh && eng->W_eff_tilde > 0.0) {
         eng->refresh_var_cholesky();
@@ -1875,6 +2083,7 @@ int cs_inspect_state(cs_engine_t* eng,
 
 int cs_force_refresh(cs_engine_t* eng) {
     if (!eng) return -1;
+    eng->flush_all_slabs();
     const bool ok_var = eng->refresh_var_cholesky();
     const bool ok_th = eng->refresh_theta_cholesky();
     eng->ticks_since_refresh = 0;
@@ -1897,6 +2106,7 @@ cs_screened_t* cs_screened_create(uint32_t dim,
     cs_screened_t* s = nullptr;
     try {
         s = new cs_screened();
+        s->kops = &causalsieve::kernels::active_ops();
         s->D = dim;
         s->active_m = std::min(active_m, dim);
         s->lag = lag;
@@ -2014,7 +2224,7 @@ int cs_screened_push_batch(cs_screened_t* s,
             s->freeze_warmup_stats();
         }
 
-        const double max_z = simd::screened_step_postwarmup(
+        const double max_z = s->kops->screened_step_postwarmup(
             D, s->D_pad,
             row,
             s->anchor.data(),

@@ -4,7 +4,7 @@ Zero runtime dependencies. Uses PEP 562 lazy attribute loading with zero
 top-level stdlib imports so CLI startup adds <1 ms of package overhead.
 """
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 CAUSALSIEVE_ABI_VERSION = 1
 
 __all__ = [
@@ -39,6 +39,8 @@ __all__ = [
     "TickResult",
     "analyze_csv",
     "analyze_dataframe",
+    "analyze_jsonl",
+    "analyze_otlp_metrics",
     "analyze_prometheus",
     "build_digest",
     "compute_stream_id",
@@ -78,6 +80,8 @@ _LAZY_MAP = {
     "load_library": ("causalsieve._native", "load_library"),
     "simd_isa": ("causalsieve._native", "simd_isa"),
     "analyze_dataframe": ("causalsieve.adapters", "analyze_dataframe"),
+    "analyze_jsonl": ("causalsieve.adapters", "analyze_jsonl"),
+    "analyze_otlp_metrics": ("causalsieve.adapters", "analyze_otlp_metrics"),
     "analyze_prometheus": ("causalsieve.adapters", "analyze_prometheus"),
     "rcaeval_rca": ("causalsieve.adapters", "rcaeval_rca"),
     "CausalDigest": ("causalsieve.digest", "CausalDigest"),

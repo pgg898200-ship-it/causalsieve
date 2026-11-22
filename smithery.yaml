@@ -1,0 +1,26 @@
+startCommand:
+  type: stdio
+  configSchema:
+    type: object
+    properties:
+      allowedRoot:
+        type: string
+        description: Optional directory root confining sieve_ingest_csv reads (blocks path traversal and symlink escapes).
+      maxCsvBytes:
+        type: integer
+        default: 104857600
+        description: Maximum allowed CSV file size in bytes (default 100 MiB).
+  commandFunction: |-
+    (config) => {
+      const args = ["--from", "causalsieve", "causalsieve-mcp"];
+      if (config.allowedRoot) {
+        args.push("--allowed-root", config.allowedRoot);
+      }
+      if (config.maxCsvBytes) {
+        args.push("--max-csv-bytes", String(config.maxCsvBytes));
+      }
+      return {
+        command: "uvx",
+        args,
+      };
+    }

@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://pgg898200-ship-it.github.io/causalsieve/sitemap.xml

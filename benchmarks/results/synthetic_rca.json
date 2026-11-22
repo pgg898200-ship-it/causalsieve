@@ -1,7 +1,7 @@
 {
   "benchmark": "synthetic_rca_100_episodes",
   "system": {
-    "timestamp_utc": "2026-11-22T16:38:07.700333+00:00",
+    "timestamp_utc": "2026-11-22T20:06:51.353282+00:00",
     "platform": "Linux-6.18.57-x86_64-with-glibc2.39",
     "cpu_model": "Intel(R) Xeon(R) CPU @ 2.30GHz",
     "cpu_count_logical": 2,
@@ -12,8 +12,8 @@
       "sse4_2"
     ],
     "compiler": "g++ (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
-    "lib_sha256": "69e960d01e22f976a907e6de4f35ccadc048f07b8ac11f1dae481eaab5cdc6e6",
-    "lib_scalar_sha256": "a38bcb0d3ad6aa1c9f034e4bf5bd31ce20f5700df1ef37750d401b5c871984b9",
+    "lib_sha256": "e97025decbdf06663c73a63fa9adee73d9cae52e56661ba77098031f8d51bc36",
+    "lib_scalar_sha256": "7a8b2d1d9d4f673dc315e2b91b2e8c97190aafd0cfcf0e0b22e70caf22a99670",
     "versions": {
       "python": "3.12.16",
       "numpy": "2.5.5",
@@ -41,7 +41,7 @@
       "avg5": 0.894,
       "mrr": 0.8297619047619048,
       "mean_rank": 1.54,
-      "mean_ms": 13.297
+      "mean_ms": 10.015
     },
     "causalsieve_hinge": {
       "n": 100,
@@ -51,7 +51,7 @@
       "avg5": 0.8759999999999999,
       "mrr": 0.8221010656010657,
       "mean_rank": 1.99,
-      "mean_ms": 27.245
+      "mean_ms": 13.534
     },
     "unshielded_online_rls": {
       "n": 100,
@@ -61,7 +61,7 @@
       "avg5": 0.898,
       "mrr": 0.8174166666666668,
       "mean_rank": 1.53,
-      "mean_ms": 14.038
+      "mean_ms": 9.822
     },
     "raw_max_z": {
       "n": 100,
@@ -71,7 +71,7 @@
       "avg5": 0.5239999999999999,
       "mrr": 0.30250000000000005,
       "mean_rank": 3.38,
-      "mean_ms": 0.584
+      "mean_ms": 0.487
     },
     "rolling_mad_z": {
       "n": 100,
@@ -81,7 +81,7 @@
       "avg5": 0.5619999999999999,
       "mrr": 0.36583333333333334,
       "mean_rank": 3.19,
-      "mean_ms": 2.246
+      "mean_ms": 1.929
     },
     "sklearn_isolation_forest": {
       "n": 100,
@@ -91,7 +91,7 @@
       "avg5": 0.7799999999999998,
       "mrr": 0.615,
       "mean_rank": 2.1,
-      "mean_ms": 2906.888
+      "mean_ms": 2593.26
     },
     "pairwise_granger_z": {
       "n": 100,
@@ -101,7 +101,7 @@
       "avg5": 0.7819999999999999,
       "mrr": 0.5886666666666668,
       "mean_rank": 2.09,
-      "mean_ms": 44.86
+      "mean_ms": 42.448
     }
   },
   "per_regime": {
@@ -119,7 +119,7 @@
           "avg5": 1.0,
           "mrr": 1.0,
           "mean_rank": 1.0,
-          "mean_ms": 6.672
+          "mean_ms": 6.67
         },
         "causalsieve_hinge": {
           "n": 20,
@@ -129,7 +129,7 @@
           "avg5": 0.96,
           "mrr": 0.9166666666666666,
           "mean_rank": 1.2,
-          "mean_ms": 7.487
+          "mean_ms": 7.34
         },
         "unshielded_online_rls": {
           "n": 20,
@@ -139,7 +139,7 @@
           "avg5": 0.99,
           "mrr": 0.975,
           "mean_rank": 1.05,
-          "mean_ms": 6.143
+          "mean_ms": 6.176
         },
         "raw_max_z": {
           "n": 20,
@@ -149,7 +149,7 @@
           "avg5": 0.4000000000000001,
           "mrr": 0.25,
           "mean_rank": 4.0,
-          "mean_ms": 0.375
+          "mean_ms": 0.384
         },
         "rolling_mad_z": {
           "n": 20,
@@ -159,7 +159,7 @@
           "avg5": 0.4000000000000001,
           "mrr": 0.25,
           "mean_rank": 4.0,
-          "mean_ms": 1.386
+          "mean_ms": 1.552
         },
         "sklearn_isolation_forest": {
           "n": 20,
@@ -169,7 +169,7 @@
           "avg5": 0.8200000000000001,
           "mrr": 0.6958333333333333,
           "mean_rank": 1.9,
-          "mean_ms": 1672.491
+          "mean_ms": 1780.481
         },
         "pairwise_granger_z": {
           "n": 20,
@@ -179,7 +179,7 @@
           "avg5": 0.8600000000000001,
           "mrr": 0.65,
           "mean_rank": 1.7,
-          "mean_ms": 16.709
+          "mean_ms": 19.394
         }
       }
     },
@@ -197,7 +197,7 @@
           "avg5": 0.93,
           "mrr": 0.825,
           "mean_rank": 1.35,
-          "mean_ms": 4.697
+          "mean_ms": 4.387
         },
         "causalsieve_hinge": {
           "n": 20,
@@ -207,7 +207,7 @@
           "avg5": 0.8,
           "mrr": 0.7113095238095237,
           "mean_rank": 2.05,
-          "mean_ms": 5.286
+          "mean_ms": 4.386
         },
         "unshielded_online_rls": {
           "n": 20,
@@ -217,7 +217,7 @@
           "avg5": 0.8,
           "mrr": 0.6912499999999999,
           "mean_rank": 2.1,
-          "mean_ms": 4.57
+          "mean_ms": 3.994
         },
         "raw_max_z": {
           "n": 20,
@@ -227,7 +227,7 @@
           "avg5": 0.5999999999999999,
           "mrr": 0.3374999999999999,
           "mean_rank": 3.0,
-          "mean_ms": 0.366
+          "mean_ms": 0.349
         },
         "rolling_mad_z": {
           "n": 20,
@@ -237,7 +237,7 @@
           "avg5": 0.8099999999999999,
           "mrr": 0.6625,
           "mean_rank": 1.95,
-          "mean_ms": 1.328
+          "mean_ms": 1.353
         },
         "sklearn_isolation_forest": {
           "n": 20,
@@ -247,7 +247,7 @@
           "avg5": 0.93,
           "mrr": 0.8416666666666666,
           "mean_rank": 1.35,
-          "mean_ms": 1285.158
+          "mean_ms": 1276.255
         },
         "pairwise_granger_z": {
           "n": 20,
@@ -257,7 +257,7 @@
           "avg5": 0.6900000000000001,
           "mrr": 0.56,
           "mean_rank": 2.55,
-          "mean_ms": 11.239
+          "mean_ms": 10.977
         }
       }
     },
@@ -275,7 +275,7 @@
           "avg5": 0.5399999999999999,
           "mrr": 0.32380952380952377,
           "mean_rank": 3.35,
-          "mean_ms": 7.777
+          "mean_ms": 4.698
         },
         "causalsieve_hinge": {
           "n": 20,
@@ -285,7 +285,7 @@
           "avg5": 0.82,
           "mrr": 0.6849999999999999,
           "mean_rank": 1.9,
-          "mean_ms": 8.538
+          "mean_ms": 4.678
         },
         "unshielded_online_rls": {
           "n": 20,
@@ -295,7 +295,7 @@
           "avg5": 0.7,
           "mrr": 0.4208333333333333,
           "mean_rank": 2.5,
-          "mean_ms": 7.674
+          "mean_ms": 4.134
         },
         "raw_max_z": {
           "n": 20,
@@ -305,7 +305,7 @@
           "avg5": 0.5999999999999999,
           "mrr": 0.33333333333333326,
           "mean_rank": 3.0,
-          "mean_ms": 0.635
+          "mean_ms": 0.36
         },
         "rolling_mad_z": {
           "n": 20,
@@ -315,7 +315,7 @@
           "avg5": 0.5999999999999999,
           "mrr": 0.33333333333333326,
           "mean_rank": 3.0,
-          "mean_ms": 2.281
+          "mean_ms": 1.385
         },
         "sklearn_isolation_forest": {
           "n": 20,
@@ -325,7 +325,7 @@
           "avg5": 0.5999999999999999,
           "mrr": 0.33333333333333326,
           "mean_rank": 3.0,
-          "mean_ms": 2310.89
+          "mean_ms": 1288.743
         },
         "pairwise_granger_z": {
           "n": 20,
@@ -335,7 +335,7 @@
           "avg5": 0.5999999999999999,
           "mrr": 0.33333333333333326,
           "mean_rank": 3.0,
-          "mean_ms": 20.753
+          "mean_ms": 11.465
         }
       }
     },
@@ -353,7 +353,7 @@
           "avg5": 1.0,
           "mrr": 1.0,
           "mean_rank": 1.0,
-          "mean_ms": 43.654
+          "mean_ms": 31.073
         },
         "causalsieve_hinge": {
           "n": 20,
@@ -363,7 +363,7 @@
           "avg5": 0.85,
           "mrr": 0.8625291375291375,
           "mean_rank": 3.55,
-          "mean_ms": 110.52
+          "mean_ms": 48.1
         },
         "unshielded_online_rls": {
           "n": 20,
@@ -373,7 +373,7 @@
           "avg5": 1.0,
           "mrr": 1.0,
           "mean_rank": 1.0,
-          "mean_ms": 48.686
+          "mean_ms": 32.244
         },
         "raw_max_z": {
           "n": 20,
@@ -383,7 +383,7 @@
           "avg5": 0.5999999999999999,
           "mrr": 0.33333333333333326,
           "mean_rank": 3.0,
-          "mean_ms": 1.188
+          "mean_ms": 0.971
         },
         "rolling_mad_z": {
           "n": 20,
@@ -393,7 +393,7 @@
           "avg5": 0.5999999999999999,
           "mrr": 0.33333333333333326,
           "mean_rank": 3.0,
-          "mean_ms": 4.877
+          "mean_ms": 3.991
         },
         "sklearn_isolation_forest": {
           "n": 20,
@@ -403,7 +403,7 @@
           "avg5": 0.76,
           "mrr": 0.5666666666666667,
           "mean_rank": 2.2,
-          "mean_ms": 7593.319
+          "mean_ms": 6921.55
         },
         "pairwise_granger_z": {
           "n": 20,
@@ -413,7 +413,7 @@
           "avg5": 0.9400000000000001,
           "mrr": 0.85,
           "mean_rank": 1.3,
-          "mean_ms": 158.885
+          "mean_ms": 153.267
         }
       }
     },
@@ -431,7 +431,7 @@
           "avg5": 1.0,
           "mrr": 1.0,
           "mean_rank": 1.0,
-          "mean_ms": 3.687
+          "mean_ms": 3.247
         },
         "causalsieve_hinge": {
           "n": 20,
@@ -441,7 +441,7 @@
           "avg5": 0.95,
           "mrr": 0.9349999999999999,
           "mean_rank": 1.25,
-          "mean_ms": 4.391
+          "mean_ms": 3.164
         },
         "unshielded_online_rls": {
           "n": 20,
@@ -451,7 +451,7 @@
           "avg5": 1.0,
           "mrr": 1.0,
           "mean_rank": 1.0,
-          "mean_ms": 3.117
+          "mean_ms": 2.562
         },
         "raw_max_z": {
           "n": 20,
@@ -461,7 +461,7 @@
           "avg5": 0.4200000000000001,
           "mrr": 0.2583333333333333,
           "mean_rank": 3.9,
-          "mean_ms": 0.358
+          "mean_ms": 0.371
         },
         "rolling_mad_z": {
           "n": 20,
@@ -471,7 +471,7 @@
           "avg5": 0.4000000000000001,
           "mrr": 0.25,
           "mean_rank": 4.0,
-          "mean_ms": 1.36
+          "mean_ms": 1.366
         },
         "sklearn_isolation_forest": {
           "n": 20,
@@ -481,7 +481,7 @@
           "avg5": 0.79,
           "mrr": 0.6375,
           "mean_rank": 2.05,
-          "mean_ms": 1672.585
+          "mean_ms": 1699.272
         },
         "pairwise_granger_z": {
           "n": 20,
@@ -491,7 +491,7 @@
           "avg5": 0.8200000000000001,
           "mrr": 0.55,
           "mean_rank": 1.9,
-          "mean_ms": 16.712
+          "mean_ms": 17.136
         }
       }
     }

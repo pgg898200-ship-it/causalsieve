@@ -95,6 +95,17 @@ sieve, digest = analyze_prometheus(prom_json, lag=2, forgetting=0.995, top_k=5)
 print(digest.to_markdown())
 ```
 
+### OpenTelemetry OTLP/JSON (`analyze_otlp_metrics`) & NDJSON (`analyze_jsonl`)
+
+Parse OpenTelemetry `ExportMetricsServiceRequest` JSON (`gauge`, `sum`, `histogram`) or streaming JSONL/NDJSON directly with zero third-party libraries:
+
+```python
+from causalsieve import analyze_otlp_metrics, analyze_jsonl
+
+sieve, digest = analyze_otlp_metrics(otlp_json, lag=2, top_k=5)
+sieve2, digest2 = analyze_jsonl("metrics.jsonl", lag=2, top_k=5)
+```
+
 ### Microservice Root-Cause Localization (`rcaeval_rca`)
 
 Drop-in function matching the `RCAEval` method interface (`<service>_<metric>` columns plus optional `"time"` column). Supports symmetric baseline/incident split via `inject_time` or fully blind mode when `inject_time=None`:
@@ -112,14 +123,14 @@ blind_res = rcaeval_rca(df, inject_time=None)  # zero knowledge of incident star
 
 ## MCP Server Configuration
 
-Launch the zero-dependency JSON-RPC 2.0 MCP stdio server via `causalsieve-mcp` or `causalsieve mcp`:
+Launch the zero-dependency JSON-RPC 2.0 MCP stdio server immediately via `uvx` (zero install) or locally via `causalsieve-mcp`:
 
 ```json
 {
   "mcpServers": {
     "causalsieve": {
-      "command": "causalsieve-mcp",
-      "args": ["--allowed-root", "/path/to/telemetry"]
+      "command": "uvx",
+      "args": ["--from", "causalsieve", "causalsieve-mcp", "--allowed-root", "/path/to/telemetry"]
     }
   }
 }
@@ -129,7 +140,7 @@ Launch the zero-dependency JSON-RPC 2.0 MCP stdio server via `causalsieve-mcp` o
 
 | Tool | Purpose | Key Required Args |
 |---|---|---|
-| `sieve_ingest_csv` | Stream a CSV file and return a 95–99.95% compressed Causal Digest + `stream_id` | `path` |
+| `sieve_ingest_csv` | Stream a CSV file and return a 99%+ compressed Causal Digest + `stream_id` | `path` |
 | `sieve_push_ticks` | Push live `(n_ticks, D)` rows into a stateful stream and get E-value / root alerts | `stream_id`, `rows` |
 | `sieve_causal_graph` | Return pruned conditional Granger + contemporaneous partial-corr / LiNGAM edges | `stream_id` |
 | `sieve_counterfactual` | Simulate `do(channel += delta)` for `horizon` steps to verify propagation | `stream_id`, `channel`, `delta` |
@@ -152,6 +163,7 @@ causalsieve rca <file.csv> [--lag 2] [--top-k 5] [--format md|json] [--hinge] [-
 causalsieve digest <file.csv> [--tokens-budget 400] [--format md|json]
 causalsieve slice <file.csv> --channel <name> --start <t0> --end <t1> [--format json|csv|table]
 causalsieve counterfactual <file.csv> --channel <name> --delta <val> [--horizon 10] [--format md|json]
+causalsieve watch [file|-] [--input-format auto|csv|jsonl] [--lag 2] [--alpha 0.01] [--format jsonl|md]
 causalsieve mcp [--allowed-root <dir>] [--max-csv-bytes <bytes>]
 ```
 

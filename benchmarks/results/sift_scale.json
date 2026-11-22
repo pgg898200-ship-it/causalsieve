@@ -16,7 +16,7 @@
     "simd_isa": "avx2+fma"
   },
   "system": {
-    "timestamp_utc": "2026-11-22T16:37:47.279119+00:00",
+    "timestamp_utc": "2026-11-22T20:06:42.532232+00:00",
     "platform": "Linux-6.18.57-x86_64-with-glibc2.39",
     "cpu_model": "Intel(R) Xeon(R) CPU @ 2.30GHz",
     "cpu_count_logical": 2,
@@ -27,8 +27,8 @@
       "sse4_2"
     ],
     "compiler": "g++ (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
-    "lib_sha256": "69e960d01e22f976a907e6de4f35ccadc048f07b8ac11f1dae481eaab5cdc6e6",
-    "lib_scalar_sha256": "a38bcb0d3ad6aa1c9f034e4bf5bd31ce20f5700df1ef37750d401b5c871984b9",
+    "lib_sha256": "e97025decbdf06663c73a63fa9adee73d9cae52e56661ba77098031f8d51bc36",
+    "lib_scalar_sha256": "7a8b2d1d9d4f673dc315e2b91b2e8c97190aafd0cfcf0e0b22e70caf22a99670",
     "versions": {
       "python": "3.12.16",
       "numpy": "2.5.5",
@@ -45,10 +45,10 @@
     "128": {
       "D": 128,
       "causalsieve_throughput": {
-        "median_ms": 3.613,
-        "ticks_per_sec": 138398.8,
-        "channel_obs_per_sec": 17715049.3,
-        "m_obs_per_sec": 17.715
+        "median_ms": 2.899,
+        "ticks_per_sec": 172465.9,
+        "channel_obs_per_sec": 22075637.7,
+        "m_obs_per_sec": 22.076
       },
       "methods": {
         "causalsieve_screened": {
@@ -59,7 +59,7 @@
           "avg5": 1.0,
           "mrr": 1.0,
           "mean_rank": 1.0,
-          "median_ms": 3.613
+          "median_ms": 2.899
         },
         "naive_variance": {
           "n": 10,
@@ -69,7 +69,7 @@
           "avg5": 0.0,
           "mrr": 0.01673542963790624,
           "mean_rank": 80.2,
-          "median_ms": 0.164
+          "median_ms": 0.176
         },
         "raw_max_z": {
           "n": 10,
@@ -79,7 +79,7 @@
           "avg5": 0.5999999999999999,
           "mrr": 0.33333333333333337,
           "mean_rank": 3.0,
-          "median_ms": 1.351
+          "median_ms": 1.447
         },
         "rolling_mad_z": {
           "n": 10,
@@ -89,17 +89,17 @@
           "avg5": 0.5999999999999999,
           "mrr": 0.33333333333333337,
           "mean_rank": 3.0,
-          "median_ms": 6.967
+          "median_ms": 7.64
         }
       }
     },
     "512": {
       "D": 512,
       "causalsieve_throughput": {
-        "median_ms": 7.39,
-        "ticks_per_sec": 67655.7,
-        "channel_obs_per_sec": 34639696.4,
-        "m_obs_per_sec": 34.64
+        "median_ms": 5.696,
+        "ticks_per_sec": 87785.8,
+        "channel_obs_per_sec": 44946329.5,
+        "m_obs_per_sec": 44.946
       },
       "methods": {
         "causalsieve_screened": {
@@ -110,7 +110,7 @@
           "avg5": 1.0,
           "mrr": 1.0,
           "mean_rank": 1.0,
-          "median_ms": 7.39
+          "median_ms": 5.696
         },
         "naive_variance": {
           "n": 10,
@@ -120,7 +120,7 @@
           "avg5": 0.0,
           "mrr": 0.0036815958473076426,
           "mean_rank": 299.9,
-          "median_ms": 0.347
+          "median_ms": 0.331
         },
         "raw_max_z": {
           "n": 10,
@@ -130,7 +130,7 @@
           "avg5": 0.5999999999999999,
           "mrr": 0.33333333333333337,
           "mean_rank": 3.0,
-          "median_ms": 5.137
+          "median_ms": 5.11
         },
         "rolling_mad_z": {
           "n": 10,
@@ -140,17 +140,17 @@
           "avg5": 0.5999999999999999,
           "mrr": 0.33333333333333337,
           "mean_rank": 3.0,
-          "median_ms": 28.577
+          "median_ms": 30.53
         }
       }
     },
     "2048": {
       "D": 2048,
       "causalsieve_throughput": {
-        "median_ms": 14.999,
-        "ticks_per_sec": 33334.5,
-        "channel_obs_per_sec": 68269017.4,
-        "m_obs_per_sec": 68.269
+        "median_ms": 13.541,
+        "ticks_per_sec": 36923.8,
+        "channel_obs_per_sec": 75619880.9,
+        "m_obs_per_sec": 75.62
       },
       "methods": {
         "causalsieve_screened": {
@@ -161,7 +161,7 @@
           "avg5": 1.0,
           "mrr": 1.0,
           "mean_rank": 1.0,
-          "median_ms": 14.999
+          "median_ms": 13.541
         },
         "naive_variance": {
           "n": 10,
@@ -171,7 +171,7 @@
           "avg5": 0.0,
           "mrr": 0.0011864772374291965,
           "mean_rank": 941.8,
-          "median_ms": 1.163
+          "median_ms": 1.155
         },
         "raw_max_z": {
           "n": 10,
@@ -181,7 +181,7 @@
           "avg5": 0.5999999999999999,
           "mrr": 0.33333333333333337,
           "mean_rank": 3.0,
-          "median_ms": 21.145
+          "median_ms": 20.845
         },
         "rolling_mad_z": {
           "n": 10,
@@ -191,17 +191,17 @@
           "avg5": 0.5999999999999999,
           "mrr": 0.33333333333333337,
           "mean_rank": 3.0,
-          "median_ms": 117.113
+          "median_ms": 118.523
         }
       }
     },
     "4096": {
       "D": 4096,
       "causalsieve_throughput": {
-        "median_ms": 25.54,
-        "ticks_per_sec": 19577.1,
-        "channel_obs_per_sec": 80187807.0,
-        "m_obs_per_sec": 80.188
+        "median_ms": 27.044,
+        "ticks_per_sec": 18488.4,
+        "channel_obs_per_sec": 75728309.5,
+        "m_obs_per_sec": 75.728
       },
       "methods": {
         "causalsieve_screened": {
@@ -212,7 +212,7 @@
           "avg5": 1.0,
           "mrr": 1.0,
           "mean_rank": 1.0,
-          "median_ms": 25.54
+          "median_ms": 27.044
         },
         "naive_variance": {
           "n": 10,
@@ -222,7 +222,7 @@
           "avg5": 0.0,
           "mrr": 0.00041462497972391906,
           "mean_rank": 2844.5,
-          "median_ms": 2.481
+          "median_ms": 2.449
         },
         "raw_max_z": {
           "n": 10,
@@ -232,7 +232,7 @@
           "avg5": 0.5999999999999999,
           "mrr": 0.33333333333333337,
           "mean_rank": 3.0,
-          "median_ms": 43.072
+          "median_ms": 43.229
         },
         "rolling_mad_z": {
           "n": 10,
@@ -242,7 +242,7 @@
           "avg5": 0.5999999999999999,
           "mrr": 0.33333333333333337,
           "mean_rank": 3.0,
-          "median_ms": 236.492
+          "median_ms": 238.799
         }
       }
     }

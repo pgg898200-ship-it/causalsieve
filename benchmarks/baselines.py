@@ -465,3 +465,243 @@ def rank_pairwise_granger_z(
     combined = np.log1p(np.maximum(0.0, z_scores)) * flow_mult
     ranked = np.argsort(-combined, kind="mergesort").astype(np.int32)
     return combined, ranked
+
+
+# =============================================================================
+# Published RCAEval SOTA Baselines (Zero-Handicap Faithful Implementations)
+# =============================================================================
+
+
+def _deterministic_rank(
+    scores: np.ndarray, col_names: Sequence[str] | None = None
+) -> np.ndarray:
+    """Rank channel indices by descending score with deterministic tie-breaking."""
+    n_cols = len(scores)
+    if col_names is not None and len(col_names) == n_cols:
+        order = sorted(
+            range(n_cols),
+            key=lambda j: (
+                -(float(scores[j]) if np.isfinite(scores[j]) else 0.0),
+                str(col_names[j]),
+                j,
+            ),
+        )
+        return np.asarray(order, dtype=np.int32)
+    clean = np.where(np.isfinite(scores), scores, 0.0)
+    return np.argsort(-clean, kind="mergesort").astype(np.int32)
+
+
+def baro_fse24(
+    data: np.ndarray,
+    inject_idx: int,
+    col_names: Sequence[str] | None = None,
+    *,
+    eps: float = 1e-12,
+) -> tuple[np.ndarray, np.ndarray]:
+    """Faithful BARO (Pham et al., FSE 2024) robust median/IQR anomaly scorer.
+
+    Strictly causal normal/anomalous split matching official RCAEval `baro`:
+      - Normal window: `X[:b_end]`, anomalous window: `X[b_end:]`.
+      - Constant-column protection matching official RCAEval `drop_constant` on
+        both normal and anomalous windows: columns constant in either segment
+        receive score 0.0 so zero-variance artifacts cannot dominate rankings.
+      - Robust scaling: `median` and `IQR = Q75 - Q25` computed strictly on the
+        normal window. For active non-constant columns whose normal IQR is zero
+        (e.g., stepped memory or sparse latency metrics where Q25 == Q75 but
+        std > 0), falls back to Gaussian-equivalent `1.349 * std` for strict
+        unit invariance (bytes vs MB), bounded below by `eps`.
+      - Channel score: peak absolute robust z-score on the anomalous window.
+    """
+    X = np.asarray(data, dtype=np.float64)
+    if X.ndim != 2:
+        raise ValueError(f"baro_fse24 expects a 2D array (T, D), got shape {X.shape}")
+    T, D = X.shape
+    b_end = max(10, min(int(inject_idx), T - 1))
+    normal = X[:b_end]
+    anomal = X[b_end:]
+
+    med = np.median(normal, axis=0)
+    q75 = np.percentile(normal, 75.0, axis=0)
+    q25 = np.percentile(normal, 25.0, axis=0)
+    iqr = q75 - q25
+    sd = np.std(normal, axis=0)
+    ptp_norm = np.ptp(normal, axis=0)
+    ptp_anom = np.ptp(anomal, axis=0)
+
+    scores = np.zeros(D, dtype=np.float64)
+    for j in range(D):
+        # Official BARO drop_constant(normal) intersect drop_constant(anomal)
+        if not np.isfinite(ptp_norm[j]) or not np.isfinite(ptp_anom[j]):
+            continue
+        if ptp_norm[j] <= 1e-12 or ptp_anom[j] <= 1e-12:
+            continue
+        scale = float(iqr[j])
+        if scale <= eps:
+            # Non-constant normal column with degenerate quartiles: use scale-invariant std
+            scale = max(1.349 * float(sd[j]), eps)
+        z = np.abs(anomal[:, j] - med[j]) / scale
+        peak = float(np.max(z))
+        scores[j] = peak if np.isfinite(peak) else 0.0
+
+    ranked = _deterministic_rank(scores, col_names)
+    return scores, ranked
+
+
+def nsigma_rcaeval(
+    data: np.ndarray,
+    inject_idx: int,
+    col_names: Sequence[str] | None = None,
+    *,
+    eps: float = 1e-12,
+) -> tuple[np.ndarray, np.ndarray]:
+    """Exact RCAEval N-Sigma baseline (`mean/std` on normal window, peak |z| on anomalous).
+
+    Matches official RCAEval `nsigma` constant-column protection (`drop_constant`
+    on normal and anomalous segments) and population `StandardScaler` normalization
+    fit strictly on `X[:inject_idx]`.
+    """
+    X = np.asarray(data, dtype=np.float64)
+    if X.ndim != 2:
+        raise ValueError(f"nsigma_rcaeval expects a 2D array (T, D), got shape {X.shape}")
+    T, D = X.shape
+    b_end = max(10, min(int(inject_idx), T - 1))
+    normal = X[:b_end]
+    anomal = X[b_end:]
+
+    mu = np.mean(normal, axis=0)
+    sd = np.std(normal, axis=0)
+    ptp_norm = np.ptp(normal, axis=0)
+    ptp_anom = np.ptp(anomal, axis=0)
+
+    scores = np.zeros(D, dtype=np.float64)
+    for j in range(D):
+        if not np.isfinite(ptp_norm[j]) or not np.isfinite(ptp_anom[j]):
+            continue
+        if ptp_norm[j] <= eps or ptp_anom[j] <= eps or sd[j] <= eps:
+            continue
+        z = np.abs(anomal[:, j] - mu[j]) / sd[j]
+        peak = float(np.max(z))
+        scores[j] = peak if np.isfinite(peak) else 0.0
+
+    ranked = _deterministic_rank(scores, col_names)
+    return scores, ranked
+
+
+def circa_structural_rca(
+    data: np.ndarray,
+    inject_idx: int,
+    col_names: Sequence[str] | None = None,
+    *,
+    ridge: float = 0.1,
+    group_by_service: bool = True,
+    eps: float = 1e-12,
+) -> tuple[np.ndarray, np.ndarray]:
+    """CIRCA-style structural regression residual RCA (Li et al., KDD 2022).
+
+    Fits conditional ridge linear regression of each metric on peer metrics
+    strictly on the normal pre-fault window `X[:inject_idx]`, then scores each
+    metric by the peak absolute standardized regression-residual shift on
+    `X[inject_idx:]` (matching CIRCA's ANMRegressor / RHT residual z-score).
+
+    Uses the exact block-precision-matrix identity:
+      For regularized normal-window correlation matrix `G = (Z^T Z)/N + ridge * I`
+      and `Omega = G^{-1}`, the exact ridge regression residuals of any block `B`
+      on all peer columns `-B` equal `Z @ (Omega[:, B] @ Omega[B, B]^{-1})`.
+    When `col_names` encodes `<service>_<metric>` and `group_by_service=True`,
+    same-service sibling metrics (e.g., `latency-50` and `latency-90`) are grouped
+    into a block so they are regressed on all cross-service peers without
+    mutually cancelling each other's fault signal; when all columns have unique
+    service prefixes (or `col_names is None`), each block has size 1 (exact
+    nodewise peer regression).
+    """
+    X = np.asarray(data, dtype=np.float64)
+    if X.ndim != 2:
+        raise ValueError(f"circa_structural_rca expects a 2D array (T, D), got shape {X.shape}")
+    T, D = X.shape
+    b_end = max(10, min(int(inject_idx), T - 1))
+    normal = X[:b_end]
+    anomal = X[b_end:]
+
+    mu = np.mean(normal, axis=0)
+    sd = np.std(normal, axis=0)
+    ptp_norm = np.ptp(normal, axis=0)
+    ptp_anom = np.ptp(anomal, axis=0)
+
+    active = np.where(
+        np.isfinite(ptp_norm)
+        & np.isfinite(ptp_anom)
+        & (ptp_norm > eps)
+        & (ptp_anom > eps)
+        & (sd > eps)
+    )[0]
+
+    scores = np.zeros(D, dtype=np.float64)
+    Da = len(active)
+    if Da == 0:
+        return scores, _deterministic_rank(scores, col_names)
+    if Da == 1:
+        j = int(active[0])
+        scores[j] = float(np.max(np.abs(anomal[:, j] - mu[j]) / sd[j]))
+        return scores, _deterministic_rank(scores, col_names)
+
+    # Standardize active columns strictly on the normal window
+    Z_norm = (normal[:, active] - mu[active]) / sd[active]
+    Z_anom = (anomal[:, active] - mu[active]) / sd[active]
+    N = float(Z_norm.shape[0])
+
+    # Regularized normal-window Gram matrix and exact precision matrix Omega
+    reg = max(float(ridge), 1e-6)
+    G = (Z_norm.T @ Z_norm) / max(N, 1.0) + reg * np.eye(Da, dtype=np.float64)
+    c_fac, lower = linalg.cho_factor(G, overwrite_a=False, check_finite=False)
+    Omega = linalg.cho_solve((c_fac, lower), np.eye(Da, dtype=np.float64), check_finite=False)
+
+    # Partition active columns into service blocks (or singletons)
+    blocks: list[np.ndarray] = []
+    if group_by_service and col_names is not None and len(col_names) == D:
+        svc_to_local: dict[str, list[int]] = {}
+        for local_i, orig_j in enumerate(active):
+            svc = str(col_names[int(orig_j)]).split("_", 1)[0]
+            svc_to_local.setdefault(svc, []).append(local_i)
+        if len(svc_to_local) > 1:
+            blocks = [np.asarray(idxs, dtype=np.intp) for idxs in svc_to_local.values()]
+        else:
+            blocks = [np.asarray([i], dtype=np.intp) for i in range(Da)]
+    else:
+        blocks = [np.asarray([i], dtype=np.intp) for i in range(Da)]
+
+    # Build exact conditional-regression residual projection matrix W (Da x Da)
+    W = np.empty((Da, Da), dtype=np.float64)
+    for blk in blocks:
+        if len(blk) == 1:
+            idx = int(blk[0])
+            diag_val = max(float(Omega[idx, idx]), 1e-12)
+            W[:, idx] = Omega[:, idx] / diag_val
+        elif len(blk) == Da:
+            W[:, blk] = np.eye(Da, dtype=np.float64)[:, blk]
+        else:
+            Omega_bb = Omega[np.ix_(blk, blk)]
+            Omega_all_b = Omega[:, blk]
+            # Solve Omega_bb @ M^T = Omega_all_b^T -> W[:, blk] = Omega_all_b @ Omega_bb^{-1}
+            try:
+                W[:, blk] = linalg.solve(
+                    Omega_bb, Omega_all_b.T, assume_a="pos", check_finite=False
+                ).T
+            except linalg.LinAlgError:
+                W[:, blk] = (linalg.pinv(Omega_bb) @ Omega_all_b.T).T
+
+    # Regression residuals strictly from normal-fitted coefficients
+    err_norm = Z_norm @ W
+    err_anom = Z_anom @ W
+
+    # CIRCA RHT standardized residual shift score on anomalous window
+    err_mu = np.mean(err_norm, axis=0)
+    err_sd = np.std(err_norm, axis=0)
+    safe_sd = np.maximum(err_sd, 1e-6)
+    z_anom = np.abs((err_anom - err_mu[None, :]) / safe_sd[None, :])
+    peak_scores = np.max(z_anom, axis=0)
+    peak_scores = np.where(np.isfinite(peak_scores), peak_scores, 0.0)
+    scores[active] = peak_scores
+
+    ranked = _deterministic_rank(scores, col_names)
+    return scores, ranked
+

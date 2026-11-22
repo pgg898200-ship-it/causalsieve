@@ -65,6 +65,12 @@ from causalsieve.adapters import (
     analyze_dataframe as analyze_dataframe,
 )
 from causalsieve.adapters import (
+    analyze_jsonl as analyze_jsonl,
+)
+from causalsieve.adapters import (
+    analyze_otlp_metrics as analyze_otlp_metrics,
+)
+from causalsieve.adapters import (
     analyze_prometheus as analyze_prometheus,
 )
 from causalsieve.adapters import (

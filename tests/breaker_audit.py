@@ -194,6 +194,9 @@ class TestFrozenProvenanceIntegrity:
         "synthetic_rca.json",
         "sift_scale.json",
         "rcaeval.json",
+        "rcaeval_trainticket.json",
+        "rcaeval_suite.json",
+        "agent_tokens.json",
     )
 
     def test_live_binary_sha256_matches_all_benchmark_jsons(self) -> None:

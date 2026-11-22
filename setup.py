@@ -1,17 +1,23 @@
 """Setuptools native C++20 shared-library build for CausalSieve wheels.
 
-Compiles ``csrc/causalsieve.cpp`` directly into a platform-native ctypes
+Compiles the multi-ISA C++20 core directly into a platform-native ctypes
 shared library inside the installed ``causalsieve`` package:
 
   - Linux:   ``causalsieve/libcausalsieve.so``
   - macOS:   ``causalsieve/libcausalsieve.dylib``
   - Windows: ``causalsieve/causalsieve.dll``
 
-Architecture & SIMD selection:
-  - x86_64 / AMD64: ``-O3 -mavx2 -mfma`` (or portable ``-O3`` when
-    ``CAUSALSIEVE_PORTABLE=1`` is set for baseline x86-64 distribution wheels).
-  - arm64 / aarch64: ``-O3`` (NEON is baseline on AArch64).
-  - Windows MSVC: ``/O2 /std:c++20 /LD /EHsc`` with explicit C99 ABI exports.
+Architecture & SIMD multi-ISA runtime dispatch:
+  - x86_64 / AMD64 (Linux, macOS x86_64, Windows MSVC — INCLUDING portable
+    ``CAUSALSIEVE_PORTABLE=1`` distribution wheels!):
+      * ``csrc/causalsieve.cpp`` + ``csrc/causalsieve_kernels_scalar.cpp`` are
+        compiled for portable baseline x86-64 (zero AVX2 instructions).
+      * ``csrc/causalsieve_kernels_avx2.cpp`` is compiled with ``-mavx2 -mfma``
+        (or ``/arch:AVX2 /D__FMA__=1`` on MSVC) and ``CAUSALSIEVE_BUILD_AVX2=1``.
+      * All translation units link into ONE shared library that selects
+        ``avx2+fma`` vs ``scalar`` once at startup via CPUID + OSXSAVE + XGETBV.
+  - arm64 / aarch64: ``-O3`` (NEON is baseline on AArch64; no x86 SIMD flags).
+  - macOS universal2: ``-O3`` with ``ARCHFLAGS`` and no x86-only flags.
 
 Because ``libcausalsieve`` exposes a pure C99 ABI loaded via ``ctypes`` with
 zero Python C-API linkage, built wheels are tagged ``py3-none-<platform>`` so
@@ -38,7 +44,9 @@ except ImportError:  # pragma: no cover - setuptools < 70.1
 
 ROOT = Path(__file__).resolve().parent
 CSRC_DIR = ROOT / "csrc"
-SOURCE_CPP = CSRC_DIR / "causalsieve.cpp"
+SOURCE_CORE_CPP = CSRC_DIR / "causalsieve.cpp"
+SOURCE_SCALAR_CPP = CSRC_DIR / "causalsieve_kernels_scalar.cpp"
+SOURCE_AVX2_CPP = CSRC_DIR / "causalsieve_kernels_avx2.cpp"
 
 # Exact C99 ABI exports from csrc/causalsieve.h (used to generate .def on MSVC).
 _C99_EXPORTS: tuple[str, ...] = (
@@ -106,6 +114,8 @@ def _detect_target_arch(plat_name: str | None = None) -> str:
     else:
         raw = (plat_name or platform.machine()).lower()
 
+    if "universal" in raw:
+        return "universal2"
     if any(tok in raw for tok in ("arm64", "aarch64")):
         return "arm64"
     if any(tok in raw for tok in ("x86_64", "amd64", "x64")):
@@ -146,7 +156,7 @@ def _find_unix_cxx() -> list[str]:
 
 
 class BuildNativeLib(build_ext):
-    """Compile ``csrc/causalsieve.cpp`` directly into ``causalsieve/<lib>``."""
+    """Compile CausalSieve multi-ISA C++20 core directly into ``causalsieve/<lib>``."""
 
     def initialize_options(self) -> None:
         super().initialize_options()
@@ -154,8 +164,9 @@ class BuildNativeLib(build_ext):
         self._output_mapping: dict[str, str] = {}
 
     def run(self) -> None:
-        if not SOURCE_CPP.is_file():
-            raise FileNotFoundError(f"Missing C++20 core source file: {SOURCE_CPP}")
+        for src in (SOURCE_CORE_CPP, SOURCE_SCALAR_CPP, SOURCE_AVX2_CPP):
+            if not src.is_file():
+                raise FileNotFoundError(f"Missing C++20 core source file: {src}")
 
         lib_name = _target_lib_name()
         build_lib = Path(self.build_lib).resolve()
@@ -175,7 +186,7 @@ class BuildNativeLib(build_ext):
         if os.name == "nt" and compiler_type in (None, "msvc"):
             self._compile_msvc(dest_path, build_temp, arch=arch, portable=portable)
         else:
-            self._compile_unix(dest_path, arch=arch, portable=portable)
+            self._compile_unix(dest_path, build_temp, arch=arch, portable=portable)
 
         self._built_outputs = [str(dest_path)]
         self._output_mapping = {str(dest_path): str(inplace_path)}
@@ -184,9 +195,16 @@ class BuildNativeLib(build_ext):
             inplace_path.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(dest_path, inplace_path)
 
-    def _compile_unix(self, dest_path: Path, *, arch: str, portable: bool) -> None:
+    def _compile_unix(
+        self,
+        dest_path: Path,
+        build_temp: Path,
+        *,
+        arch: str,
+        portable: bool,
+    ) -> None:
         cxx = _find_unix_cxx()
-        flags: list[str] = [
+        base_flags: list[str] = [
             "-std=c++20",
             "-O3",
             "-fno-math-errno",
@@ -194,13 +212,48 @@ class BuildNativeLib(build_ext):
             "-fPIC",
             f"-I{CSRC_DIR}",
         ]
-        if arch == "x86_64" and not portable:
-            flags.extend(["-mavx2", "-mfma"])
-        # On arm64 / aarch64, NEON is baseline with -O3 (no x86 SIMD flags).
+        if sys.platform == "darwin":
+            base_flags.extend(_macos_arch_flags())
+
+        # Enable runtime CPUID AVX2+FMA dispatch on all x86_64 builds (including portable wheels).
+        use_avx2_dispatch = arch == "x86_64"
+
+        core_obj = build_temp / "causalsieve.o"
+        scalar_obj = build_temp / "causalsieve_kernels_scalar.o"
+        avx2_obj = build_temp / "causalsieve_kernels_avx2.o"
+
+        core_flags = list(base_flags)
+        if use_avx2_dispatch:
+            core_flags.append("-DCAUSALSIEVE_HAS_AVX2_TU=1")
+
+        objects: list[str] = []
+
+        # 1. Core engine TU (portable baseline instructions)
+        cmd_core = [*cxx, *core_flags, "-c", str(SOURCE_CORE_CPP), "-o", str(core_obj)]
+        self.announce(
+            f"Compiling CausalSieve core TU ({arch}, portable={portable}, avx2_dispatch={use_avx2_dispatch}): {' '.join(cmd_core)}",
+            level=2,
+        )
+        subprocess.run(cmd_core, check=True)
+        objects.append(str(core_obj))
+
+        # 2. Scalar / ARM64 NEON kernel TU (portable baseline instructions)
+        cmd_scalar = [*cxx, *base_flags, "-c", str(SOURCE_SCALAR_CPP), "-o", str(scalar_obj)]
+        self.announce(f"Compiling CausalSieve scalar/NEON kernel TU: {' '.join(cmd_scalar)}", level=2)
+        subprocess.run(cmd_scalar, check=True)
+        objects.append(str(scalar_obj))
+
+        # 3. AVX2+FMA kernel TU (x86_64 only; safely guarded at runtime via CPUID+OSXSAVE+XGETBV)
+        if use_avx2_dispatch:
+            avx2_flags = [*base_flags, "-mavx2", "-mfma", "-DCAUSALSIEVE_BUILD_AVX2=1"]
+            cmd_avx2 = [*cxx, *avx2_flags, "-c", str(SOURCE_AVX2_CPP), "-o", str(avx2_obj)]
+            self.announce(f"Compiling CausalSieve AVX2+FMA kernel TU: {' '.join(cmd_avx2)}", level=2)
+            subprocess.run(cmd_avx2, check=True)
+            objects.append(str(avx2_obj))
 
         if sys.platform == "darwin":
-            flags.extend(_macos_arch_flags())
             link_flags = [
+                *_macos_arch_flags(),
                 "-dynamiclib",
                 "-install_name",
                 "@rpath/libcausalsieve.dylib",
@@ -209,9 +262,9 @@ class BuildNativeLib(build_ext):
         else:
             link_flags = ["-shared", "-lm"]
 
-        cmd = [*cxx, *flags, str(SOURCE_CPP), "-o", str(dest_path), *link_flags]
-        self.announce(f"Compiling CausalSieve native core ({arch}, portable={portable}): {' '.join(cmd)}", level=2)
-        subprocess.run(cmd, check=True)
+        cmd_link = [*cxx, *objects, "-o", str(dest_path), *link_flags]
+        self.announce(f"Linking CausalSieve native library: {' '.join(cmd_link)}", level=2)
+        subprocess.run(cmd_link, check=True)
 
     def _compile_msvc(
         self,
@@ -227,23 +280,49 @@ class BuildNativeLib(build_ext):
         if not getattr(compiler, "initialized", False):
             compiler.initialize()
 
-        extra_compile_args: list[str] = [
+        use_avx2_dispatch = arch == "x86_64"
+        base_args: list[str] = [
             "/std:c++20",
+            "/O2",
             "/D__restrict__=__restrict",
         ]
-        if arch == "x86_64" and not portable:
-            extra_compile_args.extend(["/arch:AVX2", "/D__FMA__=1"])
+        core_args = list(base_args)
+        if use_avx2_dispatch:
+            core_args.append("/DCAUSALSIEVE_HAS_AVX2_TU=1")
 
         self.announce(
-            f"Compiling CausalSieve native core (MSVC {arch}, portable={portable})",
+            f"Compiling CausalSieve native core (MSVC {arch}, portable={portable}, avx2_dispatch={use_avx2_dispatch})",
             level=2,
         )
-        objects = compiler.compile(
-            [str(SOURCE_CPP)],
-            output_dir=str(build_temp),
-            include_dirs=[str(CSRC_DIR)],
-            extra_postargs=extra_compile_args,
+
+        objects: list[str] = []
+        objects.extend(
+            compiler.compile(
+                [str(SOURCE_CORE_CPP)],
+                output_dir=str(build_temp),
+                include_dirs=[str(CSRC_DIR)],
+                extra_postargs=core_args,
+            )
         )
+        objects.extend(
+            compiler.compile(
+                [str(SOURCE_SCALAR_CPP)],
+                output_dir=str(build_temp),
+                include_dirs=[str(CSRC_DIR)],
+                extra_postargs=base_args,
+            )
+        )
+        if use_avx2_dispatch:
+            avx2_args = [*base_args, "/arch:AVX2", "/D__FMA__=1", "/DCAUSALSIEVE_BUILD_AVX2=1"]
+            objects.extend(
+                compiler.compile(
+                    [str(SOURCE_AVX2_CPP)],
+                    output_dir=str(build_temp),
+                    include_dirs=[str(CSRC_DIR)],
+                    extra_postargs=avx2_args,
+                )
+            )
+
         compiler.link_shared_object(
             objects,
             str(dest_path),
@@ -283,7 +362,11 @@ setup(
     ext_modules=[
         Extension(
             name="causalsieve._libcausalsieve",
-            sources=["csrc/causalsieve.cpp"],
+            sources=[
+                "csrc/causalsieve.cpp",
+                "csrc/causalsieve_kernels_scalar.cpp",
+                "csrc/causalsieve_kernels_avx2.cpp",
+            ],
         )
     ],
     cmdclass={

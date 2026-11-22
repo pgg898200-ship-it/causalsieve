@@ -1,6 +1,6 @@
 {
   "name": "causalsieve",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Zero-dependency SIMD online multivariate causal discovery, exogenous root-cause localization, counterfactual do-interventions, and 95-99.95% token-compressed lossless-recoverable telemetry digests.",
   "author": {
     "name": "CausalSieve Contributors"

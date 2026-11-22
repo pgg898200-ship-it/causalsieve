@@ -1,4 +1,4 @@
-"""Unit and integration tests for CausalSieve ecosystem adapters.
+"""Unit and integration tests for CausalSieve ecosystem adapters and live streaming CLI.
 
 Covers:
   1. ``analyze_dataframe`` on real ``pandas.DataFrame``, dict-of-lists, and Polars-like
@@ -12,12 +12,24 @@ Covers:
   3. ``rcaeval_rca`` drop-in contract on a real cached RCAEval Kubernetes DataFrame
      (symmetric ``inject_time`` mode, blind ``inject_time=None`` mode, out-of-order
      timestamp sorting invariance, custom ``service_parser``, and Tier-2 screened mode).
+  4. ``analyze_otlp_metrics`` on OpenTelemetry OTLP/JSON ``ExportMetricsServiceRequest``
+     payloads (gauge, sum, histogram ``sum/count`` and ``sum``-only fallback,
+     ``<service.name>_<metric.name>`` naming, duplicate datapoint attribute
+     disambiguation, missing-tick causal forward-fill, and root-cause localization).
+  5. ``analyze_jsonl`` on NDJSON/JSONL files, raw strings, and iterables of lines/dicts
+     (auto-skipping timestamps/strings/bools/objects, explicit ``time_col``, finite
+     causal forward-fill, and exact parity).
+  6. ``causalsieve watch`` CLI subprocess streaming live CSV and JSONL via stdin and
+     files (real-time pre-EOF JSONL alerts, ``--every`` status events, Markdown format,
+     and final EOF summary).
 """
 
 from __future__ import annotations
 
 import json
 import math
+import os
+import subprocess
 import sys
 from pathlib import Path
 from typing import Any
@@ -38,6 +50,8 @@ from causalsieve import (  # noqa: E402
     ScreenedSieve,
     StreamStore,
     analyze_dataframe,
+    analyze_jsonl,
+    analyze_otlp_metrics,
     analyze_prometheus,
     rcaeval_rca,
     recover_handle,
@@ -493,8 +507,511 @@ def test_rcaeval_rca_screened_mode_and_custom_service_parser() -> None:
     assert res_t2["ranks"][0] == "svc-alpha"
 
 
+# =========================================================================
+# 4. analyze_otlp_metrics tests (OpenTelemetry OTLP/JSON)
+# =========================================================================
+
+
+def test_analyze_otlp_metrics_gauge_sum_histogram_ffill_and_rca() -> None:
+    """Verify OTLP/JSON gauge, sum, histogram (sum/count & sum-only), naming, causal ffill, and RCA."""
+    T = 650
+    shock_start = 520
+    X = _make_amplified_cascade(T=T, D=6, shock_start=shock_start, seed=404)
+    base_ns = 1_710_000_000_000_000_000
+    step_ns = 1_000_000_000  # 1s in exact 64-bit nanoseconds
+
+    # Build realistic OTLP ExportMetricsServiceRequest:
+    # ch0: db / cpu.utilization (gauge asDouble) -> root cause
+    # ch1: api / http.server.duration (histogram sum/count, missing interior ticks 10, 11)
+    # ch2: gateway / request.latency (histogram sum-only without count, missing leading ticks 0, 1)
+    # ch3: cache / ops.total (sum asInt string-encoded per protobuf JSON spec)
+    # ch4 & ch5: worker / queue.depth (gauge duplicated across 2 datapoint attribute sets)
+    db_dps: list[dict[str, Any]] = []
+    api_dps: list[dict[str, Any]] = []
+    gw_dps: list[dict[str, Any]] = []
+    cache_dps: list[dict[str, Any]] = []
+    worker_dps: list[dict[str, Any]] = []
+
+    for idx in range(T):
+        ts_str = str(base_ns + idx * step_ns)
+        db_dps.append({"timeUnixNano": ts_str, "asDouble": float(X[idx, 0])})
+
+        if idx not in (10, 11):
+            cnt = 4
+            api_dps.append(
+                {
+                    "timeUnixNano": ts_str,
+                    "count": str(cnt),
+                    "sum": float(X[idx, 1] * cnt),
+                }
+            )
+
+        if idx not in (0, 1):
+            # Histogram without count -> falls back cleanly to sum
+            gw_dps.append({"timeUnixNano": ts_str, "sum": float(X[idx, 2])})
+
+        # Protobuf JSON encodes int64 as string on odd ticks, int on even ticks
+        int_val = int(round(X[idx, 3] * 100.0))
+        cache_dps.append(
+            {
+                "timeUnixNano": ts_str,
+                "asInt": str(int_val) if idx % 2 else int_val,
+            }
+        )
+
+        worker_dps.append(
+            {
+                "timeUnixNano": ts_str,
+                "asDouble": float(X[idx, 4]),
+                "attributes": [{"key": "queue", "value": {"stringValue": "fast"}}],
+            }
+        )
+        worker_dps.append(
+            {
+                "timeUnixNano": ts_str,
+                "asDouble": float(X[idx, 5]),
+                "attributes": [{"key": "queue", "value": {"stringValue": "slow"}}],
+            }
+        )
+
+    otlp_payload: dict[str, Any] = {
+        "resourceMetrics": [
+            {
+                "resource": {
+                    "attributes": [{"key": "service.name", "value": {"stringValue": "db"}}]
+                },
+                "scopeMetrics": [
+                    {
+                        "scope": {"name": "otel.runtime"},
+                        "metrics": [
+                            {"name": "cpu.utilization", "gauge": {"dataPoints": db_dps}}
+                        ],
+                    }
+                ],
+            },
+            {
+                "resource": {
+                    "attributes": [{"key": "service.name", "value": {"stringValue": "api"}}]
+                },
+                "scopeMetrics": [
+                    {
+                        "metrics": [
+                            {"name": "http.server.duration", "histogram": {"dataPoints": api_dps}}
+                        ]
+                    }
+                ],
+            },
+            {
+                "resource": {
+                    "attributes": [{"key": "service.name", "value": {"stringValue": "gateway"}}]
+                },
+                "scopeMetrics": [
+                    {
+                        "metrics": [
+                            {"name": "request.latency", "histogram": {"dataPoints": gw_dps}}
+                        ]
+                    }
+                ],
+            },
+            {
+                "resource": {
+                    "attributes": [{"key": "service.name", "value": {"stringValue": "cache"}}]
+                },
+                "scopeMetrics": [
+                    {
+                        "metrics": [
+                            {"name": "ops.total", "sum": {"dataPoints": cache_dps}}
+                        ]
+                    }
+                ],
+            },
+            {
+                "resource": {
+                    "attributes": [{"key": "service.name", "value": {"stringValue": "worker"}}]
+                },
+                "scopeMetrics": [
+                    {
+                        "metrics": [
+                            {"name": "queue.depth", "gauge": {"dataPoints": worker_dps}}
+                        ]
+                    }
+                ],
+            },
+        ]
+    }
+    otlp_json = json.dumps(otlp_payload)
+
+    sieve_d, digest_d = analyze_otlp_metrics(otlp_payload, lag=2, top_k=5, token_budget=400)
+    try:
+        assert isinstance(sieve_d, CausalSieve)
+        assert isinstance(digest_d, CausalDigest)
+        assert sieve_d.ticks == T
+        assert sieve_d.channel_names == [
+            "db_cpu.utilization",
+            "api_http.server.duration",
+            "gateway_request.latency",
+            "cache_ops.total",
+            "worker_queue.depth{queue=fast}",
+            "worker_queue.depth{queue=slow}",
+        ]
+        assert digest_d.alarm is True
+        assert digest_d.root_causes[0].name == "db_cpu.utilization"
+
+        # Verify histogram sum/count exact arithmetic and interior causal forward-fill (ticks 10, 11)
+        api_sl = sieve_d.get_raw_slice("api_http.server.duration", 9, 13)
+        assert api_sl.values == pytest.approx(
+            [float(X[9, 1]), float(X[9, 1]), float(X[9, 1]), float(X[12, 1])],
+            rel=1e-12,
+            abs=1e-12,
+        )
+
+        # Verify histogram sum-only fallback and leading missing ticks -> 0.0 (never backward-filled!)
+        gw_sl = sieve_d.get_raw_slice("gateway_request.latency", 0, 3)
+        assert gw_sl.values == pytest.approx([0.0, 0.0, float(X[2, 2])], abs=1e-12)
+
+        # Verify asInt string/int parsing on sum metric
+        cache_sl = sieve_d.get_raw_slice("cache_ops.total", 0, 4)
+        assert cache_sl.values == pytest.approx(
+            [float(int(round(X[i, 3] * 100.0))) for i in range(4)],
+            abs=0.0,
+        )
+    finally:
+        sieve_d.close()
+
+    # Exact parity on JSON string and UTF-8 bytes
+    sieve_s, digest_s = analyze_otlp_metrics(otlp_json, lag=2, top_k=5, token_budget=400)
+    sieve_b, digest_b = analyze_otlp_metrics(
+        otlp_json.encode("utf-8"), lag=2, top_k=5, token_budget=400
+    )
+    try:
+        assert [r.name for r in digest_s.root_causes] == [r.name for r in digest_d.root_causes]
+        assert [r.name for r in digest_b.root_causes] == [r.name for r in digest_d.root_causes]
+        assert digest_s.root_causes[0].root_score == pytest.approx(
+            digest_d.root_causes[0].root_score, rel=1e-12
+        )
+    finally:
+        sieve_s.close()
+        sieve_b.close()
+
+
+def test_analyze_otlp_metrics_validation_errors() -> None:
+    """Verify clear validation errors on malformed OTLP payloads."""
+    with pytest.raises(TypeError):
+        analyze_otlp_metrics(12345)  # type: ignore[arg-type]
+    with pytest.raises(ValueError, match="resourceMetrics"):
+        analyze_otlp_metrics({"invalid": []})
+    with pytest.raises(ValueError, match="zero resourceMetrics"):
+        analyze_otlp_metrics({"resourceMetrics": []})
+    with pytest.raises(ValueError, match="no finite numeric"):
+        analyze_otlp_metrics(
+            {
+                "resourceMetrics": [
+                    {
+                        "resource": {"attributes": []},
+                        "scopeMetrics": [
+                            {
+                                "metrics": [
+                                    {
+                                        "name": "empty",
+                                        "gauge": {
+                                            "dataPoints": [
+                                                {"timeUnixNano": "100", "asDouble": "NaN"}
+                                            ]
+                                        },
+                                    }
+                                ]
+                            }
+                        ],
+                    }
+                ]
+            }
+        )
+
+
+# =========================================================================
+# 5. analyze_jsonl tests (NDJSON / JSONL streams)
+# =========================================================================
+
+
+def test_analyze_jsonl_file_string_iterable_and_timestamp_exclusion(tmp_path: Path) -> None:
+    """Verify analyze_jsonl across file path, raw JSONL string, and iterables with causal ffill."""
+    T = 650
+    shock_start = 520
+    X = _make_amplified_cascade(T=T, D=6, shock_start=shock_start, seed=505)
+    names = ["db_cpu", "api_lat", "gw_lat", "cache_hit", "worker_q", "bg_io"]
+
+    dict_records: list[dict[str, Any]] = []
+    for t in range(T):
+        rec: dict[str, Any] = {
+            "ts_ms": 1_710_000_000_000 + t * 1000,
+            "env": "prod",
+            "canary": bool(t % 2),
+            "meta": {"host": f"node-{t % 3}"},
+        }
+        for j, col in enumerate(names):
+            if j == 1 and t == 50:
+                rec[col] = None
+            elif j == 2 and t == 0:
+                rec[col] = float("nan")
+            else:
+                rec[col] = float(X[t, j])
+        dict_records.append(rec)
+
+    lines = [json.dumps(r) for r in dict_records]
+    raw_jsonl = "\n".join(lines) + "\n"
+    jsonl_file = tmp_path / "metrics.jsonl"
+    jsonl_file.write_text(raw_jsonl, encoding="utf-8")
+
+    # 1. File path (Path) with explicit time_col
+    sieve_f, dig_f = analyze_jsonl(jsonl_file, time_col="ts_ms", lag=2, top_k=5)
+    try:
+        assert isinstance(sieve_f, CausalSieve)
+        assert isinstance(dig_f, CausalDigest)
+        assert sieve_f.channel_names == names
+        assert sieve_f.ticks == T
+        assert dig_f.alarm is True
+        assert dig_f.root_causes[0].name == "db_cpu"
+
+        # Strict causal forward-fill checks on null and leading NaN
+        sl_api = sieve_f.get_raw_slice("api_lat", 49, 52)
+        assert sl_api.values == pytest.approx(
+            [float(X[49, 1]), float(X[49, 1]), float(X[51, 1])], abs=1e-12
+        )
+        sl_gw = sieve_f.get_raw_slice("gw_lat", 0, 2)
+        assert sl_gw.values == pytest.approx([0.0, float(X[1, 2])], abs=1e-12)
+    finally:
+        sieve_f.close()
+
+    # 2. Raw multiline string, str file path, iterable of lines, and iterable of dicts
+    sieve_s, dig_s = analyze_jsonl(raw_jsonl, time_col="ts_ms", lag=2, top_k=5)
+    sieve_p, dig_p = analyze_jsonl(str(jsonl_file), time_col="ts_ms", lag=2, top_k=5)
+    sieve_iter_str, dig_iter_str = analyze_jsonl(iter(lines), time_col="ts_ms", lag=2, top_k=5)
+    sieve_iter_dict, dig_iter_dict = analyze_jsonl(
+        iter(dict_records), time_col="ts_ms", lag=2, top_k=5
+    )
+    try:
+        for dig in (dig_s, dig_p, dig_iter_str, dig_iter_dict):
+            assert [r.name for r in dig.root_causes] == [r.name for r in dig_f.root_causes]
+            assert dig.root_causes[0].root_score == pytest.approx(
+                dig_f.root_causes[0].root_score, rel=1e-12
+            )
+    finally:
+        sieve_s.close()
+        sieve_p.close()
+        sieve_iter_str.close()
+        sieve_iter_dict.close()
+
+    # 3. Auto-skipping standard timestamp key without explicit time_col
+    auto_records = [{"timestamp": 1000 + t, "db_cpu": float(X[t, 0]), "api_lat": float(X[t, 1])} for t in range(120)]
+    sieve_auto, _ = analyze_jsonl(auto_records, lag=2)
+    try:
+        assert sieve_auto.channel_names == ["db_cpu", "api_lat"]
+    finally:
+        sieve_auto.close()
+
+
+def test_analyze_jsonl_validation_errors(tmp_path: Path) -> None:
+    """Verify clear validation errors on malformed or empty JSONL sources."""
+    with pytest.raises(ValueError, match="zero records"):
+        analyze_jsonl("   \n\n")
+    with pytest.raises(FileNotFoundError):
+        analyze_jsonl(tmp_path / "missing.jsonl")
+    with pytest.raises(ValueError, match="Malformed JSON"):
+        analyze_jsonl('{"a": 1.0}\n{bad_json}\n')
+    with pytest.raises(ValueError, match="JSON object"):
+        analyze_jsonl("[1, 2, 3]\n")
+    with pytest.raises(TypeError):
+        analyze_jsonl({"a": 1.0})  # type: ignore[arg-type]
+
+
+# =========================================================================
+# 6. Live streaming `causalsieve watch` CLI tests
+# =========================================================================
+
+
+def _cli_env() -> dict[str, str]:
+    env = dict(os.environ)
+    existing = env.get("PYTHONPATH", "")
+    env["PYTHONPATH"] = f"{PYTHON_DIR}{os.pathsep}{existing}" if existing else str(PYTHON_DIR)
+    return env
+
+
+def test_cli_watch_live_csv_stdin_streaming_alerts_and_summary() -> None:
+    """Pipe live CSV rows into `causalsieve watch -` and verify pre-EOF alerts + final summary."""
+    T = 620
+    shock_start = 480
+    X = _make_amplified_cascade(T=T, D=6, shock_start=shock_start, seed=606)
+    cols = ["db_cpu", "api_lat", "gw_lat", "cache_hit", "worker_q", "bg_io"]
+
+    proc = subprocess.Popen(
+        [
+            sys.executable,
+            "-m",
+            "causalsieve",
+            "watch",
+            "-",
+            "--input-format",
+            "csv",
+            "--lag",
+            "2",
+            "--alpha",
+            "0.01",
+            "--top-k",
+            "4",
+            "--format",
+            "jsonl",
+        ],
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+        env=_cli_env(),
+    )
+    assert proc.stdin is not None and proc.stdout is not None
+
+    try:
+        proc.stdin.write("timestamp," + ",".join(cols) + "\n")
+        for t in range(T):
+            row_vals = ",".join(f"{X[t, j]:.6f}" for j in range(len(cols)))
+            proc.stdin.write(f"{1_710_000_000 + t},{row_vals}\n")
+        proc.stdin.flush()
+
+        # Verify real-time streaming emission BEFORE stdin EOF!
+        first_alert_line = proc.stdout.readline()
+        assert first_alert_line, "Expected at least one real-time alarm line before EOF"
+        first_alert = json.loads(first_alert_line)
+        assert first_alert["event"] == "alarm"
+        for required_key in (
+            "tick",
+            "e_value",
+            "max_exo_z",
+            "top_root_channel",
+            "top_root_name",
+            "ranked_top_k",
+        ):
+            assert required_key in first_alert
+        assert first_alert["tick"] >= shock_start - 5
+        assert first_alert["e_value"] >= 100.0 or first_alert["max_exo_z"] >= 4.5
+        assert len(first_alert["ranked_top_k"]) == 4
+
+        # Close stdin and consume remaining events through final summary
+        proc.stdin.close()
+        remaining = [json.loads(line) for line in proc.stdout if line.strip()]
+        stderr_txt = proc.stderr.read() if proc.stderr is not None else ""
+        rc = proc.wait(timeout=15)
+        assert rc == 0, f"causalsieve watch failed (rc={rc}): {stderr_txt}"
+
+        events = [first_alert, *remaining]
+        summary = events[-1]
+        assert summary["event"] == "summary"
+        assert summary["ticks"] == T
+        assert summary["dim"] == len(cols)
+        assert summary["alarm"] is True
+        assert summary["alarm_count"] >= 1
+        assert summary["max_e_value"] >= 100.0
+        assert summary["top_root_name"] == "db_cpu"
+        assert summary["ranked_top_k"][0]["name"] == "db_cpu"
+    finally:
+        if proc.poll() is None:
+            proc.kill()
+            proc.wait(timeout=5)
+
+
+def test_cli_watch_live_jsonl_stdin_every_status_and_md_file(tmp_path: Path) -> None:
+    """Verify `causalsieve watch` on piped JSONL stdin (--every status) and file Markdown output."""
+    T = 620
+    shock_start = 480
+    X = _make_amplified_cascade(T=T, D=6, shock_start=shock_start, seed=707)
+    cols = ["db_cpu", "api_lat", "gw_lat", "cache_hit", "worker_q", "bg_io"]
+
+    jsonl_lines = [
+        json.dumps(
+            {
+                "ts_ms": 1_710_000_000_000 + t * 1000,
+                "service_tag": "prod",
+                **{cols[j]: round(float(X[t, j]), 6) for j in range(len(cols))},
+            }
+        )
+        for t in range(T)
+    ]
+    jsonl_text = "\n".join(jsonl_lines) + "\n"
+
+    # 1. Pipe JSONL into stdin with auto format detection, --time-col, and --every 150
+    proc = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "causalsieve",
+            "watch",
+            "--input-format",
+            "auto",
+            "--time-col",
+            "ts_ms",
+            "--every",
+            "150",
+            "--lag",
+            "2",
+            "--top-k",
+            "3",
+            "--format",
+            "jsonl",
+        ],
+        input=jsonl_text,
+        capture_output=True,
+        text=True,
+        timeout=20,
+        env=_cli_env(),
+        check=False,
+    )
+    assert proc.returncode == 0, f"watch JSONL failed: {proc.stderr}"
+    events = [json.loads(line) for line in proc.stdout.splitlines() if line.strip()]
+    statuses = [e for e in events if e["event"] == "status"]
+    alarms = [e for e in events if e["event"] == "alarm"]
+    summary = events[-1]
+
+    assert len(statuses) == T // 150
+    assert len(alarms) >= 1
+    assert summary["event"] == "summary"
+    assert summary["ticks"] == T
+    assert summary["dim"] == len(cols)
+    assert summary["top_root_name"] == "db_cpu"
+    assert len(summary["ranked_top_k"]) == 3
+
+    # 2. File mode with Markdown output format
+    jsonl_path = tmp_path / "stream.jsonl"
+    jsonl_path.write_text(jsonl_text, encoding="utf-8")
+    proc_md = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "causalsieve",
+            "watch",
+            str(jsonl_path),
+            "--time-col",
+            "ts_ms",
+            "--format",
+            "md",
+        ],
+        capture_output=True,
+        text=True,
+        timeout=20,
+        env=_cli_env(),
+        check=False,
+    )
+    assert proc_md.returncode == 0, f"watch md failed: {proc_md.stderr}"
+    assert "**[ALARM tick=" in proc_md.stdout
+    assert "## Watch Summary (ALARM" in proc_md.stdout
+    assert "`db_cpu`" in proc_md.stdout
+
+
 def test_top_level_lazy_exports() -> None:
     """Verify adapter functions are exposed via causalsieve top-level __all__."""
-    for name in ("analyze_dataframe", "analyze_prometheus", "rcaeval_rca"):
+    for name in (
+        "analyze_dataframe",
+        "analyze_jsonl",
+        "analyze_otlp_metrics",
+        "analyze_prometheus",
+        "rcaeval_rca",
+    ):
         assert name in causalsieve.__all__
         assert callable(getattr(causalsieve, name))

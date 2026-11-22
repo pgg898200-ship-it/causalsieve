@@ -73,10 +73,11 @@ jobs:
             cd /tmp
             /tmp/cs_wheel_smoke/bin/causalsieve info --json
             /tmp/cs_wheel_smoke/bin/python -c "
-          import importlib.util, json, math, subprocess, sys
+          import importlib.util, json, math, os, subprocess, sys
           assert importlib.util.find_spec('numpy') is None
           import causalsieve as cs
           assert 'site-packages' in (cs.library_path() or '')
+          assert cs.simd_isa() in ('avx2+fma', 'scalar')
           db = [math.sin(0.37 * t) + 0.4 * math.cos(0.91 * t) + (8.0 if t >= 40 else 0.0) for t in range(60)]
           api = [0.2 * math.sin(0.53 * t) + (1.6 * db[t - 1] if t > 0 else 0.0) for t in range(60)]
           df = {'time': list(range(60)), 'db_cpu': db, 'api_lat': api}
@@ -90,8 +91,27 @@ jobs:
           ps, pdig = cs.analyze_prometheus(prom, lag=2)
           assert pdig.dim == 2 and pdig.ticks == 60
           ps.close()
+          otlp = {'resourceMetrics': [{'resource': {'attributes': [{'key': 'service.name', 'value': {'stringValue': 'db'}}]}, 'scopeMetrics': [{'metrics': [{'name': 'cpu', 'gauge': {'dataPoints': [{'timeUnixNano': str((1700000000 + t) * 1000000000), 'asDouble': db[t]} for t in range(60)]}}]}]}]}
+          os_s, odig = cs.analyze_otlp_metrics(otlp, lag=2)
+          assert odig.dim == 1 and odig.ticks == 60
+          os_s.close()
+          js, jdig = cs.analyze_jsonl([{'time': t, 'db_cpu': db[t], 'api_lat': api[t]} for t in range(60)], lag=2)
+          assert jdig.dim == 2 and jdig.ticks == 60
+          js.close()
           res = cs.rcaeval_rca(df, inject_time=40)
           assert res['ranks'] and res['ranks'][0] == 'db', res
+          watch_in = '\n'.join(json.dumps({'time': t, 'db_cpu': db[t], 'api_lat': api[t]}) for t in range(60)) + '\n'
+          wproc = subprocess.run(
+              ['/tmp/cs_wheel_smoke/bin/causalsieve', 'watch', '--input-format', 'jsonl', '--lag', '2', '--format', 'jsonl'],
+              input=watch_in, capture_output=True, text=True, check=True, timeout=15,
+          )
+          assert '\"event\": \"summary\"' in wproc.stdout or '\"event\":\"summary\"' in wproc.stdout
+          scalar_env = dict(os.environ, CAUSALSIEVE_FORCE_SCALAR='1')
+          sproc = subprocess.run(
+              ['/tmp/cs_wheel_smoke/bin/python', '-c', 'import causalsieve as cs; print(cs.simd_isa())'],
+              env=scalar_env, capture_output=True, text=True, check=True, timeout=15,
+          )
+          assert sproc.stdout.strip() == 'scalar', sproc.stdout
           proc = subprocess.run(
               ['/tmp/cs_wheel_smoke/bin/causalsieve-mcp'],
               input=json.dumps({'jsonrpc': '2.0', 'id': 1, 'method': 'initialize', 'params': {}}) + '\n',
@@ -105,7 +125,7 @@ jobs:
           rm -rf /tmp/cs_wheel_smoke
 
   macos-arm64-neon:
-    name: macOS ARM64 (Apple Silicon NEON Build, Wheel & Tests)
+    name: macOS ARM64 (Apple Silicon NEON Build, Wheel, Bench & Tests)
     runs-on: macos-15
     steps:
       - name: Checkout repository
@@ -116,15 +136,10 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Build and run C++20 native tests on Apple Silicon ARM64
+      - name: Build and run C++20 native tests + NEON throughput on Apple Silicon ARM64
         run: |
-          mkdir -p build
-          clang++ -std=c++20 -O3 -fno-math-errno -fno-trapping-math -fPIC -dynamiclib \
-            -install_name @rpath/libcausalsieve.dylib -Icsrc csrc/causalsieve.cpp \
-            -o build/libcausalsieve.dylib -lm
-          clang++ -std=c++20 -O3 -fno-math-errno -fno-trapping-math -Icsrc \
-            csrc/test_core_cpp.cpp csrc/causalsieve.cpp -o build/test_core_cpp_arm64 -lm
-          ./build/test_core_cpp_arm64
+          make build/libcausalsieve.dylib build/libcausalsieve_scalar.dylib build/test_core_cpp_opt
+          ./build/test_core_cpp_opt --parity-so ./build/libcausalsieve.dylib ./build/libcausalsieve_scalar.dylib --bench
 
       - name: Build macOS ARM64 wheel and smoke-test in bare venv
         run: |
@@ -140,6 +155,7 @@ jobs:
             /tmp/cs_mac_smoke/bin/python -c "
           import causalsieve as cs
           assert 'libcausalsieve.dylib' in (cs.library_path() or '')
+          assert cs.simd_isa() == 'neon', cs.simd_isa()
           df = {'a': [float(i % 5) + (10.0 if i > 35 else 0.0) for i in range(50)], 'b': [float(i % 3) for i in range(50)]}
           s, d = cs.analyze_dataframe(df, lag=2)
           assert d.ticks == 50 and d.dim == 2

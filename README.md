@@ -1,144 +1,196 @@
 # CausalSieve
 
-**Find the upstream root cause in live multivariate streams in microseconds — not minutes. Compress 130,000 raw telemetry tokens down to 65 with bit-exact FP64 recovery.**
+[![PyPI version](https://img.shields.io/pypi/v/causalsieve?color=22d3ee&label=PyPI)](https://pypi.org/project/causalsieve/)
+[![CI](https://github.com/pgg898200-ship-it/causalsieve/actions/workflows/ci.yml/badge.svg)](https://github.com/pgg898200-ship-it/causalsieve/actions/workflows/ci.yml)
+[![Python 3.10+](https://img.shields.io/pypi/pyversions/causalsieve?color=10b981)](https://pypi.org/project/causalsieve/)
+[![Zero Dependencies](https://img.shields.io/badge/runtime%20deps-0-10b981)](pyproject.toml)
+[![Interactive Explorer](https://img.shields.io/badge/live-explorer%20%26%20llms.txt-a78bfa)](https://pgg898200-ship-it.github.io/causalsieve/)
+[![Agent Skill](https://img.shields.io/badge/skills.sh-causalsieve-f59e0b)](https://skills.sh/pgg898200-ship-it/causalsieve/causalsieve)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-Zero runtime Python dependencies. Zero GPU required. C++20 + **AVX2/FMA** (x86-64) & **NEON** (Apple Silicon / ARM64) SIMD core (`1.69 µs/tick`), C99 ABI, Python API + Pandas/Polars/Prometheus/RCAEval adapters, sub-30 ms CLI, JSON-RPC 2.0 MCP server, and drop-in Agent Skill (`SKILL.md` + `.claude-plugin`).
+**Find the upstream root cause in live multivariate streams in microseconds — not minutes. Compress 899,000 raw telemetry tokens down to ~900 with `0.0` FP64 error recovery.**
 
-> **Why CausalSieve exists:** When service `A` breaks and cascades `A -> B -> C` with amplification, raw Z-scores and univariate detectors flag downstream victim `C`, batch causal tools (`statsmodels`, `tigramite`, `AERCA`) take seconds to minutes, and dumping raw CSV/Prometheus windows into LLM agents burns 50k–350k tokens while getting fooled by loud heteroscedastic decoys.
+Zero runtime Python dependencies. Zero GPU required. Single-binary C++20 SIMD core with **runtime CPUID dispatch (`AVX2+FMA` + scalar on x86-64 Linux/macOS/Windows, native `NEON` on Apple Silicon & ARM64)** (`1.34 µs/tick`), C99 ABI, Pandas/Polars/Prometheus/OpenTelemetry OTLP/JSONL/RCAEval adapters, live streaming `causalsieve watch` CLI, zero-install `uvx` JSON-RPC 2.0 MCP server, and drop-in Agent Skill (`SKILL.md` + `skills.sh` + `.claude-plugin`).
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/pgg898200-ship-it/causalsieve/main/docs/assets/speed_frontier.svg" alt="CausalSieve v0.2.0 Speed Frontier vs statsmodels, tigramite, NumPy" width="100%" />
+</p>
+
+> **Why CausalSieve exists:** When service `A` breaks and cascades `A -> B -> C` with amplification, raw Z-scores and univariate detectors flag downstream victim `C`, batch causal tools (`statsmodels`, `tigramite`, `CIRCA`) take seconds to minutes, and pasting raw CSV/JSON telemetry into LLM agents overflows even 128k context windows (`100%` overflow rate across real Kubernetes outages).
 >
-> **CausalSieve** solves all three in one pass: exact online conditional Granger (`< 3e-12` vs batch FP64 refits), innovation precision whitening, online non-Gaussian contemporaneous orientation, anytime-valid Ville E-process alarms, and a 95%–99.98% token-compressed Causal Digest with lossless `slice://` recovery.
+> **CausalSieve** solves all three in one pass: exact online Block-Schur conditional Granger (`< 1.9e-12` vs batch FP64 SVD refits), innovation precision whitening, online non-Gaussian LiNGAM contemporaneous orientation, anytime-valid Ville E-process alarms, and a **99.90%–99.98%** token-compressed `CausalDigest` with bit-exact `0.0`-error FP64 `slice://` recovery.
 
 ---
 
-## Headline Verified Results
+## Headline Verified Results (`v0.2.0`)
 
-Measured live on **1× Intel Xeon @ 2.30 GHz (`avx2+fma`)** against frozen binary `libcausalsieve.so` (`sha256: 69e960d0...`):
+Measured live on **1× Intel Xeon @ 2.30 GHz** against frozen runtime-dispatched `libcausalsieve.so` (`avx2+fma`, `sha256: e97025de...` — exact same binary architecture shipped inside PyPI wheels!):
 
-| Benchmark | Metric | CausalSieve | Best Incumbent | Edge |
+| Benchmark | Metric | CausalSieve `v0.2.0` | Best Incumbent | Edge |
 |---|---|---:|---:|---:|
-| **Streaming Throughput (`D=16, p=2`)** | Steady-state rate | **287,259 ticks/s** (`3.48 µs`) | `tigramite` PCMCI `3,293 ms` | **518× faster** (`98×` vs `statsmodels`) |
-| **Full `32×32` Conditional Granger + Precision** | `T=500` ingest + graph | **12.12 ms** (`0.043 ms` query) | `statsmodels` `24,070 ms` / `tigramite` `15,670 ms` | **1,987×** vs `statsmodels`, **1,293×** vs `tigramite`, **24.8×** vs NumPy |
-| **Full `64×64` Conditional Granger + Precision** | `T=500` ingest + graph | **38.45 ms** (`0.088 ms` query) | `statsmodels` `1,879 s`† / NumPy `613 ms` | **48,875×** vs `statsmodels`, **16.0×** vs NumPy |
-| **Real K8s Outages (`RCAEval` OB+SS Sealed, n=40)** | Service AC@1 / AC@5 / MRR | **67.5% / 100% / 0.804** (`33.3 ms`) | `pairwise_granger_z` `60.0% / 90% / 0.741` (`162 ms`) | **#1 across all 5 metrics**, 40/40 Top-5, **99.95% fewer tokens** (`131.7k -> 65`) |
-| **Real 64-Service K8s (`RCAEval` Train Ticket, D≈217, n=25)** | Service AC@1 / AC@3 / MRR | **48.0% / 84.0% / 0.669** (`375 ms`) | `pairwise_granger_z` `20.0% / 32% / 0.344` (`2,127 ms` uncapped) | **2.4×–12× AC@1**, **99.98% fewer tokens** (`346.7k -> 64`), blind also **48.0%** |
-| **Blind Real K8s Outages (ZERO `inject_time`, n=40 OB+SS)** | Service AC@1 / MRR | **65.0% / 0.746** (`30.1 ms`) | `rolling_mad_z` `52.5% / 0.712` (given `inject_time`) | Beats every baseline **without knowing when the outage started** |
-| **100-Episode Multi-Regime Synthetic RCA** | Overall AC@1 / MRR | **73.0% / 0.830** (`13.3 ms`) | `IsolationForest` `38.0% / 0.615` (`2,907 ms`) | **+35.0 pts AC@1**, **219× faster**, **99.88% fewer tokens** |
-| **Tier-2 `D=4,096` Loud-Decoy Firehose (20% 3.5×-noise)** | Throughput & Top-1 Recall | **19,577 ticks/s** (`80.2M obs/s`), **100%** | Raw Max-Z / MAD-Z / Var: **0%** | **100% vs 0% AC@1** at 80M obs/s on 1 core |
-| **Mathematical Exactness Oracle** | Parity vs batch FP64 SVD + refits | **`< 3e-12`** across 19/19 cells | Batch FP64 reference | Exact algebraic equivalence (`Freivalds < 1e-11`) |
+| **Streaming Throughput (`D=8 / D=16, p=2`)** | Steady-state rate | **746.8k / 385.3k ticks/s** (`1.34 / 2.60 µs`) | `tigramite` `3,308 ms` / NumPy `5.73 ms` | **585×** vs `tigramite`, beats offline NumPy at `D=16` |
+| **Full `32×32` Conditional Granger + Precision** | `T=500` ingest + graph | **11.22 ms** (`154.2k ticks/s`) | `statsmodels` `26,187 ms` / `tigramite` `16,461 ms` | **2,334×** vs `statsmodels`, **1,467×** vs `tigramite`, **28.5×** vs NumPy |
+| **Full `64×64` Conditional Granger + Precision** | `T=500` ingest + graph | **30.57 ms** (`48.95k ticks/s`) | `statsmodels` `2,186 s`† / NumPy `641 ms` | **71,514×** vs `statsmodels`, **21.0×** vs NumPy |
+| **ALL 645 Real K8s Outages (`RCAEval` RE1+RE2)** | Micro / Macro AC@1 & MRR | **75.7% / 76.5% AC@1 · 0.839 / 0.844 MRR** | `BARO` (FSE'24) `72.7%` / `N-Sigma` `72.6%` / `CIRCA` `71.6%` | **#1 overall** across 645 outages (`+7.2 pts` on `RE1-TT`, `+5.5 pts` on `RE2-TT`), **99.976%** fewer tokens |
+| **Real K8s Sealed Holdout (`RE1` OB+SS, n=40)** | Service AC@1 / AC@5 / MRR | **67.5% / 100% / 0.804** (`29.1 ms`) | `pairwise_granger_z` `60.0% / 90% / 0.741` (`169 ms`) | **#1 across all 5 metrics**, 40/40 Top-5; blind (no `inject_time`) **65.0%** beats every baseline |
+| **Agent Context Compression (60 Real Outages)** | Mean BPE tokens & 8k/128k overflow | **911.5 tokens (`0.0%` overflow at 8k)** | Raw CSV `899k` (`100%` @ 128k) / JSON `2.65M` (`100%`) | **986×** vs CSV, **2,905×** vs JSON, **360/360 bit-exact `0.0` FP64** `slice://` (`65.1 µs`) |
+| **Multi-Agent `CausalBlackboard` (2× Ballot Stuffing)** | Consensus AC@1 & overwrite churn | **100.0% (50/50) · `0.0%` churn** | Majority / Conf-Vote / Mutable BB: **0.0%** (`94.4%` churn) | **12.86×** grounded weight via proper scoring (`Brier 0.0088 vs 0.6851`) |
+| **Tier-2 `D=4,096` Loud-Decoy Firehose (20% 3.5×)** | Throughput & Top-1 Recall | **18,488 ticks/s** (`75.7M obs/s`), **100%** | Raw Max-Z / MAD-Z / Var: **0%** | **100% vs 0% AC@1** at 75M+ obs/s on 1 core |
+| **Mathematical Exactness Oracle** | Parity vs batch FP64 SVD + refits | **`< 1.86e-12`** across 19/19 cells | Batch FP64 reference | Exact algebraic equivalence (`Freivalds < 2.6e-14`, `AVX2 vs scalar < 6e-14`) |
 
-†`statsmodels` at `D=64` linearly extrapolated from 200 timed pairs out of 4,032. Full tables, honest tradeoffs, and reproduction commands in [BENCHMARKS.md](BENCHMARKS.md).
+†`statsmodels` at `D=64` linearly extrapolated from 200 timed pairs out of 4,032. Complete tables, all 6 dataset breakdowns, and honest tradeoffs in [BENCHMARKS.md](BENCHMARKS.md).
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/pgg898200-ship-it/causalsieve/main/docs/assets/rcaeval_pareto.svg" alt="RCAEval Real Kubernetes Outages Accuracy vs Latency Pareto Frontier" width="100%" />
+</p>
 
 ---
 
 ## 3-Line Quickstart
 
-### One-Command Install (Zero Python Runtime Dependencies)
+### One-Command Install (Zero Runtime Dependencies, Automatic AVX2/NEON Dispatch)
 ```sh
-pip install causalsieve                              # instant 115 KB prebuilt wheel (Linux x86_64/ARM64 NEON, macOS Apple Silicon NEON/Intel, Windows x64)
-# Optional on AVX2 x86-64 CPUs for full AVX2+FMA native peak throughput:
-pip install --no-binary causalsieve causalsieve
-causalsieve info                                     # verify active SIMD ISA (avx2+fma / neon / scalar)
+pip install causalsieve        # prebuilt multi-ISA wheel (auto runtime AVX2+FMA on x86-64, NEON on ARM64; 0 runtime deps)
+causalsieve info               # verify active SIMD ISA (avx2+fma / neon / scalar)
 ```
 
-### CLI: Compress a 130k-Token Incident CSV into a ~300-Token Causal Digest
+### CLI: Compress Telemetry, Verify Counterfactuals & Watch Live Streams
 ```sh
 causalsieve rca metrics.csv --lag 2 --top-k 5 --format md
 causalsieve counterfactual metrics.csv --channel db_cpu --delta 3.0 --horizon 10
-causalsieve slice metrics.csv --channel db_cpu --start 490 --end 530   # 0.0-error FP64 recovery
+causalsieve slice metrics.csv --channel db_cpu --start 490 --end 530        # 0.0-error FP64 recovery
+tail -f telemetry.jsonl | causalsieve watch --input-format jsonl --lag 2    # live Ville E-process alerts
 ```
 
-### Python API & Drop-In Ecosystem Adapters (Zero Hard Dependencies)
+### Python API & Drop-In Observability Adapters (Zero Hard Dependencies)
 ```python
-from causalsieve import CausalSieve, build_digest, analyze_dataframe, analyze_prometheus, rcaeval_rca
+from causalsieve import (
+    CausalSieve,
+    build_digest,
+    analyze_dataframe,
+    analyze_prometheus,
+    analyze_otlp_metrics,
+    analyze_jsonl,
+    rcaeval_rca,
+)
 
 # 1. Streaming / batch core (zero-copy if NumPy float64 C-contiguous passed)
 with CausalSieve(dim=16, lag=2, channel_names=[f"svc_{i}" for i in range(16)]) as sieve:
-    sieve.push_batch(rows)                          # 287k ticks/s on 1 Xeon core
+    sieve.push_batch(rows)                          # 385k ticks/s on 1 Xeon core
     attr = sieve.root_attribution()                 # ranked exogenous root causes (not victims)
     granger = sieve.granger_matrix()                # exact Block-Schur D x D F-stats & partial R^2
     cf = sieve.counterfactual_do("svc_0", 4.0, 10)  # quantitative do-intervention propagation
-    digest = build_digest(sieve, top_k=5)           # 95-99.98% token reduction + lossless handles
+    digest = build_digest(sieve, top_k=5)           # 99.9%+ token reduction + lossless handles
 
-# 2. Drop-in adapters for Pandas / Polars DataFrames, Prometheus query_range JSON, & RCAEval
-_, df_digest = analyze_dataframe(df)                # works with pandas, polars, or dict-of-lists
+# 2. Zero-dependency adapters for Pandas/Polars, Prometheus, OpenTelemetry OTLP, JSONL & RCAEval
+_, df_digest = analyze_dataframe(df)                # pandas, polars, or dict-of-lists
 _, prom_digest = analyze_prometheus(prom_json)      # Prometheus /api/v1/query_range matrix JSON
+_, otlp_digest = analyze_otlp_metrics(otlp_json)    # OpenTelemetry OTLP/JSON gauge/sum/histogram
+_, jsonl_digest = analyze_jsonl("metrics.jsonl")    # NDJSON / JSONL streaming telemetry
 rca_out = rcaeval_rca(metrics_df, inject_time=t0)   # exact RCAEval {"ranks": [...]} drop-in
 ```
 
-### MCP Server & Agent Skill (Claude Code, Codex, Gemini CLI, Cursor)
-Add to your MCP config (zero dependencies — runs over JSON-RPC 2.0 stdio):
+### Zero-Install MCP Server (`uvx`) & Agent Skill (Claude Code, Codex, Gemini CLI, Cursor)
+
+Run immediately via `uvx` with zero persistent install (JSON-RPC 2.0 over stdio, 6 ms startup):
 ```json
 {
   "mcpServers": {
     "causalsieve": {
-      "command": "causalsieve-mcp",
-      "args": ["--allowed-root", "/path/to/telemetry"]
+      "command": "uvx",
+      "args": ["--from", "causalsieve", "causalsieve-mcp", "--allowed-root", "/path/to/telemetry"]
     }
   }
 }
 ```
-Exposes 6 tools backed by a thread-safe multi-agent `CausalBlackboard`:
-- `sieve_ingest_csv` — stream a CSV and return a 95%–99.95% compressed Causal Digest + `stream_id`
-- `sieve_push_ticks` — push live rows and receive instant exogenous root-cause & Ville E-value alerts
-- `sieve_causal_graph` — return pruned lagged Granger + contemporaneous partial-corr / LiNGAM edges
-- `sieve_counterfactual` — simulate `do(channel += delta)` to verify root-cause hypotheses
-- `sieve_recover_slice` — recover 100% lossless IEEE-754 FP64 raw points via `slice://...` handle
-- `sieve_swarm_propose` — append & objectively score multi-agent hypotheses (no overwrite churn, proper-scoring consensus)
 
-Install the drop-in Agent Skill (`SKILL.md`, `llms.txt`, `llms-full.txt`) or Claude Code plugin directly:
+Or install the drop-in Agent Skill (`SKILL.md`, indexed on [skills.sh](https://skills.sh/pgg898200-ship-it/causalsieve/causalsieve)) / Claude Code plugin directly:
 ```sh
 npx skills add pgg898200-ship-it/causalsieve
 # or in Claude Code:
 claude plugin marketplace add pgg898200-ship-it/causalsieve
 ```
 
+Exposes 6 tools backed by a thread-safe multi-agent `CausalBlackboard`:
+- `sieve_ingest_csv` — stream a CSV and return a 99%+ compressed Causal Digest + `stream_id`
+- `sieve_push_ticks` — push live rows and receive instant exogenous root-cause & Ville E-value alerts
+- `sieve_causal_graph` — return pruned lagged Granger + contemporaneous partial-corr / LiNGAM edges
+- `sieve_counterfactual` — simulate `do(channel += delta)` to verify root-cause hypotheses
+- `sieve_recover_slice` — recover 100% lossless IEEE-754 FP64 raw points via `slice://...` handle (`65 µs` median)
+- `sieve_swarm_propose` — append & objectively score multi-agent hypotheses (no overwrite churn, proper-scoring consensus)
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/pgg898200-ship-it/causalsieve/main/docs/assets/token_compression.svg" alt="CausalSieve Token Compression and Lossless FP64 Recovery" width="100%" />
+</p>
+
 ---
 
-## Why It's Fast and Accurate (The Math Moat)
+## Why It's Fast and Accurate (The Math & Systems Moat)
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/pgg898200-ship-it/causalsieve/main/docs/assets/architecture.svg" alt="CausalSieve Single-Pass SIMD Pipeline Architecture" width="100%" />
+</p>
 
 1. **Exact Block-Schur Conditional Granger (`O(D p^3 + D^2 p^2)` vs `O(D^4 p^3)`):**
-   All $D$ target channels share one inverse lagged Gram matrix $P_t = (Z_t^\top W_t Z_t + \alpha I)^{-1} \in \mathbb{R}^{K \times K}$ updated in $O(K^2)$ AVX2+FMA Sherman-Morrison steps. By the exact Schur complement identity, removing source channel $i$'s lag block $S_i$ increases the exact weighted ridge objective for target $j$ by:
+   All $D$ target channels share one inverse lagged Gram matrix $P_t = (Z_t^\top W_t Z_t + \alpha I)^{-1} \in \mathbb{R}^{K \times K}$ updated in $O(K^2)$ AVX2+FMA / NEON Sherman-Morrison steps. By the exact Schur complement identity, removing source channel $i$'s lag block $S_i$ increases the exact weighted ridge objective for target $j$ by:
    $$\Delta J_{i \to j} \equiv B_{S_i, j}^\top \left(P_{S_i, S_i}\right)^{-1} B_{S_i, j}$$
-   Zero reduced-model refits. Exact to `< 3e-12` against batch FP64 SVD refits.
+   Zero reduced-model refits. Exact to `< 1.86e-12` against batch FP64 SVD refits.
 
-2. **Precision-Whitened Exogenous Attribution + Online Non-Gaussian LiNGAM Orientation:**
-   Temporal lags are stripped via causal one-step innovations $\hat{u}_t = \tilde{x}_t - B_{t-1}^\top z_t$. Contemporaneous propagation is stripped via the online innovation precision matrix $\Theta_{t-1} = (\Sigma_{u,t-1} + \gamma_{\text{eff}} I)^{-1}$:
+2. **L1-Resident Deferred BLAS-3 Sufficient Statistics + Runtime CPUID Multi-ISA Dispatch (`v0.2.0`):**
+   - Six additive sufficient-statistic matrices ($G, C, S_u, M_{u^2 v}, M_{u \tanh v}, M_{uv}$) accumulate in L1-resident `B_SLAB=32` slabs and flush via register-blocked `4×8` AVX2+FMA / `4×4` NEON `SYRK`/`GEMM` micro-kernels — cutting per-tick memory traffic by >60% while keeping exact algebraic parity (`< 6e-14`).
+   - All `x86_64` wheels compile both portable baseline and `-mavx2 -mfma` / `/arch:AVX2` kernel translation units into ONE shared library and dispatch at runtime via `CPUID + OSXSAVE + XGETBV` (`CAUSALSIEVE_FORCE_SCALAR=1` override for testing). Zero `SIGILL` on old CPUs; full `avx2+fma` automatically on modern x86-64, native `neon` on Apple Silicon & Linux ARM64.
+
+3. **Precision-Whitened Exogenous Attribution + Online Non-Gaussian LiNGAM Orientation:**
+   Temporal lags are stripped via causal one-step innovations $\hat{u}_t = \tilde{x}_t - B_{t-1}^\top z_t$; contemporaneous propagation is stripped via the online innovation precision matrix $\Theta_{t-1} = (\Sigma_{u,t-1} + \gamma_{\text{eff}} I)^{-1}$:
    $$z^{\text{exo}}_{j,t} = \frac{(\Theta_{t-1} \hat{u}_t)_j}{\sqrt{\Theta_{jj,t-1}}}$$
-   Under skewed or heavy-tailed shocks, online Hyvärinen-Smith pairwise cumulant/$\tanh$ ratios ($O(D^2)$ streaming moments) orient contemporaneous edges $i \to j$ within the same tick — overcoming Granger causality's classic no-instantaneous-effects limitation.
+   Under skewed or heavy-tailed shocks, online Hyvärinen-Smith pairwise cumulant/$\tanh$ ratios ($O(D^2)$ streaming moments) orient contemporaneous edges $i \to j$ within the same tick.
 
-3. **Production Numerical & Statistical Armor:**
-   - **Shifted-anchor normalization + flat-channel guard:** Immune to ERDDAP `1e10` DC offsets (`100%` AC@1) AND constant-during-warmup 4 KB Kubernetes memory-page blips (`0 NaNs`).
-   - **Mallows-Huber shock shield:** Prevents sustained outages from poisoning baseline $B_t$ and $\Theta_t$.
-   - **Self-healing Freivalds drift guard:** Cheap $O(K)$ residual probe triggers automatic exact Cholesky refresh (`Freivalds < 1e-11` over 50k+ ticks).
-   - **Anytime-valid ONS betting E-process:** Finite-sample Hotelling-$T^2$ adjusted supermartingale obeying Ville's inequality ($\mathbb{P}_{H_0}(\exists t : E_t \ge 1/\alpha) \le \alpha$ — zero peeking inflation).
-   - **Tier-2 `ScreenedSieve` (`D = 128..16,384+`):** $O(D)$ AVX2 scale-free robust pre-whitening kills heteroscedastic loud decoys at `80M obs/s` and dynamically promotes top-$M$ candidates into the exact Tier-1 core.
-   - **Certified `L_inf` Swing-Filter PLA + Lossless FP64 Ring:** Guarantees every compressed trajectory knot interpolates within `max_abs_err` while every retained tick is recoverable bit-for-bit (`0.0` error).
+4. **Production Numerical & Statistical Armor:**
+   - **Shifted-anchor normalization + flat-channel guard:** Immune to ERDDAP `1e10` DC offsets (`100%` AC@1) and constant-during-warmup 4 KB Kubernetes memory-page blips (`0 NaNs`).
+   - **Mallows-Huber shock shield + self-healing Freivalds drift guard:** Prevents sustained outages from poisoning baseline $B_t$/$\Theta_t$ and auto-refreshes via Cholesky (`Freivalds < 2.6e-14`).
+   - **Anytime-valid ONS betting E-process:** Finite-sample Hotelling-$T^2$-adjusted supermartingale obeying Ville's inequality ($\mathbb{P}_{H_0}(\exists t : E_t \ge 1/\alpha) \le \alpha$).
+   - **Tier-2 `ScreenedSieve` (`D = 128..16,384+`) + Certified `L_inf` Swing-Filter PLA + Lossless FP64 Ring.**
 
 ---
 
-## Real-World Kubernetes Benchmark (`RCAEval`, 40 Sealed Holdout Cases)
+## Real-World Kubernetes Benchmark (`RCAEval`, ALL 645 RE1+RE2 Incidents)
 
-Evaluated strictly one-shot with **zero retuning** on 40 sealed held-out microservice incidents (`RE1` Online Boutique & Sock Shop, reps 2–5; reps 1 = 10 DEV cases; full SHA-256 provenance in [`benchmarks/results/rcaeval.json`](benchmarks/results/rcaeval.json)):
+Evaluated strictly one-shot with **zero retuning** across **all 645 real microservice failure cases** from `phamquiluan/RCAEval` (`RE1` 375 metric-only cases + `RE2` 270 OpenTelemetry cases across Online Boutique, Sock Shop, and 64–68 service Train Ticket; full SHA-256 provenance in [`benchmarks/results/rcaeval_suite.json`](benchmarks/results/rcaeval_suite.json)):
 
-| Method | AC@1 | AC@3 | AC@5 | Avg@5 | MRR | Mean ms/case |
-|---|---:|---:|---:|---:|---:|---:|
-| **`causalsieve`** (symmetric baseline) | **67.5%** (27/40) | **92.5%** (37/40) | **100.0%** (40/40) | **0.880** | **0.804** | **33.3 ms** |
-| **`causalsieve_blind`** (zero `inject_time`) | **65.0%** (26/40) | 75.0% (30/40) | 90.0% (36/40) | 0.780 | **0.746** | **30.1 ms** |
-| `pairwise_granger_z` | 60.0% (24/40) | 87.5% (35/40) | 90.0% (36/40) | 0.805 | 0.741 | 162.0 ms |
-| `rolling_mad_z` (Baro-style) | 52.5% (21/40) | 90.0% (36/40) | 92.5% (37/40) | 0.815 | 0.712 | 3.6 ms |
-| `raw_max_z` (3-sigma) | 40.0% (16/40) | 87.5% (35/40) | 92.5% (37/40) | 0.755 | 0.624 | 1.1 ms |
-| `sklearn_isolation_forest` | 35.0% (14/40) | 60.0% (24/40) | 72.5% (29/40) | 0.565 | 0.520 | 5,661.3 ms |
+| Method | Micro AC@1 | Micro AC@3 | Micro AC@5 | Micro Avg@5 | Micro MRR | Macro AC@1 | Macro MRR | Mean ms/case |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| **`causalsieve`** (symmetric baseline) | **75.7%** | **91.0%** | 95.2% | **0.882** | **0.839** | **76.5%** | **0.844** | 160.9 ms |
+| `baro_fse24` (Pham et al., FSE'24) | 72.7% | 90.1% | 95.8% | 0.874 | 0.824 | 73.6% | 0.829 | 7.4 ms |
+| `nsigma_rcaeval` (RCAEval N-Sigma) | 72.6% | 90.5% | **96.1%** | 0.876 | 0.823 | 73.7% | 0.830 | 3.6 ms |
+| `circa_structural_rca` (KDD'22-style) | 71.6% | 86.2% | 91.6% | 0.847 | 0.808 | 72.7% | 0.816 | 44.6 ms |
+| `pairwise_granger_z` | 53.5% | 78.4% | 86.4% | 0.745 | 0.681 | 54.9% | 0.689 | 210.3 ms |
+| `causalsieve_blind` (zero `inject_time`) | 52.2% | 82.8% | 88.7% | 0.774 | 0.688 | 50.8% | 0.682 | 163.3 ms |
+| `rolling_mad_z` | 45.7% | 78.1% | 87.9% | 0.729 | 0.642 | 45.9% | 0.642 | 11.8 ms |
+
+- Leads **both** suites independently: `RE1` (n=375) **71.5% AC@1 / 0.816 MRR** vs BARO `68.3%` / N-Sigma `66.7%`; `RE2` OpenTelemetry (n=270) **81.5% AC@1 / 0.872 MRR** vs N-Sigma `80.7%` / BARO `78.9%`.
+- Biggest wins on the hardest **64–68 service Train Ticket** clusters: **`RE1-TT`** **57.6%** vs BARO `50.4%` (**+7.2 pts**) / N-Sigma `45.6%` (**+12.0 pts**) / CIRCA `40.0%` (**+17.6 pts**); **`RE2-TT` (`D=340..376`)** **73.3%** vs BARO `67.8%` (**+5.5 pts**); **`RE2-OB`** **88.9%** vs BARO `85.6%` (**+3.3 pts**).
+- Mean token reduction across all 645 incidents: **`297,241 -> 70.4` tokens (`99.976%` reduction)**.
+
+---
+
+## Deep-Dive Guides & Agent Documentation
+
+- **[CausalSieve vs `statsmodels`, `tigramite`, `sklearn`, & `river`](docs/vs-statsmodels-tigramite.md)** — Drop-in migration code, complexity proofs, and honest crossovers.
+- **[Kubernetes, Prometheus, OpenTelemetry & Streaming RCA Cookbook](docs/kubernetes-prometheus-rca.md)** — Production recipes for Prometheus, OTLP/JSON, NDJSON, `causalsieve watch`, and `RCAEval`.
+- **[LLM & Multi-Agent Telemetry Compression Guide](docs/llm-agent-telemetry-compression.md)** — `uvx` MCP setup, `SKILL.md`, 99.90%–99.98% token reduction with `0.0` FP64 `slice://` recovery, and `CausalBlackboard`.
+- **[Full Benchmarks & Optimization Log](BENCHMARKS.md)** · **[Interactive Explorer & Pure-Markdown Docs](https://pgg898200-ship-it.github.io/causalsieve/)** · **[`llms.txt`](llms.txt)** · **[`llms-full.txt`](llms-full.txt)** · **[`SKILL.md`](SKILL.md)**.
 
 ---
 
 ## Honest Tradeoffs & Known Limits
 
 We report failures and crossovers alongside wins:
-- **Small offline one-shot (`D <= 16`):** If you never need streaming updates or per-tick exogenous scoring, a single offline NumPy Cholesky refit (`5.92 ms`) matches CausalSieve's full 500-tick streaming pass (`6.36 ms`). CausalSieve pulls ahead sharply at `D >= 32` (`24.8×` vs NumPy, `1,987×` vs `statsmodels`) and on every live streaming workload.
-- **Single-tick Python FFI overhead:** Calling `.push(x)` from Python 1,000 times adds ~11 ms of `ctypes` call overhead; use `.push_batch(X)` (or C ABI / native `causalsieve-bin`) for full `287k–592k ticks/s` speed.
-- **Purely nonlinear / non-monotone couplings:** Default linear `VAR(p)` misses pure ReLU/threshold cascades (AC@1 `0.000` on our synthetic saturation test); enabling `nonlinear_hinge=True` recovers `0.450` AC@1 (`0.685` MRR) on saturation cascades, at the cost of doubling `K` (`2pD+1`) and slightly lower finite-sample linear accuracy (`0.850` vs `1.000`).
-- **Gaussian contemporaneous shocks:** Contemporaneous direction (`LiNGAM`) requires non-Gaussian innovations (skewed or heavy-tailed); on purely Gaussian instantaneous shocks, the undirected precision skeleton remains valid while orientation is unidentifiable by theory.
-- **Packet-loss faults on `RCAEval` (`loss`):** Across all methods, network packet-loss faults are the hardest class (`causalsieve` AC@1 `37.5%`, `pairwise_granger_z` `50.0%`; `causalsieve` reaches `100%` within Top-5). On Sock Shop (`RE1-SS`) alone, `pairwise_granger_z` edges out `causalsieve` (`85%` vs `75%` AC@1) while trailing by 25 points on Online Boutique (`35%` vs `60%`) and running 4.9× slower.
+- **Simple low-D univariate outages (`RE1-OB`, `RE1-SS`, `RE2-SS`):** Fast normal-vs-anomalous scorers (`BARO`, `N-Sigma`, `2–5 ms/case`) are within ±1–3 pts of `causalsieve` (`23–30 ms/case`) on simpler 50–80 metric topologies; `causalsieve` pulls ahead sharply on large 64–68 service topologies (`RE1-TT` +7.2 pts, `RE2-TT` +5.5 pts), overall across all 645 incidents, and whenever you need the directed causal graph, counterfactual `do()`, or compressed digest.
+- **Fault classes (`delay` / `loss`):** Across all 645 cases, `causalsieve` leads `mem` (`95.8%`), `disk` (`78.3%`), `socket` (`77.8%`), and `cpu` (`75.8%`), while `N-Sigma` edges out `delay` (`75.8%` vs `74.2%`) and `BARO` edges out `loss` (`56.7%` vs `53.3%`).
+- **Offline one-shot at `D=8`:** At `D=8`, a single offline NumPy refit without streaming state (`2.43 ms`) is slightly faster than CausalSieve's full streaming pass (`3.10 ms`). CausalSieve already beats offline NumPy at `D=16` (`5.66 ms` vs `5.73 ms`) and scales to **28.5× faster** at `D=32` (**2,334×** vs `statsmodels`).
+- **Single-tick Python FFI overhead:** Calling `.push(x)` from Python 1,000 times adds ~11 ms of `ctypes` call overhead; use `.push_batch(X)` (or C ABI / native `causalsieve-bin`) for full `385k–747k ticks/s` speed.
+- **Post-mortem `Tier-2` (`ScreenedSieve`) replay:** `ScreenedSieve` (`4.0 ms/case`) is built for live streaming firehoses (`D=128..16,384+`, `75.7M obs/s`, `100%` AC@1); on long `1,441`-tick post-mortem traces (`RE2`), its default `ring_cap=512` evicts the pre-fault baseline (`use_screened=False` dense Tier-1 is recommended for post-mortem replay).
+- **Purely nonlinear / Gaussian contemporaneous cases:** Default linear `VAR(p)` misses pure ReLU/threshold cascades (enable `nonlinear_hinge=True` for `0.450` AC@1 / `0.685` MRR on saturation cascades at `2×` feature width). Gaussian contemporaneous shocks have valid undirected precision skeletons while orientation requires non-Gaussianity by theory.
 
 ---
 
@@ -146,17 +198,20 @@ We report failures and crossovers alongside wins:
 
 ```sh
 make test-asan                                    # C++20 unit tests under ASan + UBSan (0 findings)
-pytest tests/ -v                                  # 48/48 oracle, causality, RCA, adapters, digest, MCP
-pytest tests/breaker_audit.py -v                  # 29/29 adversarial security, provenance & zero-dep audit
+pytest tests/ -v                                  # 59/59 oracle, dispatch, causality, RCA, adapters, digest, MCP
+pytest tests/breaker_audit.py -v                  # 29/29 adversarial security, 8/8 SHA-256 provenance & zero-dep audit
 python3 benchmarks/bench_speed.py                 # Speed vs statsmodels, tigramite, sklearn, river, NumPy
 python3 benchmarks/bench_optimization_log.py      # 5-stage compounding optimization ladder
 python3 benchmarks/bench_synthetic_rca.py         # 100-episode multi-regime RCA
 python3 benchmarks/bench_sift_scale.py            # Tier-2 D=128..4096 loud-decoy firehose
 python3 benchmarks/bench_rcaeval.py               # Real Kubernetes RCAEval (10 DEV + 40 sealed holdout)
 python3 benchmarks/bench_rcaeval_trainticket.py   # Real 64-service Train Ticket (25 incidents, D~217)
+python3 benchmarks/bench_rcaeval_suite.py         # ALL 645 real Kubernetes RE1 + RE2 OpenTelemetry incidents
+python3 benchmarks/bench_agent_tokens.py          # Agent BPE token overflow, 0.0 FP64 slice:// & Blackboard consensus
+python3 benchmarks/generate_charts.py             # Regenerate all 4 SVG figures directly from frozen JSONs
 ```
 
-Open [`demo/causalsieve_explorer.html`](demo/causalsieve_explorer.html) locally in any browser (zero external requests / zero CDN) — or via GitHub Pages at [pgg898200-ship-it.github.io/causalsieve](https://pgg898200-ship-it.github.io/causalsieve/) — for an interactive causal cascade simulator and benchmark dashboard.
+Open [`demo/causalsieve_explorer.html`](demo/causalsieve_explorer.html) locally in any browser (zero external requests / zero CDN) — or live at [pgg898200-ship-it.github.io/causalsieve](https://pgg898200-ship-it.github.io/causalsieve/).
 
 ---
 

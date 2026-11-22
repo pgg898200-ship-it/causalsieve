@@ -20,10 +20,10 @@
     ],
     "repetition": 2,
     "simd_isa": "avx2+fma",
-    "lib_sha256": "69e960d01e22f976a907e6de4f35ccadc048f07b8ac11f1dae481eaab5cdc6e6"
+    "lib_sha256": "e97025decbdf06663c73a63fa9adee73d9cae52e56661ba77098031f8d51bc36"
   },
   "system": {
-    "timestamp_utc": "2026-11-22T18:12:31.297818+00:00",
+    "timestamp_utc": "2026-11-22T20:24:05.746393+00:00",
     "platform": "Linux-6.18.57-x86_64-with-glibc2.39",
     "cpu_model": "Intel(R) Xeon(R) CPU @ 2.30GHz",
     "cpu_count_logical": 2,
@@ -34,8 +34,8 @@
       "sse4_2"
     ],
     "compiler": "g++ (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
-    "lib_sha256": "69e960d01e22f976a907e6de4f35ccadc048f07b8ac11f1dae481eaab5cdc6e6",
-    "lib_scalar_sha256": "a38bcb0d3ad6aa1c9f034e4bf5bd31ce20f5700df1ef37750d401b5c871984b9",
+    "lib_sha256": "e97025decbdf06663c73a63fa9adee73d9cae52e56661ba77098031f8d51bc36",
+    "lib_scalar_sha256": "7a8b2d1d9d4f673dc315e2b91b2e8c97190aafd0cfcf0e0b22e70caf22a99670",
     "versions": {
       "python": "3.12.16",
       "numpy": "2.5.5",
@@ -89,8 +89,8 @@
     "active_D": 211,
     "total_pairs": 44310,
     "timed_pairs": 1000,
-    "timed_ms": 48.01,
-    "extrapolated_full_o_d2_ms": 2127.3,
+    "timed_ms": 52.07,
+    "extrapolated_full_o_d2_ms": 2307.2,
     "extrapolated": true
   },
   "summary": {
@@ -102,8 +102,8 @@
       "avg5": 0.30400000000000005,
       "mrr": 0.28763595474487436,
       "mean_rank": 12.64,
-      "mean_ms": 4.28,
-      "median_ms": 4.24
+      "mean_ms": 4.24,
+      "median_ms": 3.97
     },
     "causalsieve_tier1": {
       "n": 25,
@@ -113,8 +113,8 @@
       "avg5": 0.768,
       "mrr": 0.6689890710382513,
       "mean_rank": 4.44,
-      "mean_ms": 374.97,
-      "median_ms": 379.16
+      "mean_ms": 214.83,
+      "median_ms": 218.08
     },
     "causalsieve_tier1_blind": {
       "n": 25,
@@ -124,8 +124,8 @@
       "avg5": 0.6,
       "mrr": 0.5886962995724605,
       "mean_rank": 5.0,
-      "mean_ms": 341.32,
-      "median_ms": 336.6
+      "mean_ms": 200.32,
+      "median_ms": 200.98
     },
     "raw_max_z": {
       "n": 25,
@@ -135,8 +135,8 @@
       "avg5": 0.48,
       "mrr": 0.37806060606060604,
       "mean_rank": 5.72,
-      "mean_ms": 3.07,
-      "median_ms": 2.75
+      "mean_ms": 2.98,
+      "median_ms": 2.94
     },
     "rolling_mad_z": {
       "n": 25,
@@ -146,8 +146,8 @@
       "avg5": 0.41600000000000004,
       "mrr": 0.34329210134128163,
       "mean_rank": 6.72,
-      "mean_ms": 8.62,
-      "median_ms": 8.42
+      "mean_ms": 9.13,
+      "median_ms": 8.77
     },
     "pairwise_granger_z": {
       "n": 25,
@@ -157,8 +157,8 @@
       "avg5": 0.376,
       "mrr": 0.34427588422506455,
       "mean_rank": 10.2,
-      "mean_ms": 148.1,
-      "median_ms": 140.55
+      "mean_ms": 166.19,
+      "median_ms": 162.41
     },
     "sklearn_isolation_forest": {
       "n": 25,
@@ -168,8 +168,8 @@
       "avg5": 0.08,
       "mrr": 0.12966053585569715,
       "mean_rank": 18.72,
-      "mean_ms": 20359.98,
-      "median_ms": 20548.08
+      "mean_ms": 22168.43,
+      "median_ms": 22292.07
     }
   },
   "by_fault": {
@@ -855,7 +855,7 @@
             "ts-travel-plan-service",
             "ts-admin-basic-info-service"
           ],
-          "ms": 4.27
+          "ms": 4.25
         },
         "causalsieve_tier1": {
           "rank": 4,
@@ -866,7 +866,7 @@
             "ts-auth-service",
             "ts-execute-service"
           ],
-          "ms": 425.0
+          "ms": 278.43
         },
         "causalsieve_tier1_blind": {
           "rank": 15,
@@ -877,7 +877,7 @@
             "ts-auth-mongo",
             "ts-config-mongo"
           ],
-          "ms": 432.12
+          "ms": 237.65
         },
         "raw_max_z": {
           "rank": 4,
@@ -888,7 +888,7 @@
             "ts-auth-service",
             "ts-train-mongo"
           ],
-          "ms": 2.98
+          "ms": 3.44
         },
         "rolling_mad_z": {
           "rank": 11,
@@ -899,7 +899,7 @@
             "ts-price-mongo",
             "ts-order-mongo"
           ],
-          "ms": 8.67
+          "ms": 11.07
         },
         "pairwise_granger_z": {
           "rank": 24,
@@ -910,7 +910,7 @@
             "ts-food-map-service",
             "ts-order-mongo"
           ],
-          "ms": 145.19
+          "ms": 164.22
         },
         "sklearn_isolation_forest": {
           "rank": 12,
@@ -921,7 +921,7 @@
             "ts-payment-service",
             "ts-inside-payment-service"
           ],
-          "ms": 20732.58
+          "ms": 22959.94
         }
       }
     },
@@ -953,7 +953,7 @@
             "ts-price-mongo",
             "ts-food-map-mongo"
           ],
-          "ms": 4.07
+          "ms": 3.81
         },
         "causalsieve_tier1": {
           "rank": 1,
@@ -964,7 +964,7 @@
             "ts-assurance-service",
             "ts-admin-travel-service"
           ],
-          "ms": 309.78
+          "ms": 183.46
         },
         "causalsieve_tier1_blind": {
           "rank": 1,
@@ -975,7 +975,7 @@
             "ts-ui-dashboard",
             "ts-order-service"
           ],
-          "ms": 254.68
+          "ms": 165.28
         },
         "raw_max_z": {
           "rank": 1,
@@ -986,7 +986,7 @@
             "ts-assurance-service",
             "ts-admin-order-service"
           ],
-          "ms": 2.42
+          "ms": 2.62
         },
         "rolling_mad_z": {
           "rank": 3,
@@ -997,7 +997,7 @@
             "ts-ui-dashboard",
             "ts-assurance-service"
           ],
-          "ms": 7.48
+          "ms": 8.19
         },
         "pairwise_granger_z": {
           "rank": 1,
@@ -1008,7 +1008,7 @@
             "ts-food-service",
             "ts-consign-service"
           ],
-          "ms": 136.7
+          "ms": 163.89
         },
         "sklearn_isolation_forest": {
           "rank": 6,
@@ -1019,7 +1019,7 @@
             "ts-ui-dashboard",
             "ts-execute-service"
           ],
-          "ms": 18783.08
+          "ms": 20903.45
         }
       }
     },
@@ -1051,7 +1051,7 @@
             "ts-food-service",
             "ts-food-map-service"
           ],
-          "ms": 3.87
+          "ms": 4.55
         },
         "causalsieve_tier1": {
           "rank": 2,
@@ -1062,7 +1062,7 @@
             "ts-payment-service",
             "ts-admin-user-service"
           ],
-          "ms": 340.95
+          "ms": 227.02
         },
         "causalsieve_tier1_blind": {
           "rank": 1,
@@ -1073,7 +1073,7 @@
             "ts-assurance-service",
             "ts-notification-service"
           ],
-          "ms": 324.09
+          "ms": 243.07
         },
         "raw_max_z": {
           "rank": 3,
@@ -1084,7 +1084,7 @@
             "ts-food-map-service",
             "ts-payment-service"
           ],
-          "ms": 2.75
+          "ms": 3.12
         },
         "rolling_mad_z": {
           "rank": 3,
@@ -1095,7 +1095,7 @@
             "ts-food-map-service",
             "ts-payment-service"
           ],
-          "ms": 7.2
+          "ms": 8.54
         },
         "pairwise_granger_z": {
           "rank": 4,
@@ -1106,7 +1106,7 @@
             "ts-auth-service",
             "ts-travel2-mongo"
           ],
-          "ms": 127.44
+          "ms": 160.7
         },
         "sklearn_isolation_forest": {
           "rank": 9,
@@ -1117,7 +1117,7 @@
             "ts-rebook-service",
             "ts-food-map-service"
           ],
-          "ms": 21062.34
+          "ms": 23330.61
         }
       }
     },
@@ -1149,7 +1149,7 @@
             "ts-admin-basic-info-service",
             "ts-config-mongo"
           ],
-          "ms": 4.28
+          "ms": 4.49
         },
         "causalsieve_tier1": {
           "rank": 8,
@@ -1160,7 +1160,7 @@
             "ts-travel2-mongo",
             "ts-price-mongo"
           ],
-          "ms": 496.0
+          "ms": 269.21
         },
         "causalsieve_tier1_blind": {
           "rank": 12,
@@ -1171,7 +1171,7 @@
             "ts-inside-payment-service",
             "ts-payment-service"
           ],
-          "ms": 331.58
+          "ms": 200.98
         },
         "raw_max_z": {
           "rank": 4,
@@ -1182,7 +1182,7 @@
             "ts-auth-service",
             "ts-config-mongo"
           ],
-          "ms": 2.6
+          "ms": 2.95
         },
         "rolling_mad_z": {
           "rank": 8,
@@ -1193,7 +1193,7 @@
             "ts-payment-service",
             "ts-price-mongo"
           ],
-          "ms": 8.41
+          "ms": 9.08
         },
         "pairwise_granger_z": {
           "rank": 26,
@@ -1204,7 +1204,7 @@
             "ts-consign-service",
             "ts-payment-service"
           ],
-          "ms": 138.9
+          "ms": 156.76
         },
         "sklearn_isolation_forest": {
           "rank": 13,
@@ -1215,7 +1215,7 @@
             "ts-ui-dashboard",
             "ts-travel-service"
           ],
-          "ms": 20548.08
+          "ms": 24129.77
         }
       }
     },
@@ -1247,7 +1247,7 @@
             "ts-ticket-office-mongo",
             "ts-preserve-other-service"
           ],
-          "ms": 4.96
+          "ms": 3.99
         },
         "causalsieve_tier1": {
           "rank": 6,
@@ -1258,7 +1258,7 @@
             "ts-price-mongo",
             "ts-travel-service"
           ],
-          "ms": 446.59
+          "ms": 221.49
         },
         "causalsieve_tier1_blind": {
           "rank": 19,
@@ -1269,7 +1269,7 @@
             "ts-price-mongo",
             "ts-travel-mongo"
           ],
-          "ms": 571.7
+          "ms": 195.68
         },
         "raw_max_z": {
           "rank": 5,
@@ -1280,7 +1280,7 @@
             "ts-order-mongo",
             "ts-auth-service"
           ],
-          "ms": 7.43
+          "ms": 2.82
         },
         "rolling_mad_z": {
           "rank": 5,
@@ -1291,7 +1291,7 @@
             "ts-auth-mongo",
             "ts-auth-service"
           ],
-          "ms": 17.06
+          "ms": 8.48
         },
         "pairwise_granger_z": {
           "rank": 13,
@@ -1302,7 +1302,7 @@
             "ts-admin-travel-service",
             "ts-travel-service"
           ],
-          "ms": 361.02
+          "ms": 158.02
         },
         "sklearn_isolation_forest": {
           "rank": 25,
@@ -1313,7 +1313,7 @@
             "ts-config-service",
             "ts-avatar-service"
           ],
-          "ms": 21620.99
+          "ms": 22554.31
         }
       }
     },
@@ -1345,7 +1345,7 @@
             "ts-contacts-service",
             "ts-route-service"
           ],
-          "ms": 4.01
+          "ms": 3.82
         },
         "causalsieve_tier1": {
           "rank": 2,
@@ -1356,7 +1356,7 @@
             "ts-preserve-service",
             "ts-contacts-service"
           ],
-          "ms": 383.77
+          "ms": 213.26
         },
         "causalsieve_tier1_blind": {
           "rank": 8,
@@ -1367,7 +1367,7 @@
             "ts-contacts-service",
             "ts-assurance-mongo"
           ],
-          "ms": 328.06
+          "ms": 193.21
         },
         "raw_max_z": {
           "rank": 4,
@@ -1378,7 +1378,7 @@
             "ts-order-service",
             "ts-travel-service"
           ],
-          "ms": 2.62
+          "ms": 2.89
         },
         "rolling_mad_z": {
           "rank": 3,
@@ -1389,7 +1389,7 @@
             "ts-inside-payment-service",
             "ts-contacts-service"
           ],
-          "ms": 8.28
+          "ms": 8.77
         },
         "pairwise_granger_z": {
           "rank": 21,
@@ -1400,7 +1400,7 @@
             "ts-consign-service",
             "ts-travel-service"
           ],
-          "ms": 144.69
+          "ms": 162.73
         },
         "sklearn_isolation_forest": {
           "rank": 22,
@@ -1411,7 +1411,7 @@
             "ts-contacts-service",
             "ts-consign-service"
           ],
-          "ms": 20454.34
+          "ms": 22253.95
         }
       }
     },
@@ -1443,7 +1443,7 @@
             "ts-price-mongo",
             "ts-route-mongo"
           ],
-          "ms": 4.11
+          "ms": 3.96
         },
         "causalsieve_tier1": {
           "rank": 1,
@@ -1454,7 +1454,7 @@
             "ts-travel-mongo",
             "ts-config-mongo"
           ],
-          "ms": 299.94
+          "ms": 181.96
         },
         "causalsieve_tier1_blind": {
           "rank": 1,
@@ -1465,7 +1465,7 @@
             "ts-price-mongo",
             "ts-admin-user-service"
           ],
-          "ms": 252.69
+          "ms": 161.89
         },
         "raw_max_z": {
           "rank": 1,
@@ -1476,7 +1476,7 @@
             "ts-config-mongo",
             "ts-food-map-mongo"
           ],
-          "ms": 2.5
+          "ms": 2.8
         },
         "rolling_mad_z": {
           "rank": 1,
@@ -1487,7 +1487,7 @@
             "ts-travel-mongo",
             "ts-inside-payment-service"
           ],
-          "ms": 7.59
+          "ms": 8.21
         },
         "pairwise_granger_z": {
           "rank": 1,
@@ -1498,7 +1498,7 @@
             "ts-inside-payment-service",
             "ts-station-mongo"
           ],
-          "ms": 138.04
+          "ms": 156.28
         },
         "sklearn_isolation_forest": {
           "rank": 2,
@@ -1509,7 +1509,7 @@
             "ts-auth-mongo",
             "ts-payment-service"
           ],
-          "ms": 18730.27
+          "ms": 20264.42
         }
       }
     },
@@ -1541,7 +1541,7 @@
             "ts-consign-service",
             "ts-user-mongo"
           ],
-          "ms": 4.09
+          "ms": 3.87
         },
         "causalsieve_tier1": {
           "rank": 2,
@@ -1552,7 +1552,7 @@
             "ts-seat-service",
             "ts-preserve-other-service"
           ],
-          "ms": 342.75
+          "ms": 200.37
         },
         "causalsieve_tier1_blind": {
           "rank": 7,
@@ -1563,7 +1563,7 @@
             "ts-travel2-mongo",
             "ts-assurance-service"
           ],
-          "ms": 340.1
+          "ms": 196.32
         },
         "raw_max_z": {
           "rank": 5,
@@ -1574,7 +1574,7 @@
             "ts-seat-service",
             "ts-order-service"
           ],
-          "ms": 2.9
+          "ms": 3.05
         },
         "rolling_mad_z": {
           "rank": 5,
@@ -1585,7 +1585,7 @@
             "ts-user-service",
             "ts-order-service"
           ],
-          "ms": 7.72
+          "ms": 8.07
         },
         "pairwise_granger_z": {
           "rank": 4,
@@ -1596,7 +1596,7 @@
             "ts-order-service",
             "ts-preserve-other-service"
           ],
-          "ms": 129.59
+          "ms": 157.68
         },
         "sklearn_isolation_forest": {
           "rank": 11,
@@ -1607,7 +1607,7 @@
             "ts-consign-price-service",
             "ts-payment-service"
           ],
-          "ms": 21148.98
+          "ms": 23194.37
         }
       }
     },
@@ -1639,7 +1639,7 @@
             "ts-security-service",
             "ts-config-service"
           ],
-          "ms": 4.26
+          "ms": 4.79
         },
         "causalsieve_tier1": {
           "rank": 2,
@@ -1650,7 +1650,7 @@
             "ts-security-service",
             "ts-inside-payment-service"
           ],
-          "ms": 375.49
+          "ms": 228.41
         },
         "causalsieve_tier1_blind": {
           "rank": 2,
@@ -1661,7 +1661,7 @@
             "ts-food-service",
             "ts-admin-travel-service"
           ],
-          "ms": 318.11
+          "ms": 208.43
         },
         "raw_max_z": {
           "rank": 5,
@@ -1672,7 +1672,7 @@
             "ts-seat-service",
             "ts-order-service"
           ],
-          "ms": 2.77
+          "ms": 2.97
         },
         "rolling_mad_z": {
           "rank": 5,
@@ -1683,7 +1683,7 @@
             "ts-seat-service",
             "ts-order-service"
           ],
-          "ms": 8.7
+          "ms": 9.29
         },
         "pairwise_granger_z": {
           "rank": 5,
@@ -1694,7 +1694,7 @@
             "ts-preserve-service",
             "ts-order-service"
           ],
-          "ms": 138.26
+          "ms": 169.82
         },
         "sklearn_isolation_forest": {
           "rank": 6,
@@ -1705,7 +1705,7 @@
             "ts-rebook-service",
             "ts-security-service"
           ],
-          "ms": 20131.44
+          "ms": 22267.29
         }
       }
     },
@@ -1737,7 +1737,7 @@
             "ts-order-service",
             "ts-order-other-service"
           ],
-          "ms": 4.45
+          "ms": 4.55
         },
         "causalsieve_tier1": {
           "rank": 1,
@@ -1748,7 +1748,7 @@
             "ts-seat-service",
             "ts-preserve-service"
           ],
-          "ms": 379.16
+          "ms": 219.76
         },
         "causalsieve_tier1_blind": {
           "rank": 1,
@@ -1759,7 +1759,7 @@
             "ts-security-service",
             "ts-seat-service"
           ],
-          "ms": 324.86
+          "ms": 203.1
         },
         "raw_max_z": {
           "rank": 1,
@@ -1770,7 +1770,7 @@
             "ts-seat-service",
             "ts-config-mongo"
           ],
-          "ms": 2.82
+          "ms": 3.03
         },
         "rolling_mad_z": {
           "rank": 1,
@@ -1781,7 +1781,7 @@
             "ts-security-service",
             "ts-inside-payment-service"
           ],
-          "ms": 8.51
+          "ms": 9.12
         },
         "pairwise_granger_z": {
           "rank": 1,
@@ -1792,7 +1792,7 @@
             "ts-inside-payment-service",
             "ts-travel-mongo"
           ],
-          "ms": 144.92
+          "ms": 160.28
         },
         "sklearn_isolation_forest": {
           "rank": 1,
@@ -1803,7 +1803,7 @@
             "ts-travel-service",
             "ts-preserve-service"
           ],
-          "ms": 24277.68
+          "ms": 22292.07
         }
       }
     },
@@ -1835,7 +1835,7 @@
             "ts-preserve-other-service",
             "ts-consign-price-service"
           ],
-          "ms": 4.75
+          "ms": 3.97
         },
         "causalsieve_tier1": {
           "rank": 2,
@@ -1846,7 +1846,7 @@
             "ts-preserve-other-service",
             "ts-travel2-service"
           ],
-          "ms": 376.76
+          "ms": 218.5
         },
         "causalsieve_tier1_blind": {
           "rank": 1,
@@ -1857,7 +1857,7 @@
             "ts-consign-mongo",
             "ts-preserve-other-service"
           ],
-          "ms": 317.82
+          "ms": 192.91
         },
         "raw_max_z": {
           "rank": 3,
@@ -1868,7 +1868,7 @@
             "ts-consign-price-service",
             "ts-food-service"
           ],
-          "ms": 2.65
+          "ms": 2.83
         },
         "rolling_mad_z": {
           "rank": 3,
@@ -1879,7 +1879,7 @@
             "ts-travel-plan-service",
             "ts-food-service"
           ],
-          "ms": 9.36
+          "ms": 8.69
         },
         "pairwise_granger_z": {
           "rank": 10,
@@ -1890,7 +1890,7 @@
             "ts-consign-price-service",
             "ts-order-other-service"
           ],
-          "ms": 141.15
+          "ms": 162.41
         },
         "sklearn_isolation_forest": {
           "rank": 32,
@@ -1901,7 +1901,7 @@
             "ts-avatar-service",
             "ts-travel-mongo"
           ],
-          "ms": 20980.66
+          "ms": 22350.53
         }
       }
     },
@@ -1933,7 +1933,7 @@
             "ts-config-mongo",
             "ts-train-mongo"
           ],
-          "ms": 4.12
+          "ms": 3.93
         },
         "causalsieve_tier1": {
           "rank": 1,
@@ -1944,7 +1944,7 @@
             "ts-order-service",
             "ts-travel-mongo"
           ],
-          "ms": 299.55
+          "ms": 175.88
         },
         "causalsieve_tier1_blind": {
           "rank": 1,
@@ -1955,7 +1955,7 @@
             "ts-station-mongo",
             "ts-config-mongo"
           ],
-          "ms": 267.82
+          "ms": 170.96
         },
         "raw_max_z": {
           "rank": 1,
@@ -1966,7 +1966,7 @@
             "ts-travel-service",
             "ts-travel2-service"
           ],
-          "ms": 2.72
+          "ms": 2.7
         },
         "rolling_mad_z": {
           "rank": 1,
@@ -1977,7 +1977,7 @@
             "ts-consign-price-service",
             "ts-consign-service"
           ],
-          "ms": 8.82
+          "ms": 8.21
         },
         "pairwise_granger_z": {
           "rank": 1,
@@ -1988,7 +1988,7 @@
             "ts-consign-service",
             "ts-travel2-service"
           ],
-          "ms": 141.59
+          "ms": 162.17
         },
         "sklearn_isolation_forest": {
           "rank": 11,
@@ -1999,7 +1999,7 @@
             "ts-order-other-service",
             "ts-auth-service"
           ],
-          "ms": 19034.02
+          "ms": 20685.83
         }
       }
     },
@@ -2031,7 +2031,7 @@
             "ts-config-service",
             "ts-auth-mongo"
           ],
-          "ms": 4.26
+          "ms": 7.97
         },
         "causalsieve_tier1": {
           "rank": 1,
@@ -2042,7 +2042,7 @@
             "ts-security-service",
             "ts-seat-service"
           ],
-          "ms": 375.34
+          "ms": 218.08
         },
         "causalsieve_tier1_blind": {
           "rank": 2,
@@ -2053,7 +2053,7 @@
             "ts-preserve-other-service",
             "ts-payment-service"
           ],
-          "ms": 377.03
+          "ms": 213.1
         },
         "raw_max_z": {
           "rank": 4,
@@ -2064,7 +2064,7 @@
             "ts-route-service",
             "ts-security-service"
           ],
-          "ms": 2.71
+          "ms": 4.16
         },
         "rolling_mad_z": {
           "rank": 2,
@@ -2075,7 +2075,7 @@
             "ts-notification-service",
             "ts-security-service"
           ],
-          "ms": 7.08
+          "ms": 8.46
         },
         "pairwise_granger_z": {
           "rank": 3,
@@ -2086,7 +2086,7 @@
             "ts-preserve-other-service",
             "ts-security-service"
           ],
-          "ms": 130.35
+          "ms": 149.29
         },
         "sklearn_isolation_forest": {
           "rank": 13,
@@ -2097,7 +2097,7 @@
             "ts-consign-service",
             "ts-order-other-service"
           ],
-          "ms": 21137.24
+          "ms": 22496.51
         }
       }
     },
@@ -2129,7 +2129,7 @@
             "ts-seat-service",
             "ts-ticketinfo-service"
           ],
-          "ms": 4.38
+          "ms": 4.89
         },
         "causalsieve_tier1": {
           "rank": 1,
@@ -2140,7 +2140,7 @@
             "ts-travel2-service",
             "ts-food-service"
           ],
-          "ms": 379.27
+          "ms": 217.53
         },
         "causalsieve_tier1_blind": {
           "rank": 1,
@@ -2151,7 +2151,7 @@
             "ts-travel-service",
             "ts-travel2-service"
           ],
-          "ms": 313.43
+          "ms": 191.01
         },
         "raw_max_z": {
           "rank": 2,
@@ -2162,7 +2162,7 @@
             "ts-travel-service",
             "ts-travel2-service"
           ],
-          "ms": 3.89
+          "ms": 2.94
         },
         "rolling_mad_z": {
           "rank": 2,
@@ -2173,7 +2173,7 @@
             "ts-food-service",
             "ts-seat-service"
           ],
-          "ms": 8.97
+          "ms": 9.65
         },
         "pairwise_granger_z": {
           "rank": 8,
@@ -2184,7 +2184,7 @@
             "ts-seat-service",
             "ts-food-service"
           ],
-          "ms": 140.55
+          "ms": 158.97
         },
         "sklearn_isolation_forest": {
           "rank": 9,
@@ -2195,7 +2195,7 @@
             "ts-ui-dashboard",
             "ts-preserve-other-service"
           ],
-          "ms": 20814.79
+          "ms": 22200.92
         }
       }
     },
@@ -2227,7 +2227,7 @@
             "ts-basic-service",
             "ts-travel2-service"
           ],
-          "ms": 5.5
+          "ms": 4.02
         },
         "causalsieve_tier1": {
           "rank": 2,
@@ -2238,7 +2238,7 @@
             "ts-travel2-service",
             "ts-ui-dashboard"
           ],
-          "ms": 395.03
+          "ms": 220.85
         },
         "causalsieve_tier1_blind": {
           "rank": 4,
@@ -2249,7 +2249,7 @@
             "ts-route-service",
             "ts-price-mongo"
           ],
-          "ms": 440.29
+          "ms": 228.07
         },
         "raw_max_z": {
           "rank": 3,
@@ -2260,7 +2260,7 @@
             "ts-food-service",
             "ts-travel2-service"
           ],
-          "ms": 3.58
+          "ms": 3.26
         },
         "rolling_mad_z": {
           "rank": 6,
@@ -2271,7 +2271,7 @@
             "ts-seat-service",
             "ts-travel-service"
           ],
-          "ms": 10.25
+          "ms": 9.4
         },
         "pairwise_granger_z": {
           "rank": 16,
@@ -2282,7 +2282,7 @@
             "ts-travel2-service",
             "ts-food-service"
           ],
-          "ms": 147.86
+          "ms": 180.11
         },
         "sklearn_isolation_forest": {
           "rank": 37,
@@ -2293,7 +2293,7 @@
             "ts-preserve-service",
             "ts-consign-price-service"
           ],
-          "ms": 21012.74
+          "ms": 24229.4
         }
       }
     },
@@ -2325,7 +2325,7 @@
             "ts-auth-service",
             "ts-contacts-service"
           ],
-          "ms": 4.33
+          "ms": 4.1
         },
         "causalsieve_tier1": {
           "rank": 1,
@@ -2336,7 +2336,7 @@
             "ts-execute-service",
             "ts-security-service"
           ],
-          "ms": 396.13
+          "ms": 237.06
         },
         "causalsieve_tier1_blind": {
           "rank": 6,
@@ -2347,7 +2347,7 @@
             "ts-admin-travel-service",
             "ts-assurance-service"
           ],
-          "ms": 336.6
+          "ms": 207.98
         },
         "raw_max_z": {
           "rank": 3,
@@ -2358,7 +2358,7 @@
             "ts-user-service",
             "ts-admin-travel-service"
           ],
-          "ms": 2.86
+          "ms": 3.02
         },
         "rolling_mad_z": {
           "rank": 2,
@@ -2369,7 +2369,7 @@
             "ts-notification-service",
             "ts-admin-travel-service"
           ],
-          "ms": 8.53
+          "ms": 9.47
         },
         "pairwise_granger_z": {
           "rank": 2,
@@ -2380,7 +2380,7 @@
             "ts-user-service",
             "ts-auth-service"
           ],
-          "ms": 146.46
+          "ms": 215.28
         },
         "sklearn_isolation_forest": {
           "rank": 20,
@@ -2391,7 +2391,7 @@
             "ts-assurance-service",
             "ts-cancel-service"
           ],
-          "ms": 20866.17
+          "ms": 23356.6
         }
       }
     },
@@ -2423,7 +2423,7 @@
             "ts-inside-payment-service",
             "ts-train-service"
           ],
-          "ms": 4.24
+          "ms": 3.88
         },
         "causalsieve_tier1": {
           "rank": 2,
@@ -2434,7 +2434,7 @@
             "ts-payment-service",
             "ts-travel2-service"
           ],
-          "ms": 427.69
+          "ms": 229.27
         },
         "causalsieve_tier1_blind": {
           "rank": 1,
@@ -2445,7 +2445,7 @@
             "ts-travel-service",
             "ts-config-service"
           ],
-          "ms": 351.15
+          "ms": 217.92
         },
         "raw_max_z": {
           "rank": 8,
@@ -2456,7 +2456,7 @@
             "ts-route-plan-service",
             "ts-notification-service"
           ],
-          "ms": 2.87
+          "ms": 2.98
         },
         "rolling_mad_z": {
           "rank": 8,
@@ -2467,7 +2467,7 @@
             "ts-route-plan-service",
             "ts-notification-service"
           ],
-          "ms": 8.95
+          "ms": 9.57
         },
         "pairwise_granger_z": {
           "rank": 2,
@@ -2478,7 +2478,7 @@
             "ts-admin-order-service",
             "ts-execute-service"
           ],
-          "ms": 139.82
+          "ms": 170.89
         },
         "sklearn_isolation_forest": {
           "rank": 28,
@@ -2489,7 +2489,7 @@
             "ts-execute-service",
             "ts-notification-service"
           ],
-          "ms": 20210.39
+          "ms": 22523.34
         }
       }
     },
@@ -2521,7 +2521,7 @@
             "ts-travel2-service",
             "ts-inside-payment-service"
           ],
-          "ms": 3.95
+          "ms": 3.8
         },
         "causalsieve_tier1": {
           "rank": 1,
@@ -2532,7 +2532,7 @@
             "ts-admin-user-service",
             "ts-consign-price-service"
           ],
-          "ms": 360.14
+          "ms": 188.74
         },
         "causalsieve_tier1_blind": {
           "rank": 1,
@@ -2543,7 +2543,7 @@
             "ts-assurance-service",
             "ts-food-map-mongo"
           ],
-          "ms": 356.47
+          "ms": 219.17
         },
         "raw_max_z": {
           "rank": 4,
@@ -2554,7 +2554,7 @@
             "ts-train-service",
             "ts-travel2-service"
           ],
-          "ms": 2.54
+          "ms": 2.76
         },
         "rolling_mad_z": {
           "rank": 5,
@@ -2565,7 +2565,7 @@
             "ts-order-other-service",
             "ts-train-service"
           ],
-          "ms": 7.06
+          "ms": 16.45
         },
         "pairwise_granger_z": {
           "rank": 5,
@@ -2576,7 +2576,7 @@
             "ts-order-other-service",
             "ts-train-service"
           ],
-          "ms": 129.38
+          "ms": 194.46
         },
         "sklearn_isolation_forest": {
           "rank": 36,
@@ -2587,7 +2587,7 @@
             "ts-notification-service",
             "ts-basic-service"
           ],
-          "ms": 20605.32
+          "ms": 22589.33
         }
       }
     },
@@ -2619,7 +2619,7 @@
             "ts-travel2-service",
             "ts-preserve-other-service"
           ],
-          "ms": 4.58
+          "ms": 3.89
         },
         "causalsieve_tier1": {
           "rank": 1,
@@ -2630,7 +2630,7 @@
             "ts-travel2-service",
             "ts-ui-dashboard"
           ],
-          "ms": 398.71
+          "ms": 229.84
         },
         "causalsieve_tier1_blind": {
           "rank": 1,
@@ -2641,7 +2641,7 @@
             "ts-seat-service",
             "ts-admin-travel-service"
           ],
-          "ms": 357.81
+          "ms": 219.05
         },
         "raw_max_z": {
           "rank": 8,
@@ -2652,7 +2652,7 @@
             "ts-avatar-service",
             "ts-rebook-service"
           ],
-          "ms": 5.37
+          "ms": 3.03
         },
         "rolling_mad_z": {
           "rank": 8,
@@ -2663,7 +2663,7 @@
             "ts-avatar-service",
             "ts-rebook-service"
           ],
-          "ms": 9.42
+          "ms": 9.39
         },
         "pairwise_granger_z": {
           "rank": 1,
@@ -2674,7 +2674,7 @@
             "ts-admin-user-service",
             "ts-avatar-service"
           ],
-          "ms": 142.98
+          "ms": 172.77
         },
         "sklearn_isolation_forest": {
           "rank": 25,
@@ -2685,7 +2685,7 @@
             "ts-avatar-service",
             "ts-execute-service"
           ],
-          "ms": 20478.91
+          "ms": 22067.5
         }
       }
     },
@@ -2717,7 +2717,7 @@
             "ts-admin-travel-service",
             "ts-price-mongo"
           ],
-          "ms": 4.35
+          "ms": 3.94
         },
         "causalsieve_tier1": {
           "rank": 1,
@@ -2728,7 +2728,7 @@
             "ts-travel2-mongo",
             "ts-price-mongo"
           ],
-          "ms": 321.7
+          "ms": 207.22
         },
         "causalsieve_tier1_blind": {
           "rank": 1,
@@ -2739,7 +2739,7 @@
             "ts-travel2-mongo",
             "ts-seat-service"
           ],
-          "ms": 348.49
+          "ms": 218.18
         },
         "raw_max_z": {
           "rank": 2,
@@ -2750,7 +2750,7 @@
             "ts-travel-service",
             "ts-seat-service"
           ],
-          "ms": 2.92
+          "ms": 3.17
         },
         "rolling_mad_z": {
           "rank": 2,
@@ -2761,7 +2761,7 @@
             "ts-travel2-service",
             "ts-seat-service"
           ],
-          "ms": 8.8
+          "ms": 9.04
         },
         "pairwise_granger_z": {
           "rank": 5,
@@ -2772,7 +2772,7 @@
             "ts-seat-service",
             "ts-train-service"
           ],
-          "ms": 141.66
+          "ms": 162.9
         },
         "sklearn_isolation_forest": {
           "rank": 18,
@@ -2783,7 +2783,7 @@
             "ts-travel-service",
             "ts-preserve-service"
           ],
-          "ms": 20719.16
+          "ms": 22770.7
         }
       }
     },
@@ -2815,7 +2815,7 @@
             "ts-assurance-service",
             "ts-route-mongo"
           ],
-          "ms": 4.15
+          "ms": 4.02
         },
         "causalsieve_tier1": {
           "rank": 3,
@@ -2826,7 +2826,7 @@
             "ts-food-service",
             "ts-route-plan-service"
           ],
-          "ms": 402.31
+          "ms": 230.11
         },
         "causalsieve_tier1_blind": {
           "rank": 2,
@@ -2837,7 +2837,7 @@
             "ts-admin-travel-service",
             "ts-contacts-service"
           ],
-          "ms": 340.12
+          "ms": 194.27
         },
         "raw_max_z": {
           "rank": 6,
@@ -2848,7 +2848,7 @@
             "ts-seat-service",
             "ts-food-service"
           ],
-          "ms": 2.79
+          "ms": 2.94
         },
         "rolling_mad_z": {
           "rank": 4,
@@ -2859,7 +2859,7 @@
             "ts-travel-service",
             "ts-seat-service"
           ],
-          "ms": 8.42
+          "ms": 9.17
         },
         "pairwise_granger_z": {
           "rank": 4,
@@ -2870,7 +2870,7 @@
             "ts-travel-service",
             "ts-seat-service"
           ],
-          "ms": 143.22
+          "ms": 161.53
         },
         "sklearn_isolation_forest": {
           "rank": 5,
@@ -2881,7 +2881,7 @@
             "ts-order-other-mongo",
             "ts-travel-service"
           ],
-          "ms": 20531.47
+          "ms": 22281.7
         }
       }
     },
@@ -2913,7 +2913,7 @@
             "ts-travel-mongo",
             "ts-config-service"
           ],
-          "ms": 3.89
+          "ms": 3.73
         },
         "causalsieve_tier1": {
           "rank": 1,
@@ -2924,7 +2924,7 @@
             "ts-admin-user-service",
             "ts-travel-mongo"
           ],
-          "ms": 300.7
+          "ms": 176.7
         },
         "causalsieve_tier1_blind": {
           "rank": 1,
@@ -2935,7 +2935,7 @@
             "ts-train-mongo",
             "ts-price-service"
           ],
-          "ms": 341.41
+          "ms": 188.93
         },
         "raw_max_z": {
           "rank": 4,
@@ -2946,7 +2946,7 @@
             "ts-travel-service",
             "ts-food-service"
           ],
-          "ms": 2.48
+          "ms": 2.67
         },
         "rolling_mad_z": {
           "rank": 4,
@@ -2957,7 +2957,7 @@
             "ts-travel-service",
             "ts-food-service"
           ],
-          "ms": 7.66
+          "ms": 7.92
         },
         "pairwise_granger_z": {
           "rank": 4,
@@ -2968,7 +2968,7 @@
             "ts-travel-service",
             "ts-admin-travel-service"
           ],
-          "ms": 138.31
+          "ms": 162.05
         },
         "sklearn_isolation_forest": {
           "rank": 42,
@@ -2979,7 +2979,7 @@
             "ts-admin-order-service",
             "ts-price-service"
           ],
-          "ms": 18209.06
+          "ms": 20045.86
         }
       }
     },
@@ -3011,7 +3011,7 @@
             "ts-travel-mongo",
             "ts-travel-service"
           ],
-          "ms": 4.1
+          "ms": 3.83
         },
         "causalsieve_tier1": {
           "rank": 1,
@@ -3022,7 +3022,7 @@
             "ts-assurance-service",
             "ts-admin-travel-service"
           ],
-          "ms": 375.24
+          "ms": 181.77
         },
         "causalsieve_tier1_blind": {
           "rank": 5,
@@ -3033,7 +3033,7 @@
             "ts-assurance-mongo",
             "ts-travel-service"
           ],
-          "ms": 382.86
+          "ms": 209.02
         },
         "raw_max_z": {
           "rank": 4,
@@ -3044,7 +3044,7 @@
             "ts-travel-service",
             "ts-admin-travel-service"
           ],
-          "ms": 2.66
+          "ms": 2.93
         },
         "rolling_mad_z": {
           "rank": 5,
@@ -3055,7 +3055,7 @@
             "ts-order-other-service",
             "ts-travel-service"
           ],
-          "ms": 7.0
+          "ms": 7.5
         },
         "pairwise_granger_z": {
           "rank": 8,
@@ -3066,7 +3066,7 @@
             "ts-order-other-service",
             "ts-user-service"
           ],
-          "ms": 129.02
+          "ms": 147.54
         },
         "sklearn_isolation_forest": {
           "rank": 11,
@@ -3077,7 +3077,7 @@
             "ts-preserve-other-service",
             "ts-user-service"
           ],
-          "ms": 20300.5
+          "ms": 22283.1
         }
       }
     },
@@ -3109,7 +3109,7 @@
             "ts-food-service",
             "ts-admin-route-service"
           ],
-          "ms": 4.13
+          "ms": 3.96
         },
         "causalsieve_tier1": {
           "rank": 3,
@@ -3120,7 +3120,7 @@
             "ts-auth-service",
             "ts-food-service"
           ],
-          "ms": 383.98
+          "ms": 202.99
         },
         "causalsieve_tier1_blind": {
           "rank": 14,
@@ -3131,7 +3131,7 @@
             "ts-admin-route-service",
             "ts-config-service"
           ],
-          "ms": 265.82
+          "ms": 160.2
         },
         "raw_max_z": {
           "rank": 3,
@@ -3142,7 +3142,7 @@
             "ts-preserve-other-service",
             "ts-news-service"
           ],
-          "ms": 2.46
+          "ms": 2.64
         },
         "rolling_mad_z": {
           "rank": 10,
@@ -3153,7 +3153,7 @@
             "ts-consign-service",
             "ts-seat-service"
           ],
-          "ms": 7.84
+          "ms": 7.89
         },
         "pairwise_granger_z": {
           "rank": 25,
@@ -3164,7 +3164,7 @@
             "ts-basic-service",
             "ts-auth-service"
           ],
-          "ms": 146.1
+          "ms": 173.5
         },
         "sklearn_isolation_forest": {
           "rank": 12,
@@ -3175,7 +3175,7 @@
             "ts-consign-service",
             "ts-order-other-service"
           ],
-          "ms": 18698.89
+          "ms": 20421.06
         }
       }
     },
@@ -3207,7 +3207,7 @@
             "ts-station-mongo",
             "ts-order-service"
           ],
-          "ms": 3.99
+          "ms": 4.05
         },
         "causalsieve_tier1": {
           "rank": 61,
@@ -3218,7 +3218,7 @@
             "ts-food-service",
             "ts-config-service"
           ],
-          "ms": 382.24
+          "ms": 212.76
         },
         "causalsieve_tier1_blind": {
           "rank": 17,
@@ -3229,7 +3229,7 @@
             "ts-food-mongo",
             "ts-ticket-office-mongo"
           ],
-          "ms": 257.79
+          "ms": 171.53
         },
         "raw_max_z": {
           "rank": 55,
@@ -3240,7 +3240,7 @@
             "ts-route-plan-service",
             "ts-food-service"
           ],
-          "ms": 2.5
+          "ms": 2.76
         },
         "rolling_mad_z": {
           "rank": 61,
@@ -3251,7 +3251,7 @@
             "ts-execute-service",
             "ts-food-map-service"
           ],
-          "ms": 7.8
+          "ms": 8.7
         },
         "pairwise_granger_z": {
           "rank": 61,
@@ -3262,7 +3262,7 @@
             "ts-route-service",
             "ts-price-service"
           ],
-          "ms": 139.34
+          "ms": 170.49
         },
         "sklearn_isolation_forest": {
           "rank": 62,
@@ -3273,7 +3273,7 @@
             "ts-consign-service",
             "ts-travel2-service"
           ],
-          "ms": 17910.3
+          "ms": 19758.17
         }
       }
     }

@@ -194,7 +194,18 @@ void test_atomic_validation_and_causality() {
     CHECK(cs_push(eng, bad.data(), nullptr, nullptr, nullptr) == -1, "Inf push must fail");
     CHECK(cs_tick_count(eng) == ticks_before, "Inf push must not increment tick");
 
-    /* Batch atomic rejection: NaN on row 35 of 40 must mutate ZERO rows */
+    /* Batch atomic rejection: NaN/Inf at every SIMD lane offset (0..23) must mutate ZERO rows */
+    for (size_t bad_pos = 0; bad_pos < 24; ++bad_pos) {
+        std::vector<double> bad_batch(X.begin() + 40 * 6, X.end());
+        bad_batch[bad_pos] = (bad_pos % 3 == 0)
+            ? std::numeric_limits<double>::quiet_NaN()
+            : ((bad_pos % 3 == 1) ? std::numeric_limits<double>::infinity()
+                                  : -std::numeric_limits<double>::infinity());
+        CHECK(cs_push_batch(eng, bad_batch.data(), 40, nullptr, nullptr, nullptr) == -1,
+              "batch NaN/Inf at lane offset must fail");
+        CHECK(cs_tick_count(eng) == ticks_before, "batch NaN/Inf must preserve tick_count");
+    }
+
     std::vector<double> bad_batch(X.begin() + 40 * 6, X.end());
     bad_batch[35 * 6 + 4] = -std::numeric_limits<double>::infinity();
     CHECK(cs_push_batch(eng, bad_batch.data(), 40, nullptr, nullptr, nullptr) == -1, "batch Inf must fail");

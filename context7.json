@@ -1,0 +1,22 @@
+{
+  "$schema": "https://context7.com/schema/context7.json",
+  "projectTitle": "CausalSieve",
+  "description": "Zero-runtime-dependency C++20 SIMD engine for online multivariate causal discovery (Block-Schur conditional Granger, innovation precision whitening, online LiNGAM orientation), anytime-valid Ville E-process change detection, counterfactual do-interventions, and lossless-recoverable stream digests.",
+  "folders": [],
+  "excludeFolders": [
+    "benchmarks/data",
+    "build",
+    "dist",
+    ".git",
+    "csrc",
+    "tests"
+  ],
+  "rules": [
+    "Install with `pip install causalsieve` (zero runtime dependencies) or run the MCP server with `uvx --from causalsieve causalsieve-mcp`.",
+    "Use `CausalSieve.push_batch()` with contiguous float64 NumPy arrays or `array('d')` buffers for peak batch throughput instead of per-tick Python loops.",
+    "Use `build_digest()` and `slice://<stream_id>/<channel>/<start>..<end>` recovery handles instead of passing raw telemetry CSV or JSON rows into LLM context.",
+    "Use `analyze_dataframe()`, `analyze_prometheus()`, `analyze_otlp_metrics()`, `analyze_jsonl()`, or `rcaeval_rca()` for zero-dependency ingestion with strict causal forward-fill.",
+    "Keep `normalize_scale=True` (default) for telemetry with large DC offsets or flat channels, and enable `nonlinear_hinge=True` only when modeling asymmetric threshold saturation cascades.",
+    "Use `causalsieve watch` to stream CSV or JSONL telemetry incrementally from stdin or files with real-time Ville E-process alerts."
+  ]
+}

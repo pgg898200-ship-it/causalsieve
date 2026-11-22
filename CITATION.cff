@@ -2,7 +2,7 @@ cff-version: 1.2.0
 message: "If you use CausalSieve in research, engineering, or benchmarks, please cite it as below."
 type: software
 title: "CausalSieve: Zero-Dependency SIMD Online Multivariate Causal Discovery, Exogenous Root-Cause Localization, and Lossless-Recoverable Stream Digests"
-version: "0.1.0"
+version: "0.2.0"
 date-released: "2026-11-22"
 license: MIT
 repository-code: "https://github.com/pgg898200-ship-it/causalsieve"

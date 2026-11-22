@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="920" height="580" viewBox="0 0 920 580" role="img" aria-label="CausalSieve LLM Token Compression with 0.0 FP64 Lossless Recovery">
+  <title>CausalSieve LLM Token Compression with 0.0 FP64 Lossless Recovery</title>
+  <desc>Comparison of raw telemetry tokens vs CausalSieve Digest tokens across synthetic and real Kubernetes RCAEval benchmarks.</desc>
+  <defs>
+    <linearGradient id="csBarGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#22d3ee"/>
+      <stop offset="100%" stop-color="#34d399"/>
+    </linearGradient>
+    <pattern id="skipHatch" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <rect width="8" height="8" fill="#1f242c"/>
+      <line x1="0" y1="0" x2="0" y2="8" stroke="#484f58" stroke-width="2"/>
+    </pattern>
+    <marker id="arrowCyan" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 1.5 L 9 5 L 0 8.5 z" fill="#22d3ee"/>
+    </marker>
+    <marker id="arrowMuted" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 1.5 L 9 5 L 0 8.5 z" fill="#94a3b8"/>
+    </marker>
+  </defs>
+  <rect x="0.5" y="0.5" width="919" height="579" rx="12" fill="#0d1117" stroke="#30363d" stroke-width="1"/>
+  <text x="24.0" y="34.0" fill="#e6edf3" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="18" font-weight="700" text-anchor="start">Telemetry Token Compression: Raw Context vs CausalSieve Digest</text>
+  <text x="24.0" y="54.0" fill="#8b949e" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" font-weight="400" text-anchor="start">Log10 token scale (~4 chars/token)  •  99.88%–99.98% context cut with 0.0 FP64 error slice:// recovery</text>
+  <rect x="24" y="68" width="12" height="12" rx="3" fill="#fb7185"/>
+  <text x="42.0" y="78.0" fill="#e6edf3" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="500" text-anchor="start">Raw Telemetry Tokens (CSV / JSON dump)</text>
+  <rect x="305" y="68" width="12" height="12" rx="3" fill="url(#csBarGrad)"/>
+  <text x="323.0" y="78.0" fill="#e6edf3" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="500" text-anchor="start">CausalSieve Digest Tokens (Root Causes + Graph + Certified PLA + slice://)</text>
+  <rect x="186.0" y="96.0" width="549.0" height="344.0" rx="6" fill="#161b22" stroke="#21262d"/>
+  <line x1="186.0" y1="96.0" x2="186.0" y2="440.0" stroke="#21262d" stroke-width="1" stroke-dasharray="3,3"/>
+  <text x="186.0" y="456.0" fill="#8b949e" font-family="'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace" font-size="10" font-weight="400" text-anchor="middle">1</text>
+  <line x1="277.5" y1="96.0" x2="277.5" y2="440.0" stroke="#21262d" stroke-width="1" stroke-dasharray="3,3"/>
+  <text x="277.5" y="456.0" fill="#8b949e" font-family="'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace" font-size="10" font-weight="400" text-anchor="middle">10</text>
+  <line x1="369.0" y1="96.0" x2="369.0" y2="440.0" stroke="#21262d" stroke-width="1" stroke-dasharray="3,3"/>
+  <text x="369.0" y="456.0" fill="#8b949e" font-family="'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace" font-size="10" font-weight="400" text-anchor="middle">100</text>
+  <line x1="460.5" y1="96.0" x2="460.5" y2="440.0" stroke="#21262d" stroke-width="1" stroke-dasharray="3,3"/>
+  <text x="460.5" y="456.0" fill="#8b949e" font-family="'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace" font-size="10" font-weight="400" text-anchor="middle">1k</text>
+  <line x1="552.0" y1="96.0" x2="552.0" y2="440.0" stroke="#21262d" stroke-width="1" stroke-dasharray="3,3"/>
+  <text x="552.0" y="456.0" fill="#8b949e" font-family="'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace" font-size="10" font-weight="400" text-anchor="middle">10k</text>
+  <line x1="643.5" y1="96.0" x2="643.5" y2="440.0" stroke="#21262d" stroke-width="1" stroke-dasharray="3,3"/>
+  <text x="643.5" y="456.0" fill="#8b949e" font-family="'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace" font-size="10" font-weight="400" text-anchor="middle">100k</text>
+  <line x1="735.0" y1="96.0" x2="735.0" y2="440.0" stroke="#21262d" stroke-width="1" stroke-dasharray="3,3"/>
+  <text x="735.0" y="456.0" fill="#8b949e" font-family="'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace" font-size="10" font-weight="400" text-anchor="middle">1M</text>
+  <text x="24.0" y="132.0" fill="#e6edf3" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" font-weight="700" text-anchor="start">Synthetic 100-Ep</text>
+  <text x="24.0" y="150.0" fill="#8b949e" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start">5 regimes × 20 seeds</text>
+  <rect x="186.0" y="114.0" width="398.7" height="22" rx="4" fill="#fb7185" opacity="0.88"/>
+  <text x="576.7" y="129.0" fill="#0d1117" font-family="'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace" font-size="11" font-weight="700" text-anchor="end">22,758 tok</text>
+  <rect x="186.0" y="142.0" width="131.3" height="22" rx="4" fill="url(#csBarGrad)"/>
+  <text x="325.3" y="157.0" fill="#22d3ee" font-family="'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace" font-size="11" font-weight="700" text-anchor="start">27.2 tok</text>
+  <rect x="752.0" y="116.0" width="144" height="46" rx="8" fill="#0f2922" stroke="#34d399" stroke-width="1"/>
+  <text x="824.0" y="136.0" fill="#34d399" font-family="'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace" font-size="15" font-weight="700" text-anchor="middle">-99.88%</text>
+  <text x="824.0" y="153.0" fill="#e6edf3" font-family="'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace" font-size="10" font-weight="400" text-anchor="middle">837× smaller</text>
+  <line x1="24" y1="184.0" x2="896" y2="184.0" stroke="#21262d" stroke-width="1"/>
+  <text x="24.0" y="216.0" fill="#e6edf3" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" font-weight="700" text-anchor="start">RCAEval RE1 OB+SS</text>
+  <text x="24.0" y="234.0" fill="#8b949e" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start">n=40 real K8s outages</text>
+  <rect x="186.0" y="198.0" width="468.4" height="22" rx="4" fill="#fb7185" opacity="0.88"/>
+  <text x="646.4" y="213.0" fill="#0d1117" font-family="'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace" font-size="11" font-weight="700" text-anchor="end">131,705 tok</text>
+  <rect x="186.0" y="226.0" width="165.8" height="22" rx="4" fill="url(#csBarGrad)"/>
+  <text x="359.8" y="241.0" fill="#22d3ee" font-family="'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace" font-size="11" font-weight="700" text-anchor="start">64.9 tok</text>
+  <rect x="752.0" y="200.0" width="144" height="46" rx="8" fill="#0f2922" stroke="#34d399" stroke-width="1"/>
+  <text x="824.0" y="220.0" fill="#34d399" font-family="'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace" font-size="15" font-weight="700" text-anchor="middle">-99.95%</text>
+  <text x="824.0" y="237.0" fill="#e6edf3" font-family="'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace" font-size="10" font-weight="400" text-anchor="middle">2,029× smaller</text>
+  <line x1="24" y1="268.0" x2="896" y2="268.0" stroke="#21262d" stroke-width="1"/>
+  <text x="24.0" y="300.0" fill="#e6edf3" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" font-weight="700" text-anchor="start">Train Ticket 64-Svc</text>
+  <text x="24.0" y="318.0" fill="#8b949e" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start">n=25, D≈217 metrics</text>
+  <rect x="186.0" y="282.0" width="506.9" height="22" rx="4" fill="#fb7185" opacity="0.88"/>
+  <text x="684.9" y="297.0" fill="#0d1117" font-family="'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace" font-size="11" font-weight="700" text-anchor="end">346,742 tok</text>
+  <rect x="186.0" y="310.0" width="165.1" height="22" rx="4" fill="url(#csBarGrad)"/>
+  <text x="359.1" y="325.0" fill="#22d3ee" font-family="'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace" font-size="11" font-weight="700" text-anchor="start">63.8 tok</text>
+  <rect x="752.0" y="284.0" width="144" height="46" rx="8" fill="#0f2922" stroke="#34d399" stroke-width="1"/>
+  <text x="824.0" y="304.0" fill="#34d399" font-family="'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace" font-size="15" font-weight="700" text-anchor="middle">-99.98%</text>
+  <text x="824.0" y="321.0" fill="#e6edf3" font-family="'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace" font-size="10" font-weight="400" text-anchor="middle">5,435× smaller</text>
+  <line x1="24" y1="352.0" x2="896" y2="352.0" stroke="#21262d" stroke-width="1"/>
+  <text x="24.0" y="384.0" fill="#e6edf3" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" font-weight="700" text-anchor="start">RCAEval Full Suite</text>
+  <text x="24.0" y="402.0" fill="#8b949e" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start">n=? cases</text>
+  <rect x="186.0" y="366.0" width="500.8" height="22" rx="4" fill="#fb7185" opacity="0.88"/>
+  <text x="678.8" y="381.0" fill="#0d1117" font-family="'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace" font-size="11" font-weight="700" text-anchor="end">297,241 tok</text>
+  <rect x="186.0" y="394.0" width="169.1" height="22" rx="4" fill="url(#csBarGrad)"/>
+  <text x="363.1" y="409.0" fill="#22d3ee" font-family="'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace" font-size="11" font-weight="700" text-anchor="start">70.4 tok</text>
+  <rect x="752.0" y="368.0" width="144" height="46" rx="8" fill="#0f2922" stroke="#34d399" stroke-width="1"/>
+  <text x="824.0" y="388.0" fill="#34d399" font-family="'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace" font-size="15" font-weight="700" text-anchor="middle">-99.98%</text>
+  <text x="824.0" y="405.0" fill="#e6edf3" font-family="'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace" font-size="10" font-weight="400" text-anchor="middle">4,222× smaller</text>
+  <rect x="24" y="466.0" width="872" height="34" rx="8" fill="#161b22" stroke="#22d3ee" stroke-width="1"/>
+  <text x="460.0" y="487.0" fill="#22d3ee" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="600" text-anchor="middle">Lossless Drilldown: slice://&lt;stream_id&gt;/&lt;channel&gt;/&lt;t0&gt;..&lt;t1&gt; recovers IEEE-754 FP64 raw values with 0.0 error  •  Certified L∞ Swing-Filter PLA</text>
+  <line x1="24" y1="546" x2="896" y2="546" stroke="#21262d" stroke-width="1"/>
+  <text x="24.0" y="565.0" fill="#8b949e" font-family="'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace" font-size="9" font-weight="400" text-anchor="start">sha256:e97025decbdf | Intel Xeon @ 2.30GHz (avx2+fma)</text>
+  <text x="896.0" y="565.0" fill="#8b949e" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="9" font-weight="400" text-anchor="end">Token estimate: ~4 chars/token (estimate_raw_tokens vs CausalDigest Markdown)</text>
+</svg>

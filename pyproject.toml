@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "causalsieve"
-version = "0.1.0"
-description = "Zero-dependency SIMD online multivariate causal discovery, exogenous root-cause localization, and lossless-recoverable stream digests for humans and AI agents."
+version = "0.2.0"
+description = "Zero-dependency runtime-dispatched AVX2/NEON SIMD engine for online multivariate causal discovery, exogenous root-cause localization, and lossless-recoverable stream digests for humans and AI agents."
 readme = "README.md"
 license = { file = "LICENSE" }
 authors = [{ name = "CausalSieve Contributors" }]
@@ -18,11 +18,14 @@ keywords = [
     "root-cause-analysis",
     "observability",
     "prometheus",
+    "opentelemetry",
     "streaming",
     "time-series",
     "mcp",
     "multi-agent",
     "simd",
+    "avx2",
+    "neon",
 ]
 classifiers = [
     "Development Status :: 4 - Beta",
@@ -46,8 +49,11 @@ classifiers = [
 
 [project.urls]
 Homepage = "https://github.com/pgg898200-ship-it/causalsieve"
+"Interactive Explorer" = "https://pgg898200-ship-it.github.io/causalsieve/"
+Documentation = "https://pgg898200-ship-it.github.io/causalsieve/llms.txt"
+Benchmarks = "https://github.com/pgg898200-ship-it/causalsieve/blob/main/BENCHMARKS.md"
+"Agent Skill (skills.sh)" = "https://skills.sh/pgg898200-ship-it/causalsieve/causalsieve"
 Repository = "https://github.com/pgg898200-ship-it/causalsieve"
-Documentation = "https://pgg898200-ship-it.github.io/causalsieve/"
 Issues = "https://github.com/pgg898200-ship-it/causalsieve/issues"
 
 [project.optional-dependencies]

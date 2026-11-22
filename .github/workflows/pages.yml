@@ -25,10 +25,10 @@ jobs:
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
 
-      - name: Assemble static site with Explorer and root-level pure Markdown
+      - name: Assemble static site with Explorer, SVGs, and pure-Markdown Agent Docs
         run: |
           rm -rf _site
-          mkdir -p _site/skills/causalsieve
+          mkdir -p _site/skills/causalsieve _site/docs/assets
           touch _site/.nojekyll
           cp demo/causalsieve_explorer.html _site/index.html
           cp llms.txt _site/llms.txt
@@ -36,8 +36,13 @@ jobs:
           cp SKILL.md _site/SKILL.md
           cp README.md _site/README.md
           cp BENCHMARKS.md _site/BENCHMARKS.md
+          cp sitemap.xml _site/sitemap.xml
+          cp robots.txt _site/robots.txt
+          cp context7.json _site/context7.json
           cp skills/causalsieve/SKILL.md _site/skills/causalsieve/SKILL.md
-          ls -la _site/ _site/skills/causalsieve/
+          cp docs/*.md _site/docs/
+          cp docs/assets/*.svg _site/docs/assets/
+          ls -la _site/ _site/docs/ _site/docs/assets/
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v4
