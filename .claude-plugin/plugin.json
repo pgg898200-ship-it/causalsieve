@@ -1,0 +1,28 @@
+{
+  "name": "causalsieve",
+  "version": "0.1.0",
+  "description": "Zero-dependency SIMD online multivariate causal discovery, exogenous root-cause localization, counterfactual do-interventions, and 95-99.95% token-compressed lossless-recoverable telemetry digests.",
+  "author": {
+    "name": "CausalSieve Contributors"
+  },
+  "homepage": "https://pgg898200-ship-it.github.io/causalsieve/",
+  "repository": "https://github.com/pgg898200-ship-it/causalsieve",
+  "license": "MIT",
+  "keywords": [
+    "causal-discovery",
+    "root-cause-analysis",
+    "granger-causality",
+    "prometheus",
+    "observability",
+    "time-series",
+    "mcp",
+    "simd"
+  ],
+  "skills": "./skills/",
+  "mcpServers": {
+    "causalsieve": {
+      "command": "causalsieve-mcp",
+      "args": []
+    }
+  }
+}

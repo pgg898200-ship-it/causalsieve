@@ -1,0 +1,5186 @@
+{
+  "benchmark": "rcaeval_real_kubernetes_microservices",
+  "dataset_source": "https://huggingface.co/datasets/phamquiluan/RCAEval",
+  "protocol": {
+    "amendment_a8": "Pre-registered canonical Latin square across RE1-OB and RE1-SS; DEV = rep 1 (10 cases), SEALED HOLDOUT = reps 2..5 (40 cases, zero tuning).",
+    "amendment_a10": "Symmetric baseline/incident split at inject_time (warmup_ticks=inject_index, production defaults), symmetric max-over-metrics service aggregation, strictly causal imputation.",
+    "simd_isa": "avx2+fma",
+    "lib_sha256": "69e960d01e22f976a907e6de4f35ccadc048f07b8ac11f1dae481eaab5cdc6e6"
+  },
+  "system": {
+    "timestamp_utc": "2026-11-22T16:43:26.030528+00:00",
+    "platform": "Linux-6.18.57-x86_64-with-glibc2.39",
+    "cpu_model": "Intel(R) Xeon(R) CPU @ 2.30GHz",
+    "cpu_count_logical": 2,
+    "simd_flags": [
+      "avx",
+      "avx2",
+      "fma",
+      "sse4_2"
+    ],
+    "compiler": "g++ (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+    "lib_sha256": "69e960d01e22f976a907e6de4f35ccadc048f07b8ac11f1dae481eaab5cdc6e6",
+    "lib_scalar_sha256": "a38bcb0d3ad6aa1c9f034e4bf5bd31ce20f5700df1ef37750d401b5c871984b9",
+    "versions": {
+      "python": "3.12.16",
+      "numpy": "2.5.5",
+      "scipy": "1.18.1",
+      "statsmodels": "0.15.0",
+      "sklearn": "1.9.1",
+      "pandas": "3.1.1",
+      "river": "0.27.0",
+      "pyarrow": "26.0.1",
+      "tigramite": "5.2.10.1"
+    }
+  },
+  "splits": {
+    "dev": {
+      "n_cases": 10,
+      "token_compression": {
+        "mean_raw_tokens": 131230.1,
+        "mean_digest_tokens": 70.9,
+        "reduction_pct": 99.946
+      },
+      "summary": {
+        "causalsieve": {
+          "n": 10,
+          "ac1": 0.8,
+          "ac3": 0.9,
+          "ac5": 0.9,
+          "avg5": 0.86,
+          "mrr": 0.85,
+          "mean_rank": 1.7,
+          "mean_ms": 33.73,
+          "median_ms": 29.16
+        },
+        "causalsieve_blind": {
+          "n": 10,
+          "ac1": 0.8,
+          "ac3": 1.0,
+          "ac5": 1.0,
+          "avg5": 0.96,
+          "mrr": 0.9,
+          "mean_rank": 1.2,
+          "mean_ms": 29.58,
+          "median_ms": 27.49
+        },
+        "raw_max_z": {
+          "n": 10,
+          "ac1": 0.4,
+          "ac3": 0.9,
+          "ac5": 1.0,
+          "avg5": 0.8200000000000001,
+          "mrr": 0.67,
+          "mean_rank": 1.9,
+          "mean_ms": 1.08,
+          "median_ms": 0.85
+        },
+        "rolling_mad_z": {
+          "n": 10,
+          "ac1": 0.3,
+          "ac3": 0.9,
+          "ac5": 0.9,
+          "avg5": 0.78,
+          "mrr": 0.6125,
+          "mean_rank": 2.3,
+          "mean_ms": 3.59,
+          "median_ms": 2.53
+        },
+        "sklearn_isolation_forest": {
+          "n": 10,
+          "ac1": 0.2,
+          "ac3": 0.4,
+          "ac5": 0.6,
+          "avg5": 0.38,
+          "mrr": 0.36281135531135533,
+          "mean_rank": 5.1,
+          "mean_ms": 5602.04,
+          "median_ms": 5674.97
+        },
+        "pairwise_granger_z": {
+          "n": 10,
+          "ac1": 0.5,
+          "ac3": 0.9,
+          "ac5": 0.9,
+          "avg5": 0.82,
+          "mrr": 0.7142857142857142,
+          "mean_rank": 2.0,
+          "mean_ms": 161.95,
+          "median_ms": 135.93
+        }
+      },
+      "by_system": {
+        "re1ob": {
+          "causalsieve": {
+            "n": 5,
+            "ac1": 0.8,
+            "ac3": 0.8,
+            "ac5": 0.8,
+            "avg5": 0.8,
+            "mrr": 0.8333333333333334,
+            "mean_rank": 2.0
+          },
+          "causalsieve_blind": {
+            "n": 5,
+            "ac1": 0.6,
+            "ac3": 1.0,
+            "ac5": 1.0,
+            "avg5": 0.9199999999999999,
+            "mrr": 0.8,
+            "mean_rank": 1.4
+          },
+          "raw_max_z": {
+            "n": 5,
+            "ac1": 0.6,
+            "ac3": 0.8,
+            "ac5": 1.0,
+            "avg5": 0.8,
+            "mrr": 0.74,
+            "mean_rank": 2.0
+          },
+          "rolling_mad_z": {
+            "n": 5,
+            "ac1": 0.4,
+            "ac3": 0.8,
+            "ac5": 0.8,
+            "avg5": 0.72,
+            "mrr": 0.625,
+            "mean_rank": 2.8
+          },
+          "sklearn_isolation_forest": {
+            "n": 5,
+            "ac1": 0.2,
+            "ac3": 0.2,
+            "ac5": 0.4,
+            "avg5": 0.27999999999999997,
+            "mrr": 0.33690476190476193,
+            "mean_rank": 5.2
+          },
+          "pairwise_granger_z": {
+            "n": 5,
+            "ac1": 0.8,
+            "ac3": 0.8,
+            "ac5": 0.8,
+            "avg5": 0.8,
+            "mrr": 0.8285714285714286,
+            "mean_rank": 2.2
+          }
+        },
+        "re1ss": {
+          "causalsieve": {
+            "n": 5,
+            "ac1": 0.8,
+            "ac3": 1.0,
+            "ac5": 1.0,
+            "avg5": 0.9199999999999999,
+            "mrr": 0.8666666666666668,
+            "mean_rank": 1.4
+          },
+          "causalsieve_blind": {
+            "n": 5,
+            "ac1": 1.0,
+            "ac3": 1.0,
+            "ac5": 1.0,
+            "avg5": 1.0,
+            "mrr": 1.0,
+            "mean_rank": 1.0
+          },
+          "raw_max_z": {
+            "n": 5,
+            "ac1": 0.2,
+            "ac3": 1.0,
+            "ac5": 1.0,
+            "avg5": 0.8400000000000001,
+            "mrr": 0.6,
+            "mean_rank": 1.8
+          },
+          "rolling_mad_z": {
+            "n": 5,
+            "ac1": 0.2,
+            "ac3": 1.0,
+            "ac5": 1.0,
+            "avg5": 0.8400000000000001,
+            "mrr": 0.6,
+            "mean_rank": 1.8
+          },
+          "sklearn_isolation_forest": {
+            "n": 5,
+            "ac1": 0.2,
+            "ac3": 0.6,
+            "ac5": 0.8,
+            "avg5": 0.4800000000000001,
+            "mrr": 0.3887179487179487,
+            "mean_rank": 5.0
+          },
+          "pairwise_granger_z": {
+            "n": 5,
+            "ac1": 0.2,
+            "ac3": 1.0,
+            "ac5": 1.0,
+            "avg5": 0.8400000000000001,
+            "mrr": 0.6,
+            "mean_rank": 1.8
+          }
+        }
+      },
+      "by_fault": {
+        "cpu": {
+          "causalsieve": {
+            "n": 2,
+            "ac1": 1.0,
+            "ac3": 1.0,
+            "ac5": 1.0,
+            "avg5": 1.0,
+            "mrr": 1.0,
+            "mean_rank": 1.0
+          },
+          "causalsieve_blind": {
+            "n": 2,
+            "ac1": 0.5,
+            "ac3": 1.0,
+            "ac5": 1.0,
+            "avg5": 0.9,
+            "mrr": 0.75,
+            "mean_rank": 1.5
+          },
+          "raw_max_z": {
+            "n": 2,
+            "ac1": 0.5,
+            "ac3": 1.0,
+            "ac5": 1.0,
+            "avg5": 0.9,
+            "mrr": 0.75,
+            "mean_rank": 1.5
+          },
+          "rolling_mad_z": {
+            "n": 2,
+            "ac1": 0.5,
+            "ac3": 1.0,
+            "ac5": 1.0,
+            "avg5": 0.9,
+            "mrr": 0.75,
+            "mean_rank": 1.5
+          },
+          "sklearn_isolation_forest": {
+            "n": 2,
+            "ac1": 0.5,
+            "ac3": 1.0,
+            "ac5": 1.0,
+            "avg5": 0.8,
+            "mrr": 0.6666666666666666,
+            "mean_rank": 2.0
+          },
+          "pairwise_granger_z": {
+            "n": 2,
+            "ac1": 0.5,
+            "ac3": 1.0,
+            "ac5": 1.0,
+            "avg5": 0.9,
+            "mrr": 0.75,
+            "mean_rank": 1.5
+          }
+        },
+        "delay": {
+          "causalsieve": {
+            "n": 2,
+            "ac1": 1.0,
+            "ac3": 1.0,
+            "ac5": 1.0,
+            "avg5": 1.0,
+            "mrr": 1.0,
+            "mean_rank": 1.0
+          },
+          "causalsieve_blind": {
+            "n": 2,
+            "ac1": 1.0,
+            "ac3": 1.0,
+            "ac5": 1.0,
+            "avg5": 1.0,
+            "mrr": 1.0,
+            "mean_rank": 1.0
+          },
+          "raw_max_z": {
+            "n": 2,
+            "ac1": 1.0,
+            "ac3": 1.0,
+            "ac5": 1.0,
+            "avg5": 1.0,
+            "mrr": 1.0,
+            "mean_rank": 1.0
+          },
+          "rolling_mad_z": {
+            "n": 2,
+            "ac1": 0.5,
+            "ac3": 1.0,
+            "ac5": 1.0,
+            "avg5": 0.9,
+            "mrr": 0.75,
+            "mean_rank": 1.5
+          },
+          "sklearn_isolation_forest": {
+            "n": 2,
+            "ac1": 0.0,
+            "ac3": 0.0,
+            "ac5": 0.0,
+            "avg5": 0.0,
+            "mrr": 0.12179487179487179,
+            "mean_rank": 9.5
+          },
+          "pairwise_granger_z": {
+            "n": 2,
+            "ac1": 0.5,
+            "ac3": 1.0,
+            "ac5": 1.0,
+            "avg5": 0.9,
+            "mrr": 0.75,
+            "mean_rank": 1.5
+          }
+        },
+        "disk": {
+          "causalsieve": {
+            "n": 2,
+            "ac1": 0.5,
+            "ac3": 1.0,
+            "ac5": 1.0,
+            "avg5": 0.8,
+            "mrr": 0.6666666666666666,
+            "mean_rank": 2.0
+          },
+          "causalsieve_blind": {
+            "n": 2,
+            "ac1": 1.0,
+            "ac3": 1.0,
+            "ac5": 1.0,
+            "avg5": 1.0,
+            "mrr": 1.0,
+            "mean_rank": 1.0
+          },
+          "raw_max_z": {
+            "n": 2,
+            "ac1": 0.5,
+            "ac3": 1.0,
+            "ac5": 1.0,
+            "avg5": 0.9,
+            "mrr": 0.75,
+            "mean_rank": 1.5
+          },
+          "rolling_mad_z": {
+            "n": 2,
+            "ac1": 0.5,
+            "ac3": 1.0,
+            "ac5": 1.0,
+            "avg5": 0.9,
+            "mrr": 0.75,
+            "mean_rank": 1.5
+          },
+          "sklearn_isolation_forest": {
+            "n": 2,
+            "ac1": 0.0,
+            "ac3": 0.5,
+            "ac5": 0.5,
+            "avg5": 0.3,
+            "mrr": 0.22916666666666666,
+            "mean_rank": 5.5
+          },
+          "pairwise_granger_z": {
+            "n": 2,
+            "ac1": 1.0,
+            "ac3": 1.0,
+            "ac5": 1.0,
+            "avg5": 1.0,
+            "mrr": 1.0,
+            "mean_rank": 1.0
+          }
+        },
+        "loss": {
+          "causalsieve": {
+            "n": 2,
+            "ac1": 0.5,
+            "ac3": 0.5,
+            "ac5": 0.5,
+            "avg5": 0.5,
+            "mrr": 0.5833333333333334,
+            "mean_rank": 3.5
+          },
+          "causalsieve_blind": {
+            "n": 2,
+            "ac1": 0.5,
+            "ac3": 1.0,
+            "ac5": 1.0,
+            "avg5": 0.9,
+            "mrr": 0.75,
+            "mean_rank": 1.5
+          },
+          "raw_max_z": {
+            "n": 2,
+            "ac1": 0.0,
+            "ac3": 0.5,
+            "ac5": 1.0,
+            "avg5": 0.5,
+            "mrr": 0.35,
+            "mean_rank": 3.5
+          },
+          "rolling_mad_z": {
+            "n": 2,
+            "ac1": 0.0,
+            "ac3": 0.5,
+            "ac5": 0.5,
+            "avg5": 0.4,
+            "mrr": 0.3125,
+            "mean_rank": 5.0
+          },
+          "sklearn_isolation_forest": {
+            "n": 2,
+            "ac1": 0.0,
+            "ac3": 0.0,
+            "ac5": 0.5,
+            "avg5": 0.1,
+            "mrr": 0.17142857142857143,
+            "mean_rank": 6.0
+          },
+          "pairwise_granger_z": {
+            "n": 2,
+            "ac1": 0.0,
+            "ac3": 0.5,
+            "ac5": 0.5,
+            "avg5": 0.4,
+            "mrr": 0.3214285714285714,
+            "mean_rank": 4.5
+          }
+        },
+        "mem": {
+          "causalsieve": {
+            "n": 2,
+            "ac1": 1.0,
+            "ac3": 1.0,
+            "ac5": 1.0,
+            "avg5": 1.0,
+            "mrr": 1.0,
+            "mean_rank": 1.0
+          },
+          "causalsieve_blind": {
+            "n": 2,
+            "ac1": 1.0,
+            "ac3": 1.0,
+            "ac5": 1.0,
+            "avg5": 1.0,
+            "mrr": 1.0,
+            "mean_rank": 1.0
+          },
+          "raw_max_z": {
+            "n": 2,
+            "ac1": 0.0,
+            "ac3": 1.0,
+            "ac5": 1.0,
+            "avg5": 0.8,
+            "mrr": 0.5,
+            "mean_rank": 2.0
+          },
+          "rolling_mad_z": {
+            "n": 2,
+            "ac1": 0.0,
+            "ac3": 1.0,
+            "ac5": 1.0,
+            "avg5": 0.8,
+            "mrr": 0.5,
+            "mean_rank": 2.0
+          },
+          "sklearn_isolation_forest": {
+            "n": 2,
+            "ac1": 0.5,
+            "ac3": 0.5,
+            "ac5": 1.0,
+            "avg5": 0.7,
+            "mrr": 0.625,
+            "mean_rank": 2.5
+          },
+          "pairwise_granger_z": {
+            "n": 2,
+            "ac1": 0.5,
+            "ac3": 1.0,
+            "ac5": 1.0,
+            "avg5": 0.9,
+            "mrr": 0.75,
+            "mean_rank": 1.5
+          }
+        }
+      },
+      "cases": [
+        {
+          "case_id": "re1ob_adservice_cpu_1",
+          "system": "re1ob",
+          "fault": "cpu",
+          "repetition": 1,
+          "split": "dev",
+          "true_service": "adservice",
+          "n_timesteps": 4201,
+          "n_metrics": 49,
+          "inject_time": 1685202688,
+          "inject_index": 2100,
+          "parquet_sha256": "464dcc215afe145d37f8b107ea291df7ffc0691756d375c54ddc1c09d0a2ac74",
+          "inject_sha256": "392017698b9b1df43c5b9a5e96dfb9c19676348d67d2ee6a4ad2061abe729112",
+          "raw_tokens": 360476,
+          "predictions": {
+            "causalsieve": {
+              "rank": 1,
+              "top5": [
+                "adservice",
+                "cartservice",
+                "emailservice",
+                "currencyservice",
+                "frontend"
+              ],
+              "ms": 54.57
+            },
+            "causalsieve_blind": {
+              "rank": 2,
+              "top5": [
+                "main",
+                "adservice",
+                "paymentservice",
+                "emailservice",
+                "checkoutservice"
+              ],
+              "ms": 38.22
+            },
+            "raw_max_z": {
+              "rank": 1,
+              "top5": [
+                "adservice",
+                "emailservice",
+                "recommendationservice",
+                "frontend-external",
+                "checkoutservice"
+              ],
+              "ms": 2.24
+            },
+            "rolling_mad_z": {
+              "rank": 1,
+              "top5": [
+                "adservice",
+                "cartservice",
+                "checkoutservice",
+                "redis",
+                "recommendationservice"
+              ],
+              "ms": 8.42
+            },
+            "sklearn_isolation_forest": {
+              "rank": 1,
+              "top5": [
+                "adservice",
+                "emailservice",
+                "recommendationservice",
+                "checkoutservice",
+                "paymentservice"
+              ],
+              "ms": 5060.64
+            },
+            "pairwise_granger_z": {
+              "rank": 1,
+              "top5": [
+                "adservice",
+                "cartservice",
+                "checkoutservice",
+                "recommendationservice",
+                "frontend"
+              ],
+              "ms": 274.24
+            }
+          },
+          "digest_tokens": 50
+        },
+        {
+          "case_id": "re1ob_cartservice_mem_1",
+          "system": "re1ob",
+          "fault": "mem",
+          "repetition": 1,
+          "split": "dev",
+          "true_service": "cartservice",
+          "n_timesteps": 4201,
+          "n_metrics": 49,
+          "inject_time": 1685273133,
+          "inject_index": 2100,
+          "parquet_sha256": "6a301f24faf9144dec6df0a9530a14ecc15814851d6463955050c70628c34a60",
+          "inject_sha256": "2b7dfa4193e63e2a5abe88cc7435c0d0591ebbf703c9e1e7c7c77beefc7ca8e3",
+          "raw_tokens": 360476,
+          "predictions": {
+            "causalsieve": {
+              "rank": 1,
+              "top5": [
+                "cartservice",
+                "emailservice",
+                "frontend-external",
+                "frontend",
+                "paymentservice"
+              ],
+              "ms": 52.09
+            },
+            "causalsieve_blind": {
+              "rank": 1,
+              "top5": [
+                "cartservice",
+                "recommendationservice",
+                "main",
+                "checkoutservice",
+                "paymentservice"
+              ],
+              "ms": 45.14
+            },
+            "raw_max_z": {
+              "rank": 2,
+              "top5": [
+                "frontend-external",
+                "cartservice",
+                "emailservice",
+                "recommendationservice",
+                "checkoutservice"
+              ],
+              "ms": 1.92
+            },
+            "rolling_mad_z": {
+              "rank": 2,
+              "top5": [
+                "frontend-external",
+                "cartservice",
+                "emailservice",
+                "shippingservice",
+                "recommendationservice"
+              ],
+              "ms": 7.47
+            },
+            "sklearn_isolation_forest": {
+              "rank": 4,
+              "top5": [
+                "frontend-external",
+                "recommendationservice",
+                "emailservice",
+                "cartservice",
+                "redis"
+              ],
+              "ms": 4904.53
+            },
+            "pairwise_granger_z": {
+              "rank": 1,
+              "top5": [
+                "cartservice",
+                "frontend-external",
+                "emailservice",
+                "shippingservice",
+                "recommendationservice"
+              ],
+              "ms": 263.53
+            }
+          },
+          "digest_tokens": 77
+        },
+        {
+          "case_id": "re1ob_checkoutservice_disk_1",
+          "system": "re1ob",
+          "fault": "disk",
+          "repetition": 1,
+          "split": "dev",
+          "true_service": "checkoutservice",
+          "n_timesteps": 721,
+          "n_metrics": 56,
+          "inject_time": 1702356364,
+          "inject_index": 360,
+          "parquet_sha256": "b90f0771881ff4e7b8e0b58ce8c94da87875553dd8eca308280a14cc4d0e71da",
+          "inject_sha256": "e36a1281ac4db480b4166a7677fac870a8bcbaa69cb51b908acce949bd4cf81b",
+          "raw_tokens": 70964,
+          "predictions": {
+            "causalsieve": {
+              "rank": 1,
+              "top5": [
+                "checkoutservice",
+                "redis",
+                "productcatalogservice",
+                "shippingservice",
+                "main"
+              ],
+              "ms": 29.38
+            },
+            "causalsieve_blind": {
+              "rank": 1,
+              "top5": [
+                "checkoutservice",
+                "emailservice",
+                "redis",
+                "productcatalogservice",
+                "main"
+              ],
+              "ms": 26.88
+            },
+            "raw_max_z": {
+              "rank": 1,
+              "top5": [
+                "checkoutservice",
+                "redis",
+                "paymentservice",
+                "cartservice",
+                "emailservice"
+              ],
+              "ms": 0.83
+            },
+            "rolling_mad_z": {
+              "rank": 1,
+              "top5": [
+                "checkoutservice",
+                "redis",
+                "cartservice",
+                "emailservice",
+                "adservice"
+              ],
+              "ms": 2.47
+            },
+            "sklearn_isolation_forest": {
+              "rank": 8,
+              "top5": [
+                "productcatalogservice",
+                "shippingservice",
+                "frontend",
+                "adservice",
+                "paymentservice"
+              ],
+              "ms": 5749.19
+            },
+            "pairwise_granger_z": {
+              "rank": 1,
+              "top5": [
+                "checkoutservice",
+                "cartservice",
+                "adservice",
+                "redis",
+                "paymentservice"
+              ],
+              "ms": 132.32
+            }
+          },
+          "digest_tokens": 52
+        },
+        {
+          "case_id": "re1ob_currencyservice_delay_1",
+          "system": "re1ob",
+          "fault": "delay",
+          "repetition": 1,
+          "split": "dev",
+          "true_service": "currencyservice",
+          "n_timesteps": 721,
+          "n_metrics": 57,
+          "inject_time": 1692576250,
+          "inject_index": 360,
+          "parquet_sha256": "54ef9d93e5572122254bd8e6aa402e0abdf7ad0193d41b834d98e33d554b6721",
+          "inject_sha256": "c358c0b5687a7e28205ffc9605a875520611bee194383b8da42299006ce88dd4",
+          "raw_tokens": 72232,
+          "predictions": {
+            "causalsieve": {
+              "rank": 1,
+              "top5": [
+                "currencyservice",
+                "checkoutservice",
+                "frontend",
+                "paymentservice",
+                "shippingservice"
+              ],
+              "ms": 27.13
+            },
+            "causalsieve_blind": {
+              "rank": 1,
+              "top5": [
+                "currencyservice",
+                "checkoutservice",
+                "paymentservice",
+                "frontend",
+                "productcatalogservice"
+              ],
+              "ms": 27.95
+            },
+            "raw_max_z": {
+              "rank": 1,
+              "top5": [
+                "currencyservice",
+                "checkoutservice",
+                "frontend",
+                "shippingservice",
+                "paymentservice"
+              ],
+              "ms": 0.79
+            },
+            "rolling_mad_z": {
+              "rank": 2,
+              "top5": [
+                "checkoutservice",
+                "currencyservice",
+                "frontend",
+                "redis",
+                "recommendationservice"
+              ],
+              "ms": 2.53
+            },
+            "sklearn_isolation_forest": {
+              "rank": 6,
+              "top5": [
+                "checkoutservice",
+                "frontend",
+                "recommendationservice",
+                "adservice",
+                "main"
+              ],
+              "ms": 5859.0
+            },
+            "pairwise_granger_z": {
+              "rank": 1,
+              "top5": [
+                "currencyservice",
+                "frontend",
+                "checkoutservice",
+                "redis",
+                "recommendationservice"
+              ],
+              "ms": 135.3
+            }
+          },
+          "digest_tokens": 155
+        },
+        {
+          "case_id": "re1ob_productcatalogservice_loss_1",
+          "system": "re1ob",
+          "fault": "loss",
+          "repetition": 1,
+          "split": "dev",
+          "true_service": "productcatalogservice",
+          "n_timesteps": 721,
+          "n_metrics": 59,
+          "inject_time": 1692665535,
+          "inject_index": 360,
+          "parquet_sha256": "708a65736c3009876959a8ad84693f779f1affab628da331200509a651739a70",
+          "inject_sha256": "43d58fdd8783811d57b9f17137d58b50f3f2f85fc7cd03f10ced9366951f51c6",
+          "raw_tokens": 74766,
+          "predictions": {
+            "causalsieve": {
+              "rank": 6,
+              "top5": [
+                "frontend",
+                "frontend-external",
+                "checkoutservice",
+                "recommendationservice",
+                "cartservice"
+              ],
+              "ms": 31.81
+            },
+            "causalsieve_blind": {
+              "rank": 2,
+              "top5": [
+                "cartservice",
+                "productcatalogservice",
+                "adservice",
+                "recommendationservice",
+                "frontend-external"
+              ],
+              "ms": 27.22
+            },
+            "raw_max_z": {
+              "rank": 5,
+              "top5": [
+                "main",
+                "emailservice",
+                "frontend-external",
+                "cartservice",
+                "productcatalogservice"
+              ],
+              "ms": 0.83
+            },
+            "rolling_mad_z": {
+              "rank": 8,
+              "top5": [
+                "main",
+                "emailservice",
+                "frontend-external",
+                "cartservice",
+                "recommendationservice"
+              ],
+              "ms": 2.84
+            },
+            "sklearn_isolation_forest": {
+              "rank": 7,
+              "top5": [
+                "emailservice",
+                "frontend-external",
+                "main",
+                "checkoutservice",
+                "recommendationservice"
+              ],
+              "ms": 5628.52
+            },
+            "pairwise_granger_z": {
+              "rank": 7,
+              "top5": [
+                "main",
+                "emailservice",
+                "cartservice",
+                "frontend-external",
+                "adservice"
+              ],
+              "ms": 130.65
+            }
+          },
+          "digest_tokens": 94
+        },
+        {
+          "case_id": "re1ss_carts_cpu_1",
+          "system": "re1ss",
+          "fault": "cpu",
+          "repetition": 1,
+          "split": "dev",
+          "true_service": "carts",
+          "n_timesteps": 721,
+          "n_metrics": 59,
+          "inject_time": 1693068669,
+          "inject_index": 360,
+          "parquet_sha256": "25d22bb722e4a83d33d5e061012eeb5c3986bd3627c3fd5f2f41abce2a35df3d",
+          "inject_sha256": "17ccf59139191dfc9b176f126d223dc8488bf44eaeb9d9a8f81ec060ff62a798",
+          "raw_tokens": 74678,
+          "predictions": {
+            "causalsieve": {
+              "rank": 1,
+              "top5": [
+                "carts",
+                "carts-db",
+                "queue-master",
+                "user",
+                "front-end"
+              ],
+              "ms": 28.95
+            },
+            "causalsieve_blind": {
+              "rank": 1,
+              "top5": [
+                "carts",
+                "payment",
+                "front-end",
+                "rabbitmq",
+                "user"
+              ],
+              "ms": 26.83
+            },
+            "raw_max_z": {
+              "rank": 2,
+              "top5": [
+                "catalogue-db",
+                "carts",
+                "queue-master",
+                "front-end",
+                "orders"
+              ],
+              "ms": 0.87
+            },
+            "rolling_mad_z": {
+              "rank": 2,
+              "top5": [
+                "catalogue-db",
+                "carts",
+                "queue-master",
+                "orders",
+                "payment"
+              ],
+              "ms": 2.55
+            },
+            "sklearn_isolation_forest": {
+              "rank": 3,
+              "top5": [
+                "catalogue-db",
+                "front-end",
+                "carts",
+                "orders",
+                "catalogue"
+              ],
+              "ms": 5545.78
+            },
+            "pairwise_granger_z": {
+              "rank": 2,
+              "top5": [
+                "catalogue-db",
+                "carts",
+                "orders",
+                "front-end",
+                "catalogue"
+              ],
+              "ms": 131.57
+            }
+          },
+          "digest_tokens": 44
+        },
+        {
+          "case_id": "re1ss_catalogue_mem_1",
+          "system": "re1ss",
+          "fault": "mem",
+          "repetition": 1,
+          "split": "dev",
+          "true_service": "catalogue",
+          "n_timesteps": 721,
+          "n_metrics": 60,
+          "inject_time": 1693074418,
+          "inject_index": 360,
+          "parquet_sha256": "da1bc7e5111b140521081aead8a6817851c76ce4a60005beefca3f077b9ae819",
+          "inject_sha256": "15dc76e72cf17481e8cf95e418969e4a341571ede1cecc95a54bca5d1a8e4c32",
+          "raw_tokens": 75943,
+          "predictions": {
+            "causalsieve": {
+              "rank": 1,
+              "top5": [
+                "catalogue",
+                "user",
+                "payment",
+                "carts",
+                "carts-db"
+              ],
+              "ms": 33.39
+            },
+            "causalsieve_blind": {
+              "rank": 1,
+              "top5": [
+                "catalogue",
+                "rabbitmq",
+                "user",
+                "queue-master",
+                "carts-db"
+              ],
+              "ms": 28.1
+            },
+            "raw_max_z": {
+              "rank": 2,
+              "top5": [
+                "catalogue-db",
+                "catalogue",
+                "front-end",
+                "user",
+                "carts"
+              ],
+              "ms": 0.83
+            },
+            "rolling_mad_z": {
+              "rank": 2,
+              "top5": [
+                "catalogue-db",
+                "catalogue",
+                "front-end",
+                "payment",
+                "user"
+              ],
+              "ms": 2.35
+            },
+            "sklearn_isolation_forest": {
+              "rank": 1,
+              "top5": [
+                "catalogue",
+                "catalogue-db",
+                "payment",
+                "session-db",
+                "carts"
+              ],
+              "ms": 5623.07
+            },
+            "pairwise_granger_z": {
+              "rank": 2,
+              "top5": [
+                "catalogue-db",
+                "catalogue",
+                "front-end",
+                "payment",
+                "user"
+              ],
+              "ms": 142.98
+            }
+          },
+          "digest_tokens": 68
+        },
+        {
+          "case_id": "re1ss_orders_disk_1",
+          "system": "re1ss",
+          "fault": "disk",
+          "repetition": 1,
+          "split": "dev",
+          "true_service": "orders",
+          "n_timesteps": 721,
+          "n_metrics": 57,
+          "inject_time": 1702362641,
+          "inject_index": 360,
+          "parquet_sha256": "c8ab87520beb168529f52e7c556ce181eb9a0997739912532ef73e6416ef79e1",
+          "inject_sha256": "bf3416682a6ab1dc83a1a522b31131c921675e3d47dbaa457664f2188f80bb18",
+          "raw_tokens": 72147,
+          "predictions": {
+            "causalsieve": {
+              "rank": 3,
+              "top5": [
+                "queue-master",
+                "user",
+                "orders",
+                "catalogue",
+                "payment"
+              ],
+              "ms": 26.74
+            },
+            "causalsieve_blind": {
+              "rank": 1,
+              "top5": [
+                "orders",
+                "rabbitmq",
+                "queue-master",
+                "user",
+                "session-db"
+              ],
+              "ms": 22.84
+            },
+            "raw_max_z": {
+              "rank": 2,
+              "top5": [
+                "queue-master",
+                "orders",
+                "catalogue",
+                "front-end",
+                "user"
+              ],
+              "ms": 0.79
+            },
+            "rolling_mad_z": {
+              "rank": 2,
+              "top5": [
+                "queue-master",
+                "orders",
+                "catalogue",
+                "session-db",
+                "user"
+              ],
+              "ms": 2.33
+            },
+            "sklearn_isolation_forest": {
+              "rank": 3,
+              "top5": [
+                "catalogue",
+                "session-db",
+                "orders",
+                "catalogue-db",
+                "user"
+              ],
+              "ms": 5998.15
+            },
+            "pairwise_granger_z": {
+              "rank": 1,
+              "top5": [
+                "orders",
+                "catalogue",
+                "queue-master",
+                "payment",
+                "front-end"
+              ],
+              "ms": 136.57
+            }
+          },
+          "digest_tokens": 45
+        },
+        {
+          "case_id": "re1ss_payment_delay_1",
+          "system": "re1ss",
+          "fault": "delay",
+          "repetition": 1,
+          "split": "dev",
+          "true_service": "payment",
+          "n_timesteps": 721,
+          "n_metrics": 59,
+          "inject_time": 1693197360,
+          "inject_index": 360,
+          "parquet_sha256": "bc7deaa9fe40364a12003e73535ee3f44c30d5b28fd041d660947418ef6b8594",
+          "inject_sha256": "1ae01659b2eaf17eb4f96f834a7b58452ac5522c0649c1a63c17db5d978a07a5",
+          "raw_tokens": 74676,
+          "predictions": {
+            "causalsieve": {
+              "rank": 1,
+              "top5": [
+                "payment",
+                "orders",
+                "carts",
+                "front-end",
+                "rabbitmq"
+              ],
+              "ms": 26.01
+            },
+            "causalsieve_blind": {
+              "rank": 1,
+              "top5": [
+                "payment",
+                "orders",
+                "user-db",
+                "carts",
+                "orders-db"
+              ],
+              "ms": 24.85
+            },
+            "raw_max_z": {
+              "rank": 1,
+              "top5": [
+                "payment",
+                "orders",
+                "queue-master",
+                "carts",
+                "rabbitmq"
+              ],
+              "ms": 0.87
+            },
+            "rolling_mad_z": {
+              "rank": 1,
+              "top5": [
+                "payment",
+                "orders",
+                "queue-master",
+                "carts",
+                "user"
+              ],
+              "ms": 2.53
+            },
+            "sklearn_isolation_forest": {
+              "rank": 13,
+              "top5": [
+                "orders",
+                "rabbitmq",
+                "user",
+                "front-end",
+                "shipping"
+              ],
+              "ms": 5930.09
+            },
+            "pairwise_granger_z": {
+              "rank": 2,
+              "top5": [
+                "orders",
+                "payment",
+                "queue-master",
+                "carts",
+                "rabbitmq"
+              ],
+              "ms": 138.0
+            }
+          },
+          "digest_tokens": 56
+        },
+        {
+          "case_id": "re1ss_user_loss_1",
+          "system": "re1ss",
+          "fault": "loss",
+          "repetition": 1,
+          "split": "dev",
+          "true_service": "user",
+          "n_timesteps": 721,
+          "n_metrics": 60,
+          "inject_time": 1693220991,
+          "inject_index": 360,
+          "parquet_sha256": "7096b8fbceb15b8f001af0673776924a168156a089db5c3007d926db452c9733",
+          "inject_sha256": "303a4bbc5a67cf771b594ad7d5e92ee2318042f26d76330aee92407a6ccca12f",
+          "raw_tokens": 75943,
+          "predictions": {
+            "causalsieve": {
+              "rank": 1,
+              "top5": [
+                "user",
+                "front-end",
+                "orders",
+                "queue-master",
+                "rabbitmq"
+              ],
+              "ms": 27.21
+            },
+            "causalsieve_blind": {
+              "rank": 1,
+              "top5": [
+                "user",
+                "payment",
+                "front-end",
+                "orders",
+                "orders-db"
+              ],
+              "ms": 27.76
+            },
+            "raw_max_z": {
+              "rank": 2,
+              "top5": [
+                "catalogue-db",
+                "user",
+                "orders",
+                "front-end",
+                "rabbitmq"
+              ],
+              "ms": 0.87
+            },
+            "rolling_mad_z": {
+              "rank": 2,
+              "top5": [
+                "catalogue-db",
+                "user",
+                "queue-master",
+                "orders",
+                "front-end"
+              ],
+              "ms": 2.44
+            },
+            "sklearn_isolation_forest": {
+              "rank": 5,
+              "top5": [
+                "catalogue-db",
+                "catalogue",
+                "session-db",
+                "front-end",
+                "user"
+              ],
+              "ms": 5721.41
+            },
+            "pairwise_granger_z": {
+              "rank": 2,
+              "top5": [
+                "catalogue-db",
+                "user",
+                "queue-master",
+                "orders",
+                "front-end"
+              ],
+              "ms": 134.3
+            }
+          },
+          "digest_tokens": 68
+        }
+      ]
+    },
+    "holdout": {
+      "n_cases": 40,
+      "token_compression": {
+        "mean_raw_tokens": 131704.8,
+        "mean_digest_tokens": 64.9,
+        "reduction_pct": 99.951
+      },
+      "summary": {
+        "causalsieve": {
+          "n": 40,
+          "ac1": 0.675,
+          "ac3": 0.925,
+          "ac5": 1.0,
+          "avg5": 0.8800000000000001,
+          "mrr": 0.8037500000000002,
+          "mean_rank": 1.6,
+          "mean_ms": 33.3,
+          "median_ms": 28.84
+        },
+        "causalsieve_blind": {
+          "n": 40,
+          "ac1": 0.65,
+          "ac3": 0.75,
+          "ac5": 0.9,
+          "avg5": 0.78,
+          "mrr": 0.7460714285714285,
+          "mean_rank": 2.225,
+          "mean_ms": 30.09,
+          "median_ms": 27.63
+        },
+        "raw_max_z": {
+          "n": 40,
+          "ac1": 0.4,
+          "ac3": 0.875,
+          "ac5": 0.925,
+          "avg5": 0.7550000000000001,
+          "mrr": 0.6239583333333334,
+          "mean_rank": 2.275,
+          "mean_ms": 1.13,
+          "median_ms": 0.89
+        },
+        "rolling_mad_z": {
+          "n": 40,
+          "ac1": 0.525,
+          "ac3": 0.9,
+          "ac5": 0.925,
+          "avg5": 0.8150000000000001,
+          "mrr": 0.7121527777777777,
+          "mean_rank": 2.05,
+          "mean_ms": 3.63,
+          "median_ms": 2.55
+        },
+        "sklearn_isolation_forest": {
+          "n": 40,
+          "ac1": 0.35,
+          "ac3": 0.6,
+          "ac5": 0.725,
+          "avg5": 0.5650000000000001,
+          "mrr": 0.5199305555555556,
+          "mean_rank": 3.85,
+          "mean_ms": 5661.26,
+          "median_ms": 5730.92
+        },
+        "pairwise_granger_z": {
+          "n": 40,
+          "ac1": 0.6,
+          "ac3": 0.875,
+          "ac5": 0.9,
+          "avg5": 0.805,
+          "mrr": 0.7408630952380953,
+          "mean_rank": 2.05,
+          "mean_ms": 162.03,
+          "median_ms": 132.59
+        }
+      },
+      "by_system": {
+        "re1ob": {
+          "causalsieve": {
+            "n": 20,
+            "ac1": 0.6,
+            "ac3": 0.9,
+            "ac5": 1.0,
+            "avg5": 0.86,
+            "mrr": 0.7641666666666667,
+            "mean_rank": 1.7
+          },
+          "causalsieve_blind": {
+            "n": 20,
+            "ac1": 0.6,
+            "ac3": 0.75,
+            "ac5": 0.8,
+            "avg5": 0.73,
+            "mrr": 0.7071428571428571,
+            "mean_rank": 2.6
+          },
+          "raw_max_z": {
+            "n": 20,
+            "ac1": 0.35,
+            "ac3": 0.8,
+            "ac5": 0.85,
+            "avg5": 0.68,
+            "mrr": 0.5687499999999999,
+            "mean_rank": 2.7
+          },
+          "rolling_mad_z": {
+            "n": 20,
+            "ac1": 0.35,
+            "ac3": 0.8,
+            "ac5": 0.85,
+            "avg5": 0.6900000000000002,
+            "mrr": 0.5743055555555554,
+            "mean_rank": 2.8
+          },
+          "sklearn_isolation_forest": {
+            "n": 20,
+            "ac1": 0.1,
+            "ac3": 0.4,
+            "ac5": 0.6,
+            "avg5": 0.37000000000000005,
+            "mrr": 0.3221230158730159,
+            "mean_rank": 4.9
+          },
+          "pairwise_granger_z": {
+            "n": 20,
+            "ac1": 0.35,
+            "ac3": 0.75,
+            "ac5": 0.8,
+            "avg5": 0.65,
+            "mrr": 0.5650595238095237,
+            "mean_rank": 2.9
+          }
+        },
+        "re1ss": {
+          "causalsieve": {
+            "n": 20,
+            "ac1": 0.75,
+            "ac3": 0.95,
+            "ac5": 1.0,
+            "avg5": 0.9,
+            "mrr": 0.8433333333333334,
+            "mean_rank": 1.5
+          },
+          "causalsieve_blind": {
+            "n": 20,
+            "ac1": 0.7,
+            "ac3": 0.75,
+            "ac5": 1.0,
+            "avg5": 0.8300000000000001,
+            "mrr": 0.7849999999999999,
+            "mean_rank": 1.85
+          },
+          "raw_max_z": {
+            "n": 20,
+            "ac1": 0.45,
+            "ac3": 0.95,
+            "ac5": 1.0,
+            "avg5": 0.8300000000000001,
+            "mrr": 0.6791666666666667,
+            "mean_rank": 1.85
+          },
+          "rolling_mad_z": {
+            "n": 20,
+            "ac1": 0.7,
+            "ac3": 1.0,
+            "ac5": 1.0,
+            "avg5": 0.9400000000000001,
+            "mrr": 0.85,
+            "mean_rank": 1.3
+          },
+          "sklearn_isolation_forest": {
+            "n": 20,
+            "ac1": 0.6,
+            "ac3": 0.8,
+            "ac5": 0.85,
+            "avg5": 0.76,
+            "mrr": 0.7177380952380952,
+            "mean_rank": 2.8
+          },
+          "pairwise_granger_z": {
+            "n": 20,
+            "ac1": 0.85,
+            "ac3": 1.0,
+            "ac5": 1.0,
+            "avg5": 0.96,
+            "mrr": 0.9166666666666666,
+            "mean_rank": 1.2
+          }
+        }
+      },
+      "by_fault": {
+        "cpu": {
+          "causalsieve": {
+            "n": 8,
+            "ac1": 0.875,
+            "ac3": 1.0,
+            "ac5": 1.0,
+            "avg5": 0.975,
+            "mrr": 0.9375,
+            "mean_rank": 1.125
+          },
+          "causalsieve_blind": {
+            "n": 8,
+            "ac1": 0.75,
+            "ac3": 0.875,
+            "ac5": 1.0,
+            "avg5": 0.8999999999999999,
+            "mrr": 0.84375,
+            "mean_rank": 1.5
+          },
+          "raw_max_z": {
+            "n": 8,
+            "ac1": 0.5,
+            "ac3": 1.0,
+            "ac5": 1.0,
+            "avg5": 0.9,
+            "mrr": 0.75,
+            "mean_rank": 1.5
+          },
+          "rolling_mad_z": {
+            "n": 8,
+            "ac1": 0.625,
+            "ac3": 1.0,
+            "ac5": 1.0,
+            "avg5": 0.9,
+            "mrr": 0.7916666666666666,
+            "mean_rank": 1.5
+          },
+          "sklearn_isolation_forest": {
+            "n": 8,
+            "ac1": 0.125,
+            "ac3": 0.625,
+            "ac5": 0.75,
+            "avg5": 0.5,
+            "mrr": 0.3918154761904762,
+            "mean_rank": 3.875
+          },
+          "pairwise_granger_z": {
+            "n": 8,
+            "ac1": 0.5,
+            "ac3": 0.75,
+            "ac5": 0.875,
+            "avg5": 0.675,
+            "mrr": 0.6239583333333333,
+            "mean_rank": 2.875
+          }
+        },
+        "delay": {
+          "causalsieve": {
+            "n": 8,
+            "ac1": 0.625,
+            "ac3": 0.875,
+            "ac5": 1.0,
+            "avg5": 0.825,
+            "mrr": 0.7541666666666667,
+            "mean_rank": 1.875
+          },
+          "causalsieve_blind": {
+            "n": 8,
+            "ac1": 0.75,
+            "ac3": 0.75,
+            "ac5": 1.0,
+            "avg5": 0.825,
+            "mrr": 0.80625,
+            "mean_rank": 1.875
+          },
+          "raw_max_z": {
+            "n": 8,
+            "ac1": 0.5,
+            "ac3": 0.875,
+            "ac5": 1.0,
+            "avg5": 0.775,
+            "mrr": 0.65625,
+            "mean_rank": 2.125
+          },
+          "rolling_mad_z": {
+            "n": 8,
+            "ac1": 0.75,
+            "ac3": 1.0,
+            "ac5": 1.0,
+            "avg5": 0.9,
+            "mrr": 0.8333333333333333,
+            "mean_rank": 1.5
+          },
+          "sklearn_isolation_forest": {
+            "n": 8,
+            "ac1": 0.625,
+            "ac3": 0.875,
+            "ac5": 0.875,
+            "avg5": 0.775,
+            "mrr": 0.7222222222222222,
+            "mean_rank": 2.5
+          },
+          "pairwise_granger_z": {
+            "n": 8,
+            "ac1": 0.5,
+            "ac3": 1.0,
+            "ac5": 1.0,
+            "avg5": 0.9,
+            "mrr": 0.75,
+            "mean_rank": 1.5
+          }
+        },
+        "disk": {
+          "causalsieve": {
+            "n": 8,
+            "ac1": 0.5,
+            "ac3": 1.0,
+            "ac5": 1.0,
+            "avg5": 0.875,
+            "mrr": 0.7291666666666666,
+            "mean_rank": 1.625
+          },
+          "causalsieve_blind": {
+            "n": 8,
+            "ac1": 0.5,
+            "ac3": 0.75,
+            "ac5": 0.875,
+            "avg5": 0.7250000000000001,
+            "mrr": 0.6510416666666666,
+            "mean_rank": 2.625
+          },
+          "raw_max_z": {
+            "n": 8,
+            "ac1": 0.375,
+            "ac3": 1.0,
+            "ac5": 1.0,
+            "avg5": 0.775,
+            "mrr": 0.6041666666666666,
+            "mean_rank": 2.125
+          },
+          "rolling_mad_z": {
+            "n": 8,
+            "ac1": 0.5,
+            "ac3": 1.0,
+            "ac5": 1.0,
+            "avg5": 0.875,
+            "mrr": 0.7291666666666666,
+            "mean_rank": 1.625
+          },
+          "sklearn_isolation_forest": {
+            "n": 8,
+            "ac1": 0.25,
+            "ac3": 0.5,
+            "ac5": 0.5,
+            "avg5": 0.45,
+            "mrr": 0.43129960317460314,
+            "mean_rank": 5.5
+          },
+          "pairwise_granger_z": {
+            "n": 8,
+            "ac1": 0.5,
+            "ac3": 0.875,
+            "ac5": 0.875,
+            "avg5": 0.775,
+            "mrr": 0.6875,
+            "mean_rank": 2.125
+          }
+        },
+        "loss": {
+          "causalsieve": {
+            "n": 8,
+            "ac1": 0.375,
+            "ac3": 0.75,
+            "ac5": 1.0,
+            "avg5": 0.725,
+            "mrr": 0.5979166666666667,
+            "mean_rank": 2.375
+          },
+          "causalsieve_blind": {
+            "n": 8,
+            "ac1": 0.375,
+            "ac3": 0.375,
+            "ac5": 0.625,
+            "avg5": 0.475,
+            "mrr": 0.49181547619047616,
+            "mean_rank": 4.0
+          },
+          "raw_max_z": {
+            "n": 8,
+            "ac1": 0.25,
+            "ac3": 0.5,
+            "ac5": 0.625,
+            "avg5": 0.47500000000000003,
+            "mrr": 0.44270833333333326,
+            "mean_rank": 3.875
+          },
+          "rolling_mad_z": {
+            "n": 8,
+            "ac1": 0.375,
+            "ac3": 0.5,
+            "ac5": 0.625,
+            "avg5": 0.525,
+            "mrr": 0.5190972222222222,
+            "mean_rank": 4.0
+          },
+          "sklearn_isolation_forest": {
+            "n": 8,
+            "ac1": 0.25,
+            "ac3": 0.375,
+            "ac5": 0.625,
+            "avg5": 0.425,
+            "mrr": 0.4147321428571429,
+            "mean_rank": 4.75
+          },
+          "pairwise_granger_z": {
+            "n": 8,
+            "ac1": 0.5,
+            "ac3": 0.75,
+            "ac5": 0.75,
+            "avg5": 0.675,
+            "mrr": 0.6428571428571428,
+            "mean_rank": 2.75
+          }
+        },
+        "mem": {
+          "causalsieve": {
+            "n": 8,
+            "ac1": 1.0,
+            "ac3": 1.0,
+            "ac5": 1.0,
+            "avg5": 1.0,
+            "mrr": 1.0,
+            "mean_rank": 1.0
+          },
+          "causalsieve_blind": {
+            "n": 8,
+            "ac1": 0.875,
+            "ac3": 1.0,
+            "ac5": 1.0,
+            "avg5": 0.975,
+            "mrr": 0.9375,
+            "mean_rank": 1.125
+          },
+          "raw_max_z": {
+            "n": 8,
+            "ac1": 0.375,
+            "ac3": 1.0,
+            "ac5": 1.0,
+            "avg5": 0.8500000000000001,
+            "mrr": 0.6666666666666666,
+            "mean_rank": 1.75
+          },
+          "rolling_mad_z": {
+            "n": 8,
+            "ac1": 0.375,
+            "ac3": 1.0,
+            "ac5": 1.0,
+            "avg5": 0.875,
+            "mrr": 0.6875,
+            "mean_rank": 1.625
+          },
+          "sklearn_isolation_forest": {
+            "n": 8,
+            "ac1": 0.5,
+            "ac3": 0.625,
+            "ac5": 0.875,
+            "avg5": 0.675,
+            "mrr": 0.6395833333333334,
+            "mean_rank": 2.625
+          },
+          "pairwise_granger_z": {
+            "n": 8,
+            "ac1": 1.0,
+            "ac3": 1.0,
+            "ac5": 1.0,
+            "avg5": 1.0,
+            "mrr": 1.0,
+            "mean_rank": 1.0
+          }
+        }
+      },
+      "cases": [
+        {
+          "case_id": "re1ob_adservice_cpu_2",
+          "system": "re1ob",
+          "fault": "cpu",
+          "repetition": 2,
+          "split": "holdout",
+          "true_service": "adservice",
+          "n_timesteps": 4201,
+          "n_metrics": 49,
+          "inject_time": 1685206967,
+          "inject_index": 2100,
+          "parquet_sha256": "efc09980ca1386b6ace770364272201ef8eb055444f804cca9f0be8c15199483",
+          "inject_sha256": "d6819c7dc9a5eef5aa2c0ee4ae2494c29ad5c68e2be6bfff450e1e3999c9529b",
+          "raw_tokens": 360476,
+          "predictions": {
+            "causalsieve": {
+              "rank": 1,
+              "top5": [
+                "adservice",
+                "emailservice",
+                "shippingservice",
+                "frontend",
+                "productcatalogservice"
+              ],
+              "ms": 52.75
+            },
+            "causalsieve_blind": {
+              "rank": 1,
+              "top5": [
+                "adservice",
+                "main",
+                "recommendationservice",
+                "cartservice",
+                "redis"
+              ],
+              "ms": 38.16
+            },
+            "raw_max_z": {
+              "rank": 1,
+              "top5": [
+                "adservice",
+                "emailservice",
+                "frontend-external",
+                "cartservice",
+                "checkoutservice"
+              ],
+              "ms": 1.6
+            },
+            "rolling_mad_z": {
+              "rank": 1,
+              "top5": [
+                "adservice",
+                "cartservice",
+                "emailservice",
+                "recommendationservice",
+                "checkoutservice"
+              ],
+              "ms": 7.38
+            },
+            "sklearn_isolation_forest": {
+              "rank": 7,
+              "top5": [
+                "emailservice",
+                "redis",
+                "checkoutservice",
+                "shippingservice",
+                "recommendationservice"
+              ],
+              "ms": 5230.7
+            },
+            "pairwise_granger_z": {
+              "rank": 5,
+              "top5": [
+                "cartservice",
+                "recommendationservice",
+                "redis",
+                "productcatalogservice",
+                "adservice"
+              ],
+              "ms": 292.95
+            }
+          },
+          "digest_tokens": 77
+        },
+        {
+          "case_id": "re1ob_adservice_cpu_3",
+          "system": "re1ob",
+          "fault": "cpu",
+          "repetition": 3,
+          "split": "holdout",
+          "true_service": "adservice",
+          "n_timesteps": 4201,
+          "n_metrics": 49,
+          "inject_time": 1685211245,
+          "inject_index": 2100,
+          "parquet_sha256": "5dad8369e838c7fdce505f443f1dd61fbe679748efa4be625dbeed6b8189feb5",
+          "inject_sha256": "e0f19a38dc3ed54b4e6ed544117b91d996c0a2098634070cd5937ef430a3e36d",
+          "raw_tokens": 360476,
+          "predictions": {
+            "causalsieve": {
+              "rank": 1,
+              "top5": [
+                "adservice",
+                "frontend",
+                "recommendationservice",
+                "emailservice",
+                "main"
+              ],
+              "ms": 52.62
+            },
+            "causalsieve_blind": {
+              "rank": 2,
+              "top5": [
+                "main",
+                "adservice",
+                "emailservice",
+                "cartservice",
+                "frontend"
+              ],
+              "ms": 39.07
+            },
+            "raw_max_z": {
+              "rank": 2,
+              "top5": [
+                "frontend",
+                "adservice",
+                "recommendationservice",
+                "emailservice",
+                "frontend-external"
+              ],
+              "ms": 1.72
+            },
+            "rolling_mad_z": {
+              "rank": 2,
+              "top5": [
+                "frontend",
+                "adservice",
+                "cartservice",
+                "emailservice",
+                "recommendationservice"
+              ],
+              "ms": 7.75
+            },
+            "sklearn_isolation_forest": {
+              "rank": 2,
+              "top5": [
+                "frontend",
+                "adservice",
+                "main",
+                "emailservice",
+                "recommendationservice"
+              ],
+              "ms": 5111.28
+            },
+            "pairwise_granger_z": {
+              "rank": 8,
+              "top5": [
+                "cartservice",
+                "frontend",
+                "recommendationservice",
+                "emailservice",
+                "productcatalogservice"
+              ],
+              "ms": 274.18
+            }
+          },
+          "digest_tokens": 90
+        },
+        {
+          "case_id": "re1ob_adservice_cpu_4",
+          "system": "re1ob",
+          "fault": "cpu",
+          "repetition": 4,
+          "split": "holdout",
+          "true_service": "adservice",
+          "n_timesteps": 4201,
+          "n_metrics": 49,
+          "inject_time": 1685229704,
+          "inject_index": 2100,
+          "parquet_sha256": "ff0563caad1bcb902a1f68bef4b9ca4134aa031e526c57045b222e9c255e337c",
+          "inject_sha256": "ee5d379440507cd245c81e08929295d9af1441c4d14541a116b95fb353e72337",
+          "raw_tokens": 360476,
+          "predictions": {
+            "causalsieve": {
+              "rank": 2,
+              "top5": [
+                "emailservice",
+                "adservice",
+                "productcatalogservice",
+                "checkoutservice",
+                "currencyservice"
+              ],
+              "ms": 59.05
+            },
+            "causalsieve_blind": {
+              "rank": 1,
+              "top5": [
+                "adservice",
+                "main",
+                "recommendationservice",
+                "frontend",
+                "currencyservice"
+              ],
+              "ms": 44.15
+            },
+            "raw_max_z": {
+              "rank": 2,
+              "top5": [
+                "emailservice",
+                "adservice",
+                "frontend-external",
+                "recommendationservice",
+                "paymentservice"
+              ],
+              "ms": 1.97
+            },
+            "rolling_mad_z": {
+              "rank": 3,
+              "top5": [
+                "emailservice",
+                "recommendationservice",
+                "adservice",
+                "frontend-external",
+                "frontend"
+              ],
+              "ms": 8.18
+            },
+            "sklearn_isolation_forest": {
+              "rank": 8,
+              "top5": [
+                "recommendationservice",
+                "emailservice",
+                "shippingservice",
+                "productcatalogservice",
+                "currencyservice"
+              ],
+              "ms": 5173.29
+            },
+            "pairwise_granger_z": {
+              "rank": 3,
+              "top5": [
+                "emailservice",
+                "recommendationservice",
+                "adservice",
+                "currencyservice",
+                "productcatalogservice"
+              ],
+              "ms": 279.69
+            }
+          },
+          "digest_tokens": 55
+        },
+        {
+          "case_id": "re1ob_adservice_cpu_5",
+          "system": "re1ob",
+          "fault": "cpu",
+          "repetition": 5,
+          "split": "holdout",
+          "true_service": "adservice",
+          "n_timesteps": 4201,
+          "n_metrics": 49,
+          "inject_time": 1685220134,
+          "inject_index": 2100,
+          "parquet_sha256": "3239c865f33c82fd6fa5a051b41a0e9e3cfd94a2b26ec65ed92f455be58ee43c",
+          "inject_sha256": "4762d68f3b71195c32898e42aea31a6b69e0a21fa4fcaf9ae58aa30d445ef658",
+          "raw_tokens": 360476,
+          "predictions": {
+            "causalsieve": {
+              "rank": 1,
+              "top5": [
+                "adservice",
+                "recommendationservice",
+                "main",
+                "cartservice",
+                "frontend"
+              ],
+              "ms": 54.33
+            },
+            "causalsieve_blind": {
+              "rank": 1,
+              "top5": [
+                "adservice",
+                "main",
+                "recommendationservice",
+                "paymentservice",
+                "checkoutservice"
+              ],
+              "ms": 37.26
+            },
+            "raw_max_z": {
+              "rank": 1,
+              "top5": [
+                "adservice",
+                "emailservice",
+                "checkoutservice",
+                "recommendationservice",
+                "paymentservice"
+              ],
+              "ms": 1.8
+            },
+            "rolling_mad_z": {
+              "rank": 1,
+              "top5": [
+                "adservice",
+                "recommendationservice",
+                "redis",
+                "frontend",
+                "cartservice"
+              ],
+              "ms": 7.49
+            },
+            "sklearn_isolation_forest": {
+              "rank": 3,
+              "top5": [
+                "recommendationservice",
+                "shippingservice",
+                "adservice",
+                "cartservice",
+                "main"
+              ],
+              "ms": 5195.38
+            },
+            "pairwise_granger_z": {
+              "rank": 1,
+              "top5": [
+                "adservice",
+                "redis",
+                "frontend",
+                "cartservice",
+                "currencyservice"
+              ],
+              "ms": 290.7
+            }
+          },
+          "digest_tokens": 127
+        },
+        {
+          "case_id": "re1ob_cartservice_mem_2",
+          "system": "re1ob",
+          "fault": "mem",
+          "repetition": 2,
+          "split": "holdout",
+          "true_service": "cartservice",
+          "n_timesteps": 4201,
+          "n_metrics": 49,
+          "inject_time": 1685277478,
+          "inject_index": 2100,
+          "parquet_sha256": "2d66b27ca40e6c32c1b8debdde04ab58283ef43b173ae5c304180f1de6e14e92",
+          "inject_sha256": "c074aaa7ccf687af8e4fbf01e9137ee91fd987835e4df97d94c20ac5208a0063",
+          "raw_tokens": 360476,
+          "predictions": {
+            "causalsieve": {
+              "rank": 1,
+              "top5": [
+                "cartservice",
+                "checkoutservice",
+                "frontend",
+                "frontend-external",
+                "adservice"
+              ],
+              "ms": 53.26
+            },
+            "causalsieve_blind": {
+              "rank": 2,
+              "top5": [
+                "main",
+                "cartservice",
+                "adservice",
+                "shippingservice",
+                "currencyservice"
+              ],
+              "ms": 37.77
+            },
+            "raw_max_z": {
+              "rank": 1,
+              "top5": [
+                "cartservice",
+                "frontend-external",
+                "emailservice",
+                "adservice",
+                "checkoutservice"
+              ],
+              "ms": 1.81
+            },
+            "rolling_mad_z": {
+              "rank": 1,
+              "top5": [
+                "cartservice",
+                "frontend-external",
+                "frontend",
+                "emailservice",
+                "shippingservice"
+              ],
+              "ms": 7.61
+            },
+            "sklearn_isolation_forest": {
+              "rank": 6,
+              "top5": [
+                "emailservice",
+                "recommendationservice",
+                "frontend",
+                "checkoutservice",
+                "productcatalogservice"
+              ],
+              "ms": 5068.43
+            },
+            "pairwise_granger_z": {
+              "rank": 1,
+              "top5": [
+                "cartservice",
+                "shippingservice",
+                "frontend-external",
+                "recommendationservice",
+                "productcatalogservice"
+              ],
+              "ms": 279.49
+            }
+          },
+          "digest_tokens": 118
+        },
+        {
+          "case_id": "re1ob_cartservice_mem_3",
+          "system": "re1ob",
+          "fault": "mem",
+          "repetition": 3,
+          "split": "holdout",
+          "true_service": "cartservice",
+          "n_timesteps": 4201,
+          "n_metrics": 49,
+          "inject_time": 1685281821,
+          "inject_index": 2100,
+          "parquet_sha256": "14733813d79c891dc45749dfa151c133a4e281c10d6d1b67eb7e77255c1b1606",
+          "inject_sha256": "ada64b370897057044cfa9d049e4305175e7bcd68c9c4358b05cb8f211a14e6c",
+          "raw_tokens": 360476,
+          "predictions": {
+            "causalsieve": {
+              "rank": 1,
+              "top5": [
+                "cartservice",
+                "frontend",
+                "frontend-external",
+                "checkoutservice",
+                "emailservice"
+              ],
+              "ms": 48.56
+            },
+            "causalsieve_blind": {
+              "rank": 1,
+              "top5": [
+                "cartservice",
+                "frontend",
+                "frontend-external",
+                "productcatalogservice",
+                "checkoutservice"
+              ],
+              "ms": 49.24
+            },
+            "raw_max_z": {
+              "rank": 2,
+              "top5": [
+                "frontend",
+                "cartservice",
+                "frontend-external",
+                "emailservice",
+                "productcatalogservice"
+              ],
+              "ms": 1.79
+            },
+            "rolling_mad_z": {
+              "rank": 2,
+              "top5": [
+                "frontend",
+                "cartservice",
+                "frontend-external",
+                "emailservice",
+                "productcatalogservice"
+              ],
+              "ms": 7.4
+            },
+            "sklearn_isolation_forest": {
+              "rank": 2,
+              "top5": [
+                "frontend",
+                "cartservice",
+                "emailservice",
+                "productcatalogservice",
+                "recommendationservice"
+              ],
+              "ms": 5016.46
+            },
+            "pairwise_granger_z": {
+              "rank": 1,
+              "top5": [
+                "cartservice",
+                "frontend",
+                "frontend-external",
+                "recommendationservice",
+                "emailservice"
+              ],
+              "ms": 284.0
+            }
+          },
+          "digest_tokens": 120
+        },
+        {
+          "case_id": "re1ob_cartservice_mem_4",
+          "system": "re1ob",
+          "fault": "mem",
+          "repetition": 4,
+          "split": "holdout",
+          "true_service": "cartservice",
+          "n_timesteps": 4201,
+          "n_metrics": 49,
+          "inject_time": 1685286163,
+          "inject_index": 2100,
+          "parquet_sha256": "33a89afd0b213e14530bb423304ada0f7b5e08d302da0f349ba70566026a5e3f",
+          "inject_sha256": "131661c4bdd74fde762fb08c5ea48dc470cc64d416187f7cbc27ca365cce8552",
+          "raw_tokens": 360476,
+          "predictions": {
+            "causalsieve": {
+              "rank": 1,
+              "top5": [
+                "cartservice",
+                "frontend",
+                "adservice",
+                "paymentservice",
+                "recommendationservice"
+              ],
+              "ms": 54.75
+            },
+            "causalsieve_blind": {
+              "rank": 1,
+              "top5": [
+                "cartservice",
+                "shippingservice",
+                "productcatalogservice",
+                "frontend",
+                "adservice"
+              ],
+              "ms": 38.7
+            },
+            "raw_max_z": {
+              "rank": 3,
+              "top5": [
+                "frontend",
+                "emailservice",
+                "cartservice",
+                "shippingservice",
+                "adservice"
+              ],
+              "ms": 1.82
+            },
+            "rolling_mad_z": {
+              "rank": 2,
+              "top5": [
+                "frontend",
+                "cartservice",
+                "emailservice",
+                "shippingservice",
+                "adservice"
+              ],
+              "ms": 7.58
+            },
+            "sklearn_isolation_forest": {
+              "rank": 5,
+              "top5": [
+                "emailservice",
+                "frontend",
+                "paymentservice",
+                "recommendationservice",
+                "cartservice"
+              ],
+              "ms": 4947.71
+            },
+            "pairwise_granger_z": {
+              "rank": 1,
+              "top5": [
+                "cartservice",
+                "frontend",
+                "shippingservice",
+                "recommendationservice",
+                "emailservice"
+              ],
+              "ms": 275.6
+            }
+          },
+          "digest_tokens": 80
+        },
+        {
+          "case_id": "re1ob_cartservice_mem_5",
+          "system": "re1ob",
+          "fault": "mem",
+          "repetition": 5,
+          "split": "holdout",
+          "true_service": "cartservice",
+          "n_timesteps": 4201,
+          "n_metrics": 49,
+          "inject_time": 1685290508,
+          "inject_index": 2100,
+          "parquet_sha256": "a74214aee3bce46e1e3621a2cbaf6a8ba90f1e89936d4e26cc12b25e8c4d8e9b",
+          "inject_sha256": "57cf986d37ffd18f7126ff9f0ad9fb9d680543c3b3b2e37b6f9804c4b3c41a4d",
+          "raw_tokens": 360476,
+          "predictions": {
+            "causalsieve": {
+              "rank": 1,
+              "top5": [
+                "cartservice",
+                "frontend",
+                "emailservice",
+                "frontend-external",
+                "productcatalogservice"
+              ],
+              "ms": 49.66
+            },
+            "causalsieve_blind": {
+              "rank": 1,
+              "top5": [
+                "cartservice",
+                "frontend",
+                "frontend-external",
+                "checkoutservice",
+                "paymentservice"
+              ],
+              "ms": 56.59
+            },
+            "raw_max_z": {
+              "rank": 2,
+              "top5": [
+                "frontend",
+                "cartservice",
+                "emailservice",
+                "frontend-external",
+                "recommendationservice"
+              ],
+              "ms": 1.89
+            },
+            "rolling_mad_z": {
+              "rank": 2,
+              "top5": [
+                "frontend",
+                "cartservice",
+                "emailservice",
+                "recommendationservice",
+                "frontend-external"
+              ],
+              "ms": 7.86
+            },
+            "sklearn_isolation_forest": {
+              "rank": 4,
+              "top5": [
+                "frontend",
+                "recommendationservice",
+                "emailservice",
+                "cartservice",
+                "adservice"
+              ],
+              "ms": 5048.98
+            },
+            "pairwise_granger_z": {
+              "rank": 1,
+              "top5": [
+                "cartservice",
+                "frontend",
+                "shippingservice",
+                "recommendationservice",
+                "currencyservice"
+              ],
+              "ms": 276.47
+            }
+          },
+          "digest_tokens": 107
+        },
+        {
+          "case_id": "re1ob_checkoutservice_disk_2",
+          "system": "re1ob",
+          "fault": "disk",
+          "repetition": 2,
+          "split": "holdout",
+          "true_service": "checkoutservice",
+          "n_timesteps": 721,
+          "n_metrics": 58,
+          "inject_time": 1702365246,
+          "inject_index": 360,
+          "parquet_sha256": "3b199068a745615cb689279b6c70e69a0acb4abd8b25a6ca38690631fc023619",
+          "inject_sha256": "8553f2a8530b2e640b82f4dc1389e48de2d92f645406626b1b80542c62c7f9e5",
+          "raw_tokens": 73497,
+          "predictions": {
+            "causalsieve": {
+              "rank": 2,
+              "top5": [
+                "emailservice",
+                "checkoutservice",
+                "frontend-external",
+                "main",
+                "shippingservice"
+              ],
+              "ms": 30.03
+            },
+            "causalsieve_blind": {
+              "rank": 3,
+              "top5": [
+                "emailservice",
+                "recommendationservice",
+                "checkoutservice",
+                "frontend-external",
+                "adservice"
+              ],
+              "ms": 29.38
+            },
+            "raw_max_z": {
+              "rank": 3,
+              "top5": [
+                "frontend-external",
+                "emailservice",
+                "checkoutservice",
+                "adservice",
+                "paymentservice"
+              ],
+              "ms": 1.07
+            },
+            "rolling_mad_z": {
+              "rank": 3,
+              "top5": [
+                "frontend-external",
+                "emailservice",
+                "checkoutservice",
+                "redis",
+                "productcatalogservice"
+              ],
+              "ms": 2.39
+            },
+            "sklearn_isolation_forest": {
+              "rank": 7,
+              "top5": [
+                "frontend-external",
+                "redis",
+                "emailservice",
+                "adservice",
+                "cartservice"
+              ],
+              "ms": 6291.19
+            },
+            "pairwise_granger_z": {
+              "rank": 2,
+              "top5": [
+                "frontend-external",
+                "checkoutservice",
+                "redis",
+                "productcatalogservice",
+                "emailservice"
+              ],
+              "ms": 132.5
+            }
+          },
+          "digest_tokens": 66
+        },
+        {
+          "case_id": "re1ob_checkoutservice_disk_3",
+          "system": "re1ob",
+          "fault": "disk",
+          "repetition": 3,
+          "split": "holdout",
+          "true_service": "checkoutservice",
+          "n_timesteps": 721,
+          "n_metrics": 58,
+          "inject_time": 1702366022,
+          "inject_index": 360,
+          "parquet_sha256": "51ecd227bdafe961c473278d6ca228c3e18f3902d90403a4981e11570d189468",
+          "inject_sha256": "86e70b2e4d8ffe23890f749e749fb0aa6bb0acd19dc3c49c4901d03be9c374a1",
+          "raw_tokens": 73497,
+          "predictions": {
+            "causalsieve": {
+              "rank": 1,
+              "top5": [
+                "checkoutservice",
+                "productcatalogservice",
+                "paymentservice",
+                "shippingservice",
+                "recommendationservice"
+              ],
+              "ms": 28.28
+            },
+            "causalsieve_blind": {
+              "rank": 1,
+              "top5": [
+                "checkoutservice",
+                "cartservice",
+                "productcatalogservice",
+                "emailservice",
+                "main"
+              ],
+              "ms": 25.27
+            },
+            "raw_max_z": {
+              "rank": 1,
+              "top5": [
+                "checkoutservice",
+                "paymentservice",
+                "recommendationservice",
+                "shippingservice",
+                "emailservice"
+              ],
+              "ms": 0.8
+            },
+            "rolling_mad_z": {
+              "rank": 2,
+              "top5": [
+                "cartservice",
+                "checkoutservice",
+                "recommendationservice",
+                "emailservice",
+                "productcatalogservice"
+              ],
+              "ms": 2.61
+            },
+            "sklearn_isolation_forest": {
+              "rank": 9,
+              "top5": [
+                "frontend",
+                "cartservice",
+                "recommendationservice",
+                "shippingservice",
+                "emailservice"
+              ],
+              "ms": 5892.82
+            },
+            "pairwise_granger_z": {
+              "rank": 3,
+              "top5": [
+                "cartservice",
+                "frontend",
+                "checkoutservice",
+                "recommendationservice",
+                "paymentservice"
+              ],
+              "ms": 130.74
+            }
+          },
+          "digest_tokens": 59
+        },
+        {
+          "case_id": "re1ob_checkoutservice_disk_4",
+          "system": "re1ob",
+          "fault": "disk",
+          "repetition": 4,
+          "split": "holdout",
+          "true_service": "checkoutservice",
+          "n_timesteps": 721,
+          "n_metrics": 58,
+          "inject_time": 1702366794,
+          "inject_index": 360,
+          "parquet_sha256": "9a022cda5f27877e889e77dd8dcb96fd497bddc764b082324e6ff03570e4c0d1",
+          "inject_sha256": "4d82559df977c103a62d07461ffbd4771846ca49b3e54d7679d7e3d1b38a56c0",
+          "raw_tokens": 73497,
+          "predictions": {
+            "causalsieve": {
+              "rank": 1,
+              "top5": [
+                "checkoutservice",
+                "paymentservice",
+                "recommendationservice",
+                "shippingservice",
+                "adservice"
+              ],
+              "ms": 25.6
+            },
+            "causalsieve_blind": {
+              "rank": 1,
+              "top5": [
+                "checkoutservice",
+                "main",
+                "recommendationservice",
+                "paymentservice",
+                "frontend"
+              ],
+              "ms": 27.96
+            },
+            "raw_max_z": {
+              "rank": 1,
+              "top5": [
+                "checkoutservice",
+                "recommendationservice",
+                "paymentservice",
+                "emailservice",
+                "productcatalogservice"
+              ],
+              "ms": 0.83
+            },
+            "rolling_mad_z": {
+              "rank": 1,
+              "top5": [
+                "checkoutservice",
+                "emailservice",
+                "recommendationservice",
+                "productcatalogservice",
+                "adservice"
+              ],
+              "ms": 2.46
+            },
+            "sklearn_isolation_forest": {
+              "rank": 2,
+              "top5": [
+                "productcatalogservice",
+                "checkoutservice",
+                "shippingservice",
+                "emailservice",
+                "frontend"
+              ],
+              "ms": 5923.19
+            },
+            "pairwise_granger_z": {
+              "rank": 2,
+              "top5": [
+                "adservice",
+                "checkoutservice",
+                "currencyservice",
+                "productcatalogservice",
+                "emailservice"
+              ],
+              "ms": 134.45
+            }
+          },
+          "digest_tokens": 55
+        },
+        {
+          "case_id": "re1ob_checkoutservice_disk_5",
+          "system": "re1ob",
+          "fault": "disk",
+          "repetition": 5,
+          "split": "holdout",
+          "true_service": "checkoutservice",
+          "n_timesteps": 721,
+          "n_metrics": 58,
+          "inject_time": 1702367565,
+          "inject_index": 360,
+          "parquet_sha256": "167885c1a7b4b3b5c9b349f398be61cb7e4c747ca18085318909122a6b1616e5",
+          "inject_sha256": "902292ae0052066745d91bc35fdcceb7423b0621de4e49931f8d4d730e36d849",
+          "raw_tokens": 73497,
+          "predictions": {
+            "causalsieve": {
+              "rank": 2,
+              "top5": [
+                "emailservice",
+                "checkoutservice",
+                "cartservice",
+                "adservice",
+                "shippingservice"
+              ],
+              "ms": 25.84
+            },
+            "causalsieve_blind": {
+              "rank": 8,
+              "top5": [
+                "emailservice",
+                "cartservice",
+                "currencyservice",
+                "productcatalogservice",
+                "adservice"
+              ],
+              "ms": 26.23
+            },
+            "raw_max_z": {
+              "rank": 3,
+              "top5": [
+                "emailservice",
+                "cartservice",
+                "checkoutservice",
+                "productcatalogservice",
+                "adservice"
+              ],
+              "ms": 1.89
+            },
+            "rolling_mad_z": {
+              "rank": 1,
+              "top5": [
+                "checkoutservice",
+                "emailservice",
+                "cartservice",
+                "currencyservice",
+                "productcatalogservice"
+              ],
+              "ms": 2.45
+            },
+            "sklearn_isolation_forest": {
+              "rank": 1,
+              "top5": [
+                "checkoutservice",
+                "emailservice",
+                "frontend",
+                "cartservice",
+                "productcatalogservice"
+              ],
+              "ms": 5878.24
+            },
+            "pairwise_granger_z": {
+              "rank": 6,
+              "top5": [
+                "emailservice",
+                "currencyservice",
+                "cartservice",
+                "adservice",
+                "productcatalogservice"
+              ],
+              "ms": 128.63
+            }
+          },
+          "digest_tokens": 53
+        },
+        {
+          "case_id": "re1ob_currencyservice_delay_2",
+          "system": "re1ob",
+          "fault": "delay",
+          "repetition": 2,
+          "split": "holdout",
+          "true_service": "currencyservice",
+          "n_timesteps": 721,
+          "n_metrics": 57,
+          "inject_time": 1692577020,
+          "inject_index": 360,
+          "parquet_sha256": "4db9b62a7112215b238f1447f6ad84a16134cc9c66643505d54fdff039c35b3d",
+          "inject_sha256": "c987520633b34e174053b3239f731be8f29250939042601d9f117ed07511a3d6",
+          "raw_tokens": 72232,
+          "predictions": {
+            "causalsieve": {
+              "rank": 1,
+              "top5": [
+                "currencyservice",
+                "frontend",
+                "checkoutservice",
+                "main",
+                "frontend-external"
+              ],
+              "ms": 27.02
+            },
+            "causalsieve_blind": {
+              "rank": 1,
+              "top5": [
+                "currencyservice",
+                "frontend",
+                "checkoutservice",
+                "adservice",
+                "frontend-external"
+              ],
+              "ms": 25.44
+            },
+            "raw_max_z": {
+              "rank": 3,
+              "top5": [
+                "recommendationservice",
+                "frontend-external",
+                "currencyservice",
+                "frontend",
+                "checkoutservice"
+              ],
+              "ms": 0.79
+            },
+            "rolling_mad_z": {
+              "rank": 3,
+              "top5": [
+                "recommendationservice",
+                "frontend-external",
+                "currencyservice",
+                "checkoutservice",
+                "frontend"
+              ],
+              "ms": 2.52
+            },
+            "sklearn_isolation_forest": {
+              "rank": 3,
+              "top5": [
+                "frontend-external",
+                "recommendationservice",
+                "currencyservice",
+                "main",
+                "checkoutservice"
+              ],
+              "ms": 5801.11
+            },
+            "pairwise_granger_z": {
+              "rank": 2,
+              "top5": [
+                "recommendationservice",
+                "currencyservice",
+                "frontend",
+                "checkoutservice",
+                "frontend-external"
+              ],
+              "ms": 130.75
+            }
+          },
+          "digest_tokens": 83
+        },
+        {
+          "case_id": "re1ob_currencyservice_delay_3",
+          "system": "re1ob",
+          "fault": "delay",
+          "repetition": 3,
+          "split": "holdout",
+          "true_service": "currencyservice",
+          "n_timesteps": 721,
+          "n_metrics": 58,
+          "inject_time": 1692610652,
+          "inject_index": 360,
+          "parquet_sha256": "74ac11b7929d5787a75c77b44943b97b7c72486a2faaad9a5e8f346092bb220b",
+          "inject_sha256": "172facccf0ef02690c48942ed14f1cad5854324fa0b2f5fbce96b5d816c9f2e0",
+          "raw_tokens": 73497,
+          "predictions": {
+            "causalsieve": {
+              "rank": 1,
+              "top5": [
+                "currencyservice",
+                "checkoutservice",
+                "frontend",
+                "main",
+                "recommendationservice"
+              ],
+              "ms": 27.88
+            },
+            "causalsieve_blind": {
+              "rank": 1,
+              "top5": [
+                "currencyservice",
+                "checkoutservice",
+                "frontend",
+                "main",
+                "paymentservice"
+              ],
+              "ms": 25.96
+            },
+            "raw_max_z": {
+              "rank": 1,
+              "top5": [
+                "currencyservice",
+                "checkoutservice",
+                "frontend",
+                "recommendationservice",
+                "emailservice"
+              ],
+              "ms": 0.78
+            },
+            "rolling_mad_z": {
+              "rank": 1,
+              "top5": [
+                "currencyservice",
+                "checkoutservice",
+                "frontend",
+                "recommendationservice",
+                "emailservice"
+              ],
+              "ms": 2.46
+            },
+            "sklearn_isolation_forest": {
+              "rank": 9,
+              "top5": [
+                "frontend",
+                "checkoutservice",
+                "recommendationservice",
+                "cartservice",
+                "emailservice"
+              ],
+              "ms": 5846.37
+            },
+            "pairwise_granger_z": {
+              "rank": 1,
+              "top5": [
+                "currencyservice",
+                "checkoutservice",
+                "cartservice",
+                "frontend",
+                "recommendationservice"
+              ],
+              "ms": 133.87
+            }
+          },
+          "digest_tokens": 55
+        },
+        {
+          "case_id": "re1ob_currencyservice_delay_4",
+          "system": "re1ob",
+          "fault": "delay",
+          "repetition": 4,
+          "split": "holdout",
+          "true_service": "currencyservice",
+          "n_timesteps": 721,
+          "n_metrics": 58,
+          "inject_time": 1692611420,
+          "inject_index": 360,
+          "parquet_sha256": "7e910560b619e8aa087c4c0ec8a94ceb51206c3a3d6ed4c76e2ca9a70a49b1f6",
+          "inject_sha256": "4b72f279cc8113033ed627927055f794df493257ca95a30731d82973211f9346",
+          "raw_tokens": 73497,
+          "predictions": {
+            "causalsieve": {
+              "rank": 2,
+              "top5": [
+                "checkoutservice",
+                "currencyservice",
+                "frontend",
+                "cartservice",
+                "frontend-external"
+              ],
+              "ms": 27.42
+            },
+            "causalsieve_blind": {
+              "rank": 1,
+              "top5": [
+                "currencyservice",
+                "checkoutservice",
+                "frontend",
+                "cartservice",
+                "main"
+              ],
+              "ms": 25.64
+            },
+            "raw_max_z": {
+              "rank": 3,
+              "top5": [
+                "recommendationservice",
+                "frontend-external",
+                "currencyservice",
+                "checkoutservice",
+                "cartservice"
+              ],
+              "ms": 1.35
+            },
+            "rolling_mad_z": {
+              "rank": 3,
+              "top5": [
+                "recommendationservice",
+                "frontend-external",
+                "currencyservice",
+                "checkoutservice",
+                "frontend"
+              ],
+              "ms": 2.52
+            },
+            "sklearn_isolation_forest": {
+              "rank": 3,
+              "top5": [
+                "frontend-external",
+                "recommendationservice",
+                "currencyservice",
+                "frontend",
+                "checkoutservice"
+              ],
+              "ms": 5713.63
+            },
+            "pairwise_granger_z": {
+              "rank": 2,
+              "top5": [
+                "recommendationservice",
+                "currencyservice",
+                "checkoutservice",
+                "frontend-external",
+                "cartservice"
+              ],
+              "ms": 129.84
+            }
+          },
+          "digest_tokens": 110
+        },
+        {
+          "case_id": "re1ob_currencyservice_delay_5",
+          "system": "re1ob",
+          "fault": "delay",
+          "repetition": 5,
+          "split": "holdout",
+          "true_service": "currencyservice",
+          "n_timesteps": 721,
+          "n_metrics": 57,
+          "inject_time": 1692579323,
+          "inject_index": 360,
+          "parquet_sha256": "1680bb0531139aeb4b46de3c7dd7e832bc05f092bb5f4dc4e96dcd55772354be",
+          "inject_sha256": "4fcd3bb2f5495558f44fe5fcb3f88de578d9744de157566de18397a5f40406b5",
+          "raw_tokens": 72232,
+          "predictions": {
+            "causalsieve": {
+              "rank": 1,
+              "top5": [
+                "currencyservice",
+                "checkoutservice",
+                "frontend",
+                "shippingservice",
+                "cartservice"
+              ],
+              "ms": 24.75
+            },
+            "causalsieve_blind": {
+              "rank": 1,
+              "top5": [
+                "currencyservice",
+                "main",
+                "frontend",
+                "checkoutservice",
+                "paymentservice"
+              ],
+              "ms": 22.25
+            },
+            "raw_max_z": {
+              "rank": 1,
+              "top5": [
+                "currencyservice",
+                "checkoutservice",
+                "frontend",
+                "emailservice",
+                "cartservice"
+              ],
+              "ms": 0.79
+            },
+            "rolling_mad_z": {
+              "rank": 1,
+              "top5": [
+                "currencyservice",
+                "checkoutservice",
+                "frontend",
+                "emailservice",
+                "redis"
+              ],
+              "ms": 2.54
+            },
+            "sklearn_isolation_forest": {
+              "rank": 1,
+              "top5": [
+                "currencyservice",
+                "checkoutservice",
+                "frontend",
+                "emailservice",
+                "recommendationservice"
+              ],
+              "ms": 5901.17
+            },
+            "pairwise_granger_z": {
+              "rank": 1,
+              "top5": [
+                "currencyservice",
+                "checkoutservice",
+                "frontend",
+                "redis",
+                "frontend-external"
+              ],
+              "ms": 132.84
+            }
+          },
+          "digest_tokens": 82
+        },
+        {
+          "case_id": "re1ob_productcatalogservice_loss_2",
+          "system": "re1ob",
+          "fault": "loss",
+          "repetition": 2,
+          "split": "holdout",
+          "true_service": "productcatalogservice",
+          "n_timesteps": 721,
+          "n_metrics": 59,
+          "inject_time": 1692666311,
+          "inject_index": 360,
+          "parquet_sha256": "946cf0df2a223fee988d2c55279f286b1637bcda06c8ab01331efaaea30a9e22",
+          "inject_sha256": "240ca16053f547be21710431eda2b4cc2b47d216f3ace3189a2ddf94fe0a0b01",
+          "raw_tokens": 74766,
+          "predictions": {
+            "causalsieve": {
+              "rank": 2,
+              "top5": [
+                "checkoutservice",
+                "productcatalogservice",
+                "adservice",
+                "frontend",
+                "currencyservice"
+              ],
+              "ms": 26.74
+            },
+            "causalsieve_blind": {
+              "rank": 8,
+              "top5": [
+                "cartservice",
+                "frontend-external",
+                "checkoutservice",
+                "frontend",
+                "adservice"
+              ],
+              "ms": 24.26
+            },
+            "raw_max_z": {
+              "rank": 8,
+              "top5": [
+                "emailservice",
+                "main",
+                "checkoutservice",
+                "recommendationservice",
+                "adservice"
+              ],
+              "ms": 1.63
+            },
+            "rolling_mad_z": {
+              "rank": 9,
+              "top5": [
+                "emailservice",
+                "main",
+                "checkoutservice",
+                "recommendationservice",
+                "adservice"
+              ],
+              "ms": 2.81
+            },
+            "sklearn_isolation_forest": {
+              "rank": 10,
+              "top5": [
+                "emailservice",
+                "main",
+                "frontend",
+                "cartservice",
+                "checkoutservice"
+              ],
+              "ms": 5820.63
+            },
+            "pairwise_granger_z": {
+              "rank": 7,
+              "top5": [
+                "emailservice",
+                "main",
+                "frontend",
+                "checkoutservice",
+                "recommendationservice"
+              ],
+              "ms": 135.4
+            }
+          },
+          "digest_tokens": 57
+        },
+        {
+          "case_id": "re1ob_productcatalogservice_loss_3",
+          "system": "re1ob",
+          "fault": "loss",
+          "repetition": 3,
+          "split": "holdout",
+          "true_service": "productcatalogservice",
+          "n_timesteps": 721,
+          "n_metrics": 59,
+          "inject_time": 1692667087,
+          "inject_index": 360,
+          "parquet_sha256": "55d763b3a3488f1fc701855228942b0a757e47e63ec9d8abf5da893772b04577",
+          "inject_sha256": "4fc009dc8c7ed554da7a3d65d72bcc34abeb504626fa34d77b90bf5e78646c01",
+          "raw_tokens": 74766,
+          "predictions": {
+            "causalsieve": {
+              "rank": 3,
+              "top5": [
+                "checkoutservice",
+                "frontend-external",
+                "productcatalogservice",
+                "recommendationservice",
+                "adservice"
+              ],
+              "ms": 26.54
+            },
+            "causalsieve_blind": {
+              "rank": 6,
+              "top5": [
+                "checkoutservice",
+                "adservice",
+                "recommendationservice",
+                "frontend-external",
+                "main"
+              ],
+              "ms": 24.81
+            },
+            "raw_max_z": {
+              "rank": 6,
+              "top5": [
+                "frontend-external",
+                "checkoutservice",
+                "recommendationservice",
+                "adservice",
+                "frontend"
+              ],
+              "ms": 1.11
+            },
+            "rolling_mad_z": {
+              "rank": 6,
+              "top5": [
+                "frontend-external",
+                "checkoutservice",
+                "recommendationservice",
+                "adservice",
+                "frontend"
+              ],
+              "ms": 2.62
+            },
+            "sklearn_isolation_forest": {
+              "rank": 5,
+              "top5": [
+                "frontend-external",
+                "recommendationservice",
+                "frontend",
+                "redis",
+                "productcatalogservice"
+              ],
+              "ms": 5865.08
+            },
+            "pairwise_granger_z": {
+              "rank": 2,
+              "top5": [
+                "frontend-external",
+                "productcatalogservice",
+                "adservice",
+                "frontend",
+                "checkoutservice"
+              ],
+              "ms": 133.16
+            }
+          },
+          "digest_tokens": 78
+        },
+        {
+          "case_id": "re1ob_productcatalogservice_loss_4",
+          "system": "re1ob",
+          "fault": "loss",
+          "repetition": 4,
+          "split": "holdout",
+          "true_service": "productcatalogservice",
+          "n_timesteps": 721,
+          "n_metrics": 59,
+          "inject_time": 1692667865,
+          "inject_index": 360,
+          "parquet_sha256": "1b1eaab126c2b9601173e08cfc433c83a169aa2f6fcdef76f2e9620d92db3772",
+          "inject_sha256": "509538e147496af704663084a6a8132b8ffa9755073febdb8aa5ea5bc85f3dc6",
+          "raw_tokens": 74766,
+          "predictions": {
+            "causalsieve": {
+              "rank": 5,
+              "top5": [
+                "checkoutservice",
+                "recommendationservice",
+                "frontend",
+                "frontend-external",
+                "productcatalogservice"
+              ],
+              "ms": 26.5
+            },
+            "causalsieve_blind": {
+              "rank": 7,
+              "top5": [
+                "checkoutservice",
+                "recommendationservice",
+                "main",
+                "adservice",
+                "frontend-external"
+              ],
+              "ms": 23.76
+            },
+            "raw_max_z": {
+              "rank": 4,
+              "top5": [
+                "frontend-external",
+                "recommendationservice",
+                "checkoutservice",
+                "productcatalogservice",
+                "adservice"
+              ],
+              "ms": 0.79
+            },
+            "rolling_mad_z": {
+              "rank": 4,
+              "top5": [
+                "frontend-external",
+                "recommendationservice",
+                "checkoutservice",
+                "productcatalogservice",
+                "adservice"
+              ],
+              "ms": 2.56
+            },
+            "sklearn_isolation_forest": {
+              "rank": 4,
+              "top5": [
+                "frontend-external",
+                "recommendationservice",
+                "frontend",
+                "productcatalogservice",
+                "currencyservice"
+              ],
+              "ms": 5722.35
+            },
+            "pairwise_granger_z": {
+              "rank": 3,
+              "top5": [
+                "frontend-external",
+                "adservice",
+                "productcatalogservice",
+                "currencyservice",
+                "frontend"
+              ],
+              "ms": 128.07
+            }
+          },
+          "digest_tokens": 76
+        },
+        {
+          "case_id": "re1ob_productcatalogservice_loss_5",
+          "system": "re1ob",
+          "fault": "loss",
+          "repetition": 5,
+          "split": "holdout",
+          "true_service": "productcatalogservice",
+          "n_timesteps": 721,
+          "n_metrics": 59,
+          "inject_time": 1692668642,
+          "inject_index": 360,
+          "parquet_sha256": "4fedaab0681614bf2987ed073b930f725238a3fcc8cad2105c1f4a5437a89a19",
+          "inject_sha256": "b98e8b195bf08a8f1ed84bdc6cdca165180abafc9a78e2f2d41b0a39f5c243a8",
+          "raw_tokens": 74766,
+          "predictions": {
+            "causalsieve": {
+              "rank": 4,
+              "top5": [
+                "recommendationservice",
+                "checkoutservice",
+                "frontend",
+                "productcatalogservice",
+                "adservice"
+              ],
+              "ms": 25.88
+            },
+            "causalsieve_blind": {
+              "rank": 4,
+              "top5": [
+                "cartservice",
+                "recommendationservice",
+                "checkoutservice",
+                "productcatalogservice",
+                "adservice"
+              ],
+              "ms": 26.69
+            },
+            "raw_max_z": {
+              "rank": 6,
+              "top5": [
+                "recommendationservice",
+                "checkoutservice",
+                "adservice",
+                "cartservice",
+                "frontend"
+              ],
+              "ms": 0.85
+            },
+            "rolling_mad_z": {
+              "rank": 8,
+              "top5": [
+                "cartservice",
+                "recommendationservice",
+                "checkoutservice",
+                "adservice",
+                "main"
+              ],
+              "ms": 2.41
+            },
+            "sklearn_isolation_forest": {
+              "rank": 7,
+              "top5": [
+                "cartservice",
+                "main",
+                "shippingservice",
+                "recommendationservice",
+                "currencyservice"
+              ],
+              "ms": 5796.53
+            },
+            "pairwise_granger_z": {
+              "rank": 6,
+              "top5": [
+                "cartservice",
+                "recommendationservice",
+                "adservice",
+                "frontend",
+                "checkoutservice"
+              ],
+              "ms": 129.57
+            }
+          },
+          "digest_tokens": 58
+        },
+        {
+          "case_id": "re1ss_carts_cpu_2",
+          "system": "re1ss",
+          "fault": "cpu",
+          "repetition": 2,
+          "split": "holdout",
+          "true_service": "carts",
+          "n_timesteps": 721,
+          "n_metrics": 59,
+          "inject_time": 1693091092,
+          "inject_index": 360,
+          "parquet_sha256": "4d515069459c0bfd799e8b79e5f109aa6ded6cabf91f9c7d3200f4ba90097580",
+          "inject_sha256": "a1e5c39d54602e29b81aaa60fb7382d638dfa455bc3faee2d6c4cb9fbef888c3",
+          "raw_tokens": 74678,
+          "predictions": {
+            "causalsieve": {
+              "rank": 1,
+              "top5": [
+                "carts",
+                "front-end",
+                "catalogue-db",
+                "rabbitmq",
+                "queue-master"
+              ],
+              "ms": 26.48
+            },
+            "causalsieve_blind": {
+              "rank": 1,
+              "top5": [
+                "carts",
+                "rabbitmq",
+                "carts-db",
+                "orders-db",
+                "session-db"
+              ],
+              "ms": 25.89
+            },
+            "raw_max_z": {
+              "rank": 1,
+              "top5": [
+                "carts",
+                "orders",
+                "front-end",
+                "catalogue-db",
+                "queue-master"
+              ],
+              "ms": 0.94
+            },
+            "rolling_mad_z": {
+              "rank": 1,
+              "top5": [
+                "carts",
+                "orders",
+                "payment",
+                "front-end",
+                "catalogue-db"
+              ],
+              "ms": 2.54
+            },
+            "sklearn_isolation_forest": {
+              "rank": 1,
+              "top5": [
+                "carts",
+                "catalogue-db",
+                "front-end",
+                "orders-db",
+                "orders"
+              ],
+              "ms": 5702.07
+            },
+            "pairwise_granger_z": {
+              "rank": 1,
+              "top5": [
+                "carts",
+                "orders",
+                "payment",
+                "front-end",
+                "catalogue-db"
+              ],
+              "ms": 137.71
+            }
+          },
+          "digest_tokens": 45
+        },
+        {
+          "case_id": "re1ss_carts_cpu_3",
+          "system": "re1ss",
+          "fault": "cpu",
+          "repetition": 3,
+          "split": "holdout",
+          "true_service": "carts",
+          "n_timesteps": 721,
+          "n_metrics": 59,
+          "inject_time": 1693091861,
+          "inject_index": 360,
+          "parquet_sha256": "a2382fcb9c524f2203fcdcd099629cf2612dc9f7aebd472459e588d2a084127f",
+          "inject_sha256": "2937c354754df3f9b4e7abb774bfdd9bf3f39357cb4be229a2cd068901e57591",
+          "raw_tokens": 74678,
+          "predictions": {
+            "causalsieve": {
+              "rank": 1,
+              "top5": [
+                "carts",
+                "orders",
+                "front-end",
+                "payment",
+                "queue-master"
+              ],
+              "ms": 27.88
+            },
+            "causalsieve_blind": {
+              "rank": 1,
+              "top5": [
+                "carts",
+                "queue-master",
+                "user",
+                "orders",
+                "carts-db"
+              ],
+              "ms": 25.13
+            },
+            "raw_max_z": {
+              "rank": 2,
+              "top5": [
+                "catalogue-db",
+                "carts",
+                "orders",
+                "front-end",
+                "user"
+              ],
+              "ms": 0.87
+            },
+            "rolling_mad_z": {
+              "rank": 2,
+              "top5": [
+                "catalogue-db",
+                "carts",
+                "orders",
+                "payment",
+                "shipping"
+              ],
+              "ms": 2.56
+            },
+            "sklearn_isolation_forest": {
+              "rank": 3,
+              "top5": [
+                "catalogue-db",
+                "orders",
+                "carts",
+                "payment",
+                "front-end"
+              ],
+              "ms": 5496.8
+            },
+            "pairwise_granger_z": {
+              "rank": 3,
+              "top5": [
+                "catalogue-db",
+                "orders",
+                "carts",
+                "shipping",
+                "front-end"
+              ],
+              "ms": 131.18
+            }
+          },
+          "digest_tokens": 45
+        },
+        {
+          "case_id": "re1ss_carts_cpu_4",
+          "system": "re1ss",
+          "fault": "cpu",
+          "repetition": 4,
+          "split": "holdout",
+          "true_service": "carts",
+          "n_timesteps": 721,
+          "n_metrics": 59,
+          "inject_time": 1693092993,
+          "inject_index": 360,
+          "parquet_sha256": "8c3071aa76c485aa573231c112b5b7eef8e241dc72e827612b0d4ee21ee36d06",
+          "inject_sha256": "1fb037a3b080d0fbcd6fca554efa4f7a5af083917152aa8c4cc2db6abb3abc2d",
+          "raw_tokens": 74678,
+          "predictions": {
+            "causalsieve": {
+              "rank": 1,
+              "top5": [
+                "carts",
+                "front-end",
+                "catalogue",
+                "orders",
+                "carts-db"
+              ],
+              "ms": 26.79
+            },
+            "causalsieve_blind": {
+              "rank": 1,
+              "top5": [
+                "carts",
+                "payment",
+                "orders",
+                "front-end",
+                "catalogue"
+              ],
+              "ms": 24.93
+            },
+            "raw_max_z": {
+              "rank": 1,
+              "top5": [
+                "carts",
+                "orders",
+                "front-end",
+                "queue-master",
+                "catalogue"
+              ],
+              "ms": 1.0
+            },
+            "rolling_mad_z": {
+              "rank": 1,
+              "top5": [
+                "carts",
+                "payment",
+                "orders",
+                "catalogue",
+                "session-db"
+              ],
+              "ms": 4.66
+            },
+            "sklearn_isolation_forest": {
+              "rank": 5,
+              "top5": [
+                "orders",
+                "queue-master",
+                "user",
+                "payment",
+                "carts"
+              ],
+              "ms": 5871.02
+            },
+            "pairwise_granger_z": {
+              "rank": 1,
+              "top5": [
+                "carts",
+                "orders",
+                "payment",
+                "catalogue-db",
+                "catalogue"
+              ],
+              "ms": 131.6
+            }
+          },
+          "digest_tokens": 44
+        },
+        {
+          "case_id": "re1ss_carts_cpu_5",
+          "system": "re1ss",
+          "fault": "cpu",
+          "repetition": 5,
+          "split": "holdout",
+          "true_service": "carts",
+          "n_timesteps": 721,
+          "n_metrics": 59,
+          "inject_time": 1693093761,
+          "inject_index": 360,
+          "parquet_sha256": "9f00c57e1b0196675d14a9294f31e86da639f69cdf177ad3d4ba437b236a4ff3",
+          "inject_sha256": "e5437d802c8859b364598e8cad91f99f46a0ec2885f97f08dc1da2cb25e3b57b",
+          "raw_tokens": 74678,
+          "predictions": {
+            "causalsieve": {
+              "rank": 1,
+              "top5": [
+                "carts",
+                "orders",
+                "queue-master",
+                "shipping",
+                "front-end"
+              ],
+              "ms": 26.07
+            },
+            "causalsieve_blind": {
+              "rank": 4,
+              "top5": [
+                "payment",
+                "catalogue",
+                "front-end",
+                "carts",
+                "orders-db"
+              ],
+              "ms": 24.66
+            },
+            "raw_max_z": {
+              "rank": 2,
+              "top5": [
+                "orders",
+                "carts",
+                "queue-master",
+                "front-end",
+                "shipping"
+              ],
+              "ms": 0.84
+            },
+            "rolling_mad_z": {
+              "rank": 1,
+              "top5": [
+                "carts",
+                "orders",
+                "shipping",
+                "user",
+                "queue-master"
+              ],
+              "ms": 2.83
+            },
+            "sklearn_isolation_forest": {
+              "rank": 2,
+              "top5": [
+                "orders",
+                "carts",
+                "front-end",
+                "queue-master",
+                "catalogue"
+              ],
+              "ms": 5573.29
+            },
+            "pairwise_granger_z": {
+              "rank": 1,
+              "top5": [
+                "carts",
+                "orders",
+                "queue-master",
+                "catalogue",
+                "front-end"
+              ],
+              "ms": 130.16
+            }
+          },
+          "digest_tokens": 67
+        },
+        {
+          "case_id": "re1ss_catalogue_mem_2",
+          "system": "re1ss",
+          "fault": "mem",
+          "repetition": 2,
+          "split": "holdout",
+          "true_service": "catalogue",
+          "n_timesteps": 721,
+          "n_metrics": 60,
+          "inject_time": 1693113880,
+          "inject_index": 360,
+          "parquet_sha256": "0a92b6c9968987bb6f55e93f69540f5bece1773c4bb9d4cf8003f454814cc174",
+          "inject_sha256": "4b1c9a6e3fbb74651c1dd34a4ee803ab6774ee2f8759584481600b8d0d828c92",
+          "raw_tokens": 75943,
+          "predictions": {
+            "causalsieve": {
+              "rank": 1,
+              "top5": [
+                "catalogue",
+                "catalogue-db",
+                "user",
+                "carts",
+                "rabbitmq"
+              ],
+              "ms": 31.93
+            },
+            "causalsieve_blind": {
+              "rank": 1,
+              "top5": [
+                "catalogue",
+                "user",
+                "user-db",
+                "orders-db",
+                "carts-db"
+              ],
+              "ms": 27.7
+            },
+            "raw_max_z": {
+              "rank": 1,
+              "top5": [
+                "catalogue",
+                "front-end",
+                "catalogue-db",
+                "user",
+                "carts"
+              ],
+              "ms": 0.76
+            },
+            "rolling_mad_z": {
+              "rank": 1,
+              "top5": [
+                "catalogue",
+                "front-end",
+                "user",
+                "catalogue-db",
+                "payment"
+              ],
+              "ms": 2.39
+            },
+            "sklearn_isolation_forest": {
+              "rank": 1,
+              "top5": [
+                "catalogue",
+                "user",
+                "rabbitmq",
+                "carts",
+                "payment"
+              ],
+              "ms": 5631.74
+            },
+            "pairwise_granger_z": {
+              "rank": 1,
+              "top5": [
+                "catalogue",
+                "front-end",
+                "payment",
+                "carts",
+                "orders-db"
+              ],
+              "ms": 129.83
+            }
+          },
+          "digest_tokens": 57
+        },
+        {
+          "case_id": "re1ss_catalogue_mem_3",
+          "system": "re1ss",
+          "fault": "mem",
+          "repetition": 3,
+          "split": "holdout",
+          "true_service": "catalogue",
+          "n_timesteps": 721,
+          "n_metrics": 60,
+          "inject_time": 1693114650,
+          "inject_index": 360,
+          "parquet_sha256": "3a2a6c802a5df1a1d60670c32f0a88f49d22bec29ed85d2bccab185b2d01595d",
+          "inject_sha256": "7dfdd5078c1f0da2e58582addb9943dd6012e2820bdef5ec2d262ef9f8e8a826",
+          "raw_tokens": 75943,
+          "predictions": {
+            "causalsieve": {
+              "rank": 1,
+              "top5": [
+                "catalogue",
+                "carts",
+                "orders",
+                "front-end",
+                "orders-db"
+              ],
+              "ms": 29.39
+            },
+            "causalsieve_blind": {
+              "rank": 1,
+              "top5": [
+                "catalogue",
+                "orders",
+                "payment",
+                "queue-master",
+                "user"
+              ],
+              "ms": 28.23
+            },
+            "raw_max_z": {
+              "rank": 2,
+              "top5": [
+                "catalogue-db",
+                "catalogue",
+                "orders",
+                "front-end",
+                "carts"
+              ],
+              "ms": 0.83
+            },
+            "rolling_mad_z": {
+              "rank": 2,
+              "top5": [
+                "catalogue-db",
+                "catalogue",
+                "orders",
+                "front-end",
+                "user"
+              ],
+              "ms": 2.64
+            },
+            "sklearn_isolation_forest": {
+              "rank": 1,
+              "top5": [
+                "catalogue",
+                "catalogue-db",
+                "queue-master",
+                "front-end",
+                "shipping"
+              ],
+              "ms": 5712.92
+            },
+            "pairwise_granger_z": {
+              "rank": 1,
+              "top5": [
+                "catalogue",
+                "catalogue-db",
+                "orders",
+                "front-end",
+                "payment"
+              ],
+              "ms": 131.52
+            }
+          },
+          "digest_tokens": 46
+        },
+        {
+          "case_id": "re1ss_catalogue_mem_4",
+          "system": "re1ss",
+          "fault": "mem",
+          "repetition": 4,
+          "split": "holdout",
+          "true_service": "catalogue",
+          "n_timesteps": 721,
+          "n_metrics": 59,
+          "inject_time": 1693115774,
+          "inject_index": 360,
+          "parquet_sha256": "b45638c9b0ab5fae306e27626a5a35b822fa25f144eab2931d86bf128b85c56c",
+          "inject_sha256": "c681befe54c28ac808130ddc814921221bbaefded0acec5fc3cb50227407e9b9",
+          "raw_tokens": 74678,
+          "predictions": {
+            "causalsieve": {
+              "rank": 1,
+              "top5": [
+                "catalogue",
+                "catalogue-db",
+                "carts",
+                "front-end",
+                "rabbitmq"
+              ],
+              "ms": 29.41
+            },
+            "causalsieve_blind": {
+              "rank": 1,
+              "top5": [
+                "catalogue",
+                "user-db",
+                "catalogue-db",
+                "shipping",
+                "queue-master"
+              ],
+              "ms": 25.46
+            },
+            "raw_max_z": {
+              "rank": 1,
+              "top5": [
+                "catalogue",
+                "catalogue-db",
+                "front-end",
+                "user",
+                "carts"
+              ],
+              "ms": 0.84
+            },
+            "rolling_mad_z": {
+              "rank": 1,
+              "top5": [
+                "catalogue",
+                "catalogue-db",
+                "user",
+                "front-end",
+                "carts"
+              ],
+              "ms": 2.59
+            },
+            "sklearn_isolation_forest": {
+              "rank": 1,
+              "top5": [
+                "catalogue",
+                "user",
+                "carts",
+                "catalogue-db",
+                "orders"
+              ],
+              "ms": 5729.97
+            },
+            "pairwise_granger_z": {
+              "rank": 1,
+              "top5": [
+                "catalogue",
+                "front-end",
+                "catalogue-db",
+                "rabbitmq",
+                "payment"
+              ],
+              "ms": 137.19
+            }
+          },
+          "digest_tokens": 48
+        },
+        {
+          "case_id": "re1ss_catalogue_mem_5",
+          "system": "re1ss",
+          "fault": "mem",
+          "repetition": 5,
+          "split": "holdout",
+          "true_service": "catalogue",
+          "n_timesteps": 721,
+          "n_metrics": 59,
+          "inject_time": 1693116544,
+          "inject_index": 360,
+          "parquet_sha256": "23bc41d0636be5001e9c12d4a55f687c2cf8e7b01f013469794def4695929cd0",
+          "inject_sha256": "f5a37fbe2a3fe43e8126b6fb0a1524871159d30db40ee8bc5c1874889272220b",
+          "raw_tokens": 74678,
+          "predictions": {
+            "causalsieve": {
+              "rank": 1,
+              "top5": [
+                "catalogue",
+                "user",
+                "front-end",
+                "carts",
+                "catalogue-db"
+              ],
+              "ms": 28.21
+            },
+            "causalsieve_blind": {
+              "rank": 1,
+              "top5": [
+                "catalogue",
+                "user",
+                "queue-master",
+                "front-end",
+                "carts"
+              ],
+              "ms": 26.37
+            },
+            "raw_max_z": {
+              "rank": 2,
+              "top5": [
+                "catalogue-db",
+                "catalogue",
+                "front-end",
+                "user",
+                "orders"
+              ],
+              "ms": 0.96
+            },
+            "rolling_mad_z": {
+              "rank": 2,
+              "top5": [
+                "catalogue-db",
+                "catalogue",
+                "front-end",
+                "user",
+                "orders"
+              ],
+              "ms": 2.37
+            },
+            "sklearn_isolation_forest": {
+              "rank": 1,
+              "top5": [
+                "catalogue",
+                "catalogue-db",
+                "front-end",
+                "user",
+                "orders"
+              ],
+              "ms": 5659.8
+            },
+            "pairwise_granger_z": {
+              "rank": 1,
+              "top5": [
+                "catalogue",
+                "catalogue-db",
+                "front-end",
+                "user",
+                "orders"
+              ],
+              "ms": 130.1
+            }
+          },
+          "digest_tokens": 68
+        },
+        {
+          "case_id": "re1ss_orders_disk_2",
+          "system": "re1ss",
+          "fault": "disk",
+          "repetition": 2,
+          "split": "holdout",
+          "true_service": "orders",
+          "n_timesteps": 721,
+          "n_metrics": 60,
+          "inject_time": 1702374820,
+          "inject_index": 360,
+          "parquet_sha256": "ff2b68b268cf1cd439b0661578fbfb1a79658ae6ef8a6c39be0ac16161c0999c",
+          "inject_sha256": "4541f8a0a19b79d6e0b12cb9e4cb429ffd13b8b9092a22762168d6f66862e9f3",
+          "raw_tokens": 75942,
+          "predictions": {
+            "causalsieve": {
+              "rank": 1,
+              "top5": [
+                "orders",
+                "payment",
+                "rabbitmq",
+                "catalogue",
+                "carts-db"
+              ],
+              "ms": 25.97
+            },
+            "causalsieve_blind": {
+              "rank": 2,
+              "top5": [
+                "rabbitmq",
+                "orders",
+                "payment",
+                "user",
+                "carts"
+              ],
+              "ms": 32.49
+            },
+            "raw_max_z": {
+              "rank": 2,
+              "top5": [
+                "payment",
+                "orders",
+                "rabbitmq",
+                "catalogue",
+                "queue-master"
+              ],
+              "ms": 0.86
+            },
+            "rolling_mad_z": {
+              "rank": 2,
+              "top5": [
+                "payment",
+                "orders",
+                "rabbitmq",
+                "catalogue",
+                "session-db"
+              ],
+              "ms": 3.09
+            },
+            "sklearn_isolation_forest": {
+              "rank": 8,
+              "top5": [
+                "user",
+                "catalogue",
+                "payment",
+                "user-db",
+                "shipping"
+              ],
+              "ms": 5798.91
+            },
+            "pairwise_granger_z": {
+              "rank": 1,
+              "top5": [
+                "orders",
+                "rabbitmq",
+                "payment",
+                "catalogue",
+                "front-end"
+              ],
+              "ms": 129.29
+            }
+          },
+          "digest_tokens": 45
+        },
+        {
+          "case_id": "re1ss_orders_disk_3",
+          "system": "re1ss",
+          "fault": "disk",
+          "repetition": 3,
+          "split": "holdout",
+          "true_service": "orders",
+          "n_timesteps": 721,
+          "n_metrics": 60,
+          "inject_time": 1702375600,
+          "inject_index": 360,
+          "parquet_sha256": "93e9037bd18ea92e15570128116e32bb9f4ffbe9bc7a783753d3cf883e78c3ef",
+          "inject_sha256": "7c00d5bb1b51eb54f9c0f952f252cb07b42623a1eb9c6974195fe4d6220a8075",
+          "raw_tokens": 75942,
+          "predictions": {
+            "causalsieve": {
+              "rank": 1,
+              "top5": [
+                "orders",
+                "catalogue",
+                "payment",
+                "user",
+                "front-end"
+              ],
+              "ms": 32.52
+            },
+            "causalsieve_blind": {
+              "rank": 1,
+              "top5": [
+                "orders",
+                "session-db",
+                "catalogue",
+                "payment",
+                "rabbitmq"
+              ],
+              "ms": 32.03
+            },
+            "raw_max_z": {
+              "rank": 1,
+              "top5": [
+                "orders",
+                "payment",
+                "catalogue",
+                "rabbitmq",
+                "user"
+              ],
+              "ms": 0.84
+            },
+            "rolling_mad_z": {
+              "rank": 2,
+              "top5": [
+                "shipping",
+                "orders",
+                "payment",
+                "catalogue",
+                "rabbitmq"
+              ],
+              "ms": 2.54
+            },
+            "sklearn_isolation_forest": {
+              "rank": 14,
+              "top5": [
+                "shipping",
+                "rabbitmq",
+                "session-db",
+                "user",
+                "queue-master"
+              ],
+              "ms": 5728.15
+            },
+            "pairwise_granger_z": {
+              "rank": 1,
+              "top5": [
+                "orders",
+                "catalogue",
+                "payment",
+                "shipping",
+                "user"
+              ],
+              "ms": 131.34
+            }
+          },
+          "digest_tokens": 44
+        },
+        {
+          "case_id": "re1ss_orders_disk_4",
+          "system": "re1ss",
+          "fault": "disk",
+          "repetition": 4,
+          "split": "holdout",
+          "true_service": "orders",
+          "n_timesteps": 721,
+          "n_metrics": 60,
+          "inject_time": 1702376381,
+          "inject_index": 360,
+          "parquet_sha256": "623c655ff181f8731b090cc115ab02ee5a116467b3c5b5e15e8c8ad9a04b24e7",
+          "inject_sha256": "a3ee5304740817b36baa6c9fcc562e22dd89b58ce516709199551ca0bcef9b1d",
+          "raw_tokens": 75942,
+          "predictions": {
+            "causalsieve": {
+              "rank": 2,
+              "top5": [
+                "catalogue",
+                "orders",
+                "queue-master",
+                "payment",
+                "user-db"
+              ],
+              "ms": 30.94
+            },
+            "causalsieve_blind": {
+              "rank": 1,
+              "top5": [
+                "orders",
+                "user",
+                "carts-db",
+                "carts",
+                "payment"
+              ],
+              "ms": 27.57
+            },
+            "raw_max_z": {
+              "rank": 3,
+              "top5": [
+                "catalogue",
+                "payment",
+                "orders",
+                "queue-master",
+                "front-end"
+              ],
+              "ms": 1.54
+            },
+            "rolling_mad_z": {
+              "rank": 1,
+              "top5": [
+                "orders",
+                "payment",
+                "catalogue",
+                "session-db",
+                "queue-master"
+              ],
+              "ms": 3.19
+            },
+            "sklearn_isolation_forest": {
+              "rank": 1,
+              "top5": [
+                "orders",
+                "session-db",
+                "user",
+                "catalogue-db",
+                "catalogue"
+              ],
+              "ms": 5724.82
+            },
+            "pairwise_granger_z": {
+              "rank": 1,
+              "top5": [
+                "orders",
+                "payment",
+                "catalogue",
+                "session-db",
+                "queue-master"
+              ],
+              "ms": 132.72
+            }
+          },
+          "digest_tokens": 45
+        },
+        {
+          "case_id": "re1ss_orders_disk_5",
+          "system": "re1ss",
+          "fault": "disk",
+          "repetition": 5,
+          "split": "holdout",
+          "true_service": "orders",
+          "n_timesteps": 721,
+          "n_metrics": 60,
+          "inject_time": 1702377162,
+          "inject_index": 360,
+          "parquet_sha256": "8dd88fd4e178e119e8c3e6645c019c4b1414307485ebc261d983e498fac7cabc",
+          "inject_sha256": "a350562dbd9b4cd435ef434e757f16ea7b51a4c6fc64288dbce186d505906ebe",
+          "raw_tokens": 75942,
+          "predictions": {
+            "causalsieve": {
+              "rank": 3,
+              "top5": [
+                "queue-master",
+                "catalogue",
+                "orders",
+                "payment",
+                "orders-db"
+              ],
+              "ms": 32.64
+            },
+            "causalsieve_blind": {
+              "rank": 4,
+              "top5": [
+                "shipping",
+                "rabbitmq",
+                "queue-master",
+                "orders",
+                "payment"
+              ],
+              "ms": 30.02
+            },
+            "raw_max_z": {
+              "rank": 3,
+              "top5": [
+                "queue-master",
+                "catalogue",
+                "orders",
+                "payment",
+                "front-end"
+              ],
+              "ms": 0.9
+            },
+            "rolling_mad_z": {
+              "rank": 1,
+              "top5": [
+                "orders",
+                "queue-master",
+                "catalogue",
+                "payment",
+                "catalogue-db"
+              ],
+              "ms": 2.38
+            },
+            "sklearn_isolation_forest": {
+              "rank": 2,
+              "top5": [
+                "catalogue-db",
+                "orders",
+                "catalogue",
+                "carts",
+                "payment"
+              ],
+              "ms": 5780.7
+            },
+            "pairwise_granger_z": {
+              "rank": 1,
+              "top5": [
+                "orders",
+                "payment",
+                "catalogue",
+                "queue-master",
+                "catalogue-db"
+              ],
+              "ms": 133.59
+            }
+          },
+          "digest_tokens": 46
+        },
+        {
+          "case_id": "re1ss_payment_delay_2",
+          "system": "re1ss",
+          "fault": "delay",
+          "repetition": 2,
+          "split": "holdout",
+          "true_service": "payment",
+          "n_timesteps": 721,
+          "n_metrics": 58,
+          "inject_time": 1693140464,
+          "inject_index": 360,
+          "parquet_sha256": "8d43e2bd7ec74507f9939fe8ed794c2601a8a0c8b7b4344985ade718e0a411cf",
+          "inject_sha256": "267c5aecd730e081af27794682547ac0df657e9f2f0a535f96cfdabb5899e73a",
+          "raw_tokens": 73412,
+          "predictions": {
+            "causalsieve": {
+              "rank": 1,
+              "top5": [
+                "payment",
+                "orders",
+                "front-end",
+                "carts-db",
+                "user-db"
+              ],
+              "ms": 30.95
+            },
+            "causalsieve_blind": {
+              "rank": 1,
+              "top5": [
+                "payment",
+                "orders",
+                "queue-master",
+                "catalogue",
+                "carts-db"
+              ],
+              "ms": 25.49
+            },
+            "raw_max_z": {
+              "rank": 1,
+              "top5": [
+                "payment",
+                "orders",
+                "front-end",
+                "carts",
+                "queue-master"
+              ],
+              "ms": 0.84
+            },
+            "rolling_mad_z": {
+              "rank": 1,
+              "top5": [
+                "payment",
+                "orders",
+                "session-db",
+                "carts",
+                "front-end"
+              ],
+              "ms": 2.54
+            },
+            "sklearn_isolation_forest": {
+              "rank": 1,
+              "top5": [
+                "payment",
+                "front-end",
+                "orders",
+                "session-db",
+                "user"
+              ],
+              "ms": 5761.17
+            },
+            "pairwise_granger_z": {
+              "rank": 1,
+              "top5": [
+                "payment",
+                "orders",
+                "front-end",
+                "session-db",
+                "queue-master"
+              ],
+              "ms": 129.64
+            }
+          },
+          "digest_tokens": 46
+        },
+        {
+          "case_id": "re1ss_payment_delay_3",
+          "system": "re1ss",
+          "fault": "delay",
+          "repetition": 3,
+          "split": "holdout",
+          "true_service": "payment",
+          "n_timesteps": 721,
+          "n_metrics": 58,
+          "inject_time": 1693141235,
+          "inject_index": 360,
+          "parquet_sha256": "ae98a3fa62b7011721007c53a93c220a52f7874074fdef4021aab028bf1669fd",
+          "inject_sha256": "66c75df6eff2d2e4d42d9812c56afb0241e0554ca8e8f43af7584fe2320fe63f",
+          "raw_tokens": 73412,
+          "predictions": {
+            "causalsieve": {
+              "rank": 3,
+              "top5": [
+                "orders",
+                "front-end",
+                "payment",
+                "queue-master",
+                "shipping"
+              ],
+              "ms": 26.12
+            },
+            "causalsieve_blind": {
+              "rank": 5,
+              "top5": [
+                "orders",
+                "queue-master",
+                "user",
+                "carts-db",
+                "payment"
+              ],
+              "ms": 24.32
+            },
+            "raw_max_z": {
+              "rank": 4,
+              "top5": [
+                "orders",
+                "queue-master",
+                "carts",
+                "payment",
+                "front-end"
+              ],
+              "ms": 0.87
+            },
+            "rolling_mad_z": {
+              "rank": 1,
+              "top5": [
+                "payment",
+                "orders",
+                "queue-master",
+                "user",
+                "rabbitmq"
+              ],
+              "ms": 2.55
+            },
+            "sklearn_isolation_forest": {
+              "rank": 1,
+              "top5": [
+                "payment",
+                "orders",
+                "front-end",
+                "user",
+                "shipping"
+              ],
+              "ms": 5748.69
+            },
+            "pairwise_granger_z": {
+              "rank": 2,
+              "top5": [
+                "orders",
+                "payment",
+                "carts",
+                "queue-master",
+                "rabbitmq"
+              ],
+              "ms": 131.46
+            }
+          },
+          "digest_tokens": 56
+        },
+        {
+          "case_id": "re1ss_payment_delay_4",
+          "system": "re1ss",
+          "fault": "delay",
+          "repetition": 4,
+          "split": "holdout",
+          "true_service": "payment",
+          "n_timesteps": 721,
+          "n_metrics": 59,
+          "inject_time": 1693142362,
+          "inject_index": 360,
+          "parquet_sha256": "e2b8984b1527315add26c225f2d865d2a0687c463748227b0c06e5cd541bcdd9",
+          "inject_sha256": "1dc13f2d3a2948257246f2c9a2c96e57bb734522de121f8866520119f0fef92f",
+          "raw_tokens": 74678,
+          "predictions": {
+            "causalsieve": {
+              "rank": 1,
+              "top5": [
+                "payment",
+                "orders",
+                "carts",
+                "queue-master",
+                "user-db"
+              ],
+              "ms": 26.0
+            },
+            "causalsieve_blind": {
+              "rank": 1,
+              "top5": [
+                "payment",
+                "orders",
+                "queue-master",
+                "carts",
+                "carts-db"
+              ],
+              "ms": 26.37
+            },
+            "raw_max_z": {
+              "rank": 1,
+              "top5": [
+                "payment",
+                "orders",
+                "carts",
+                "front-end",
+                "queue-master"
+              ],
+              "ms": 0.79
+            },
+            "rolling_mad_z": {
+              "rank": 1,
+              "top5": [
+                "payment",
+                "orders",
+                "user-db",
+                "session-db",
+                "catalogue"
+              ],
+              "ms": 2.35
+            },
+            "sklearn_isolation_forest": {
+              "rank": 1,
+              "top5": [
+                "payment",
+                "catalogue",
+                "orders",
+                "user",
+                "carts"
+              ],
+              "ms": 5697.5
+            },
+            "pairwise_granger_z": {
+              "rank": 2,
+              "top5": [
+                "orders",
+                "payment",
+                "user-db",
+                "user",
+                "queue-master"
+              ],
+              "ms": 134.43
+            }
+          },
+          "digest_tokens": 46
+        },
+        {
+          "case_id": "re1ss_payment_delay_5",
+          "system": "re1ss",
+          "fault": "delay",
+          "repetition": 5,
+          "split": "holdout",
+          "true_service": "payment",
+          "n_timesteps": 721,
+          "n_metrics": 59,
+          "inject_time": 1693143134,
+          "inject_index": 360,
+          "parquet_sha256": "5f9d6d47f60716c5b60e83b3e8b9605c7464f6e6c2a7996db7a1b16e24145d7d",
+          "inject_sha256": "288b2bbfb00077327eb48e3b6bea5c4359b6e46e93d14cb7e4505e40c1e8540c",
+          "raw_tokens": 74678,
+          "predictions": {
+            "causalsieve": {
+              "rank": 5,
+              "top5": [
+                "orders",
+                "front-end",
+                "catalogue-db",
+                "queue-master",
+                "payment"
+              ],
+              "ms": 26.76
+            },
+            "causalsieve_blind": {
+              "rank": 4,
+              "top5": [
+                "orders",
+                "carts",
+                "carts-db",
+                "payment",
+                "queue-master"
+              ],
+              "ms": 30.37
+            },
+            "raw_max_z": {
+              "rank": 3,
+              "top5": [
+                "orders",
+                "carts",
+                "payment",
+                "front-end",
+                "queue-master"
+              ],
+              "ms": 0.99
+            },
+            "rolling_mad_z": {
+              "rank": 1,
+              "top5": [
+                "payment",
+                "orders",
+                "carts",
+                "queue-master",
+                "catalogue"
+              ],
+              "ms": 2.53
+            },
+            "sklearn_isolation_forest": {
+              "rank": 1,
+              "top5": [
+                "payment",
+                "orders",
+                "front-end",
+                "shipping",
+                "session-db"
+              ],
+              "ms": 6402.14
+            },
+            "pairwise_granger_z": {
+              "rank": 1,
+              "top5": [
+                "payment",
+                "orders",
+                "carts",
+                "queue-master",
+                "front-end"
+              ],
+              "ms": 132.68
+            }
+          },
+          "digest_tokens": 55
+        },
+        {
+          "case_id": "re1ss_user_loss_2",
+          "system": "re1ss",
+          "fault": "loss",
+          "repetition": 2,
+          "split": "holdout",
+          "true_service": "user",
+          "n_timesteps": 721,
+          "n_metrics": 58,
+          "inject_time": 1693162498,
+          "inject_index": 360,
+          "parquet_sha256": "0358fc8790d2052c40d59e09b60715798e1db94fac6a33db8f40948db85c2434",
+          "inject_sha256": "035f0dba1b38434bc5266e06d0d44d35128a5f99ae7569ec12b9a65ca3399825",
+          "raw_tokens": 73412,
+          "predictions": {
+            "causalsieve": {
+              "rank": 1,
+              "top5": [
+                "user",
+                "front-end",
+                "orders",
+                "user-db",
+                "session-db"
+              ],
+              "ms": 29.8
+            },
+            "causalsieve_blind": {
+              "rank": 1,
+              "top5": [
+                "user",
+                "orders",
+                "carts-db",
+                "user-db",
+                "carts"
+              ],
+              "ms": 29.61
+            },
+            "raw_max_z": {
+              "rank": 1,
+              "top5": [
+                "user",
+                "orders",
+                "front-end",
+                "carts",
+                "queue-master"
+              ],
+              "ms": 0.82
+            },
+            "rolling_mad_z": {
+              "rank": 1,
+              "top5": [
+                "user",
+                "orders",
+                "front-end",
+                "payment",
+                "carts"
+              ],
+              "ms": 2.5
+            },
+            "sklearn_isolation_forest": {
+              "rank": 1,
+              "top5": [
+                "user",
+                "front-end",
+                "carts",
+                "orders",
+                "carts-db"
+              ],
+              "ms": 5787.66
+            },
+            "pairwise_granger_z": {
+              "rank": 1,
+              "top5": [
+                "user",
+                "orders",
+                "front-end",
+                "payment",
+                "queue-master"
+              ],
+              "ms": 131.05
+            }
+          },
+          "digest_tokens": 44
+        },
+        {
+          "case_id": "re1ss_user_loss_3",
+          "system": "re1ss",
+          "fault": "loss",
+          "repetition": 3,
+          "split": "holdout",
+          "true_service": "user",
+          "n_timesteps": 721,
+          "n_metrics": 59,
+          "inject_time": 1693254468,
+          "inject_index": 360,
+          "parquet_sha256": "a9c7f34372a3470d3e6b9aaa0cc3579b51e7298aa2b2272555f56e75abda8229",
+          "inject_sha256": "3591c5e7bbaa8e587509a13619bf36ddc0f3cd1f29aa985cdeedef034a20f5ad",
+          "raw_tokens": 74676,
+          "predictions": {
+            "causalsieve": {
+              "rank": 2,
+              "top5": [
+                "orders",
+                "user",
+                "front-end",
+                "carts-db",
+                "user-db"
+              ],
+              "ms": 31.12
+            },
+            "causalsieve_blind": {
+              "rank": 4,
+              "top5": [
+                "orders",
+                "catalogue",
+                "carts",
+                "user",
+                "queue-master"
+              ],
+              "ms": 29.2
+            },
+            "raw_max_z": {
+              "rank": 3,
+              "top5": [
+                "orders",
+                "front-end",
+                "user",
+                "rabbitmq",
+                "queue-master"
+              ],
+              "ms": 0.99
+            },
+            "rolling_mad_z": {
+              "rank": 1,
+              "top5": [
+                "user",
+                "orders",
+                "front-end",
+                "session-db",
+                "payment"
+              ],
+              "ms": 2.48
+            },
+            "sklearn_isolation_forest": {
+              "rank": 2,
+              "top5": [
+                "orders",
+                "user",
+                "front-end",
+                "rabbitmq",
+                "catalogue"
+              ],
+              "ms": 5787.28
+            },
+            "pairwise_granger_z": {
+              "rank": 1,
+              "top5": [
+                "user",
+                "orders",
+                "front-end",
+                "session-db",
+                "rabbitmq"
+              ],
+              "ms": 139.04
+            }
+          },
+          "digest_tokens": 54
+        },
+        {
+          "case_id": "re1ss_user_loss_4",
+          "system": "re1ss",
+          "fault": "loss",
+          "repetition": 4,
+          "split": "holdout",
+          "true_service": "user",
+          "n_timesteps": 721,
+          "n_metrics": 60,
+          "inject_time": 1693164412,
+          "inject_index": 360,
+          "parquet_sha256": "235522ed235fec486dc2f9cd80ecfa2e90848a7835fc0e6a45fa94a14a233f18",
+          "inject_sha256": "7661b7b5d32f2578d66255dd3822fc51b45e2f5e05f2258b5c55fc9559369b3a",
+          "raw_tokens": 75942,
+          "predictions": {
+            "causalsieve": {
+              "rank": 1,
+              "top5": [
+                "user",
+                "front-end",
+                "payment",
+                "orders",
+                "carts-db"
+              ],
+              "ms": 33.37
+            },
+            "causalsieve_blind": {
+              "rank": 1,
+              "top5": [
+                "user",
+                "front-end",
+                "orders",
+                "carts",
+                "user-db"
+              ],
+              "ms": 28.21
+            },
+            "raw_max_z": {
+              "rank": 2,
+              "top5": [
+                "front-end",
+                "user",
+                "orders",
+                "payment",
+                "carts"
+              ],
+              "ms": 0.84
+            },
+            "rolling_mad_z": {
+              "rank": 2,
+              "top5": [
+                "front-end",
+                "user",
+                "orders",
+                "payment",
+                "carts"
+              ],
+              "ms": 2.55
+            },
+            "sklearn_isolation_forest": {
+              "rank": 8,
+              "top5": [
+                "front-end",
+                "payment",
+                "session-db",
+                "catalogue-db",
+                "carts-db"
+              ],
+              "ms": 5879.2
+            },
+            "pairwise_granger_z": {
+              "rank": 1,
+              "top5": [
+                "user",
+                "front-end",
+                "orders",
+                "payment",
+                "carts"
+              ],
+              "ms": 132.35
+            }
+          },
+          "digest_tokens": 44
+        },
+        {
+          "case_id": "re1ss_user_loss_5",
+          "system": "re1ss",
+          "fault": "loss",
+          "repetition": 5,
+          "split": "holdout",
+          "true_service": "user",
+          "n_timesteps": 721,
+          "n_metrics": 60,
+          "inject_time": 1693221764,
+          "inject_index": 360,
+          "parquet_sha256": "dba96ea0f1c7177e2e136ab6327daf04b762eb394d62b906d97fd555b67427b5",
+          "inject_sha256": "b3bd83967da2b2b25ae2e7be7df1384f0070cb0f4aa839b062c77b83e1f94468",
+          "raw_tokens": 75943,
+          "predictions": {
+            "causalsieve": {
+              "rank": 1,
+              "top5": [
+                "user",
+                "shipping",
+                "orders",
+                "user-db",
+                "queue-master"
+              ],
+              "ms": 32.37
+            },
+            "causalsieve_blind": {
+              "rank": 1,
+              "top5": [
+                "user",
+                "carts-db",
+                "queue-master",
+                "orders",
+                "shipping"
+              ],
+              "ms": 31.11
+            },
+            "raw_max_z": {
+              "rank": 1,
+              "top5": [
+                "user",
+                "orders",
+                "queue-master",
+                "rabbitmq",
+                "front-end"
+              ],
+              "ms": 0.85
+            },
+            "rolling_mad_z": {
+              "rank": 1,
+              "top5": [
+                "user",
+                "queue-master",
+                "orders",
+                "catalogue",
+                "shipping"
+              ],
+              "ms": 2.38
+            },
+            "sklearn_isolation_forest": {
+              "rank": 1,
+              "top5": [
+                "user",
+                "rabbitmq",
+                "orders",
+                "payment",
+                "session-db"
+              ],
+              "ms": 5731.88
+            },
+            "pairwise_granger_z": {
+              "rank": 1,
+              "top5": [
+                "user",
+                "orders",
+                "queue-master",
+                "catalogue",
+                "rabbitmq"
+              ],
+              "ms": 131.59
+            }
+          },
+          "digest_tokens": 44
+        }
+      ]
+    }
+  }
+}

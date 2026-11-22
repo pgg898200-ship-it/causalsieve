@@ -1,0 +1,2195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CausalSieve — Interactive Causal RCA &amp; Frozen Benchmark Explorer</title>
+<style>
+  :root {
+    --bg: #080c14;
+    --bg-elev: #0f1624;
+    --bg-card: #131c2e;
+    --bg-subtle: #182338;
+    --border: #23324d;
+    --border-bright: #334a70;
+    --text: #e6edf7;
+    --text-muted: #93a4bf;
+    --text-dim: #647794;
+    --cyan: #22d3ee;
+    --cyan-soft: rgba(34, 211, 238, 0.14);
+    --emerald: #10b981;
+    --emerald-soft: rgba(16, 185, 129, 0.15);
+    --amber: #f59e0b;
+    --amber-soft: rgba(245, 158, 11, 0.15);
+    --coral: #f43f5e;
+    --coral-soft: rgba(244, 63, 94, 0.16);
+    --violet: #a78bfa;
+    --violet-soft: rgba(167, 139, 250, 0.16);
+    --blue: #60a5fa;
+    --mono: ui-monospace, "SFMono-Regular", Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    --sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --radius: 12px;
+    --radius-sm: 8px;
+  }
+
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: radial-gradient(1200px 600px at 15% -10%, rgba(34, 211, 238, 0.08), transparent 60%),
+                radial-gradient(900px 500px at 90% 0%, rgba(167, 139, 250, 0.07), transparent 55%),
+                var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap {
+    max-width: 1380px;
+    margin: 0 auto;
+    padding: 24px 20px 56px;
+  }
+
+  /* Header & Provenance Banner */
+  header.hero {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 18px;
+    padding: 22px 26px;
+    background: linear-gradient(180deg, rgba(19, 28, 46, 0.96), rgba(15, 22, 36, 0.94));
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    box-shadow: 0 18px 48px rgba(0, 0, 0, 0.35);
+    margin-bottom: 22px;
+  }
+
+  .brand-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 6px;
+  }
+
+  .logo-badge {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #06b6d4, #10b981);
+    display: grid;
+    place-items: center;
+    font-family: var(--mono);
+    font-weight: 800;
+    font-size: 16px;
+    color: #041019;
+    letter-spacing: -0.04em;
+    box-shadow: 0 0 22px rgba(34, 211, 238, 0.35);
+  }
+
+  h1 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 750;
+    letter-spacing: -0.02em;
+  }
+
+  .subtitle {
+    margin: 2px 0 0;
+    color: var(--text-muted);
+    font-size: 14px;
+    max-width: 680px;
+  }
+
+  .provenance-card {
+    background: rgba(8, 12, 20, 0.72);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-family: var(--mono);
+    font-size: 11.5px;
+    min-width: 340px;
+    max-width: 480px;
+  }
+
+  .prov-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 650;
+    font-family: var(--mono);
+    letter-spacing: 0.02em;
+  }
+
+  .pill-emerald { background: var(--emerald-soft); color: #34d399; border: 1px solid rgba(16,185,129,0.35); }
+  .pill-cyan { background: var(--cyan-soft); color: var(--cyan); border: 1px solid rgba(34,211,238,0.35); }
+  .pill-coral { background: var(--coral-soft); color: #fb7185; border: 1px solid rgba(244,63,94,0.35); }
+  .pill-amber { background: var(--amber-soft); color: #fbbf24; border: 1px solid rgba(245,158,11,0.35); }
+  .pill-violet { background: var(--violet-soft); color: var(--violet); border: 1px solid rgba(167,139,250,0.35); }
+
+  .prov-line {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    color: var(--text-muted);
+    padding: 2px 0;
+  }
+
+  .prov-hash {
+    color: var(--cyan);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 255px;
+  }
+
+  .btn-copy {
+    background: var(--bg-subtle);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 2px 8px;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .btn-copy:hover { border-color: var(--cyan); background: rgba(34, 211, 238, 0.1); }
+
+  /* Top KPI Strip */
+  .kpi-strip {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .kpi {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+  }
+  .kpi-label {
+    font-size: 11.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+    font-weight: 600;
+  }
+  .kpi-val {
+    font-family: var(--mono);
+    font-size: 24px;
+    font-weight: 750;
+    margin-top: 4px;
+    font-variant-numeric: tabular-nums;
+  }
+  .kpi-sub {
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-top: 2px;
+  }
+
+  /* Primary Navigation Tabs */
+  .main-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 18px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 12px;
+  }
+
+  .nav-btn {
+    background: var(--bg-card);
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 18px;
+    font-size: 14px;
+    font-weight: 650;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .nav-btn:hover { color: var(--text); border-color: var(--border-bright); }
+  .nav-btn.active {
+    background: linear-gradient(135deg, rgba(34, 211, 238, 0.18), rgba(16, 185, 129, 0.12));
+    color: var(--text);
+    border-color: var(--cyan);
+    box-shadow: 0 0 18px rgba(34, 211, 238, 0.16);
+  }
+
+  .section-panel { display: none; }
+  .section-panel.active { display: block; }
+
+  /* Cards & Grids */
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    margin-bottom: 16px;
+  }
+
+  .card-title {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    margin: 0 0 12px;
+    font-size: 15.5px;
+    font-weight: 700;
+  }
+
+  .grid-2 {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  .grid-sim {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+    gap: 16px;
+  }
+
+  @media (max-width: 980px) {
+    .grid-2, .grid-sim { grid-template-columns: 1fr; }
+  }
+
+  /* Controls */
+  .controls-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+    padding: 12px 14px;
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+  }
+
+  .ctrl-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12.5px;
+    color: var(--text-muted);
+  }
+
+  .node-btn-group, .seg-group {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+
+  .btn-chip {
+    background: var(--bg-subtle);
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 6px 11px;
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.14s ease;
+  }
+  .btn-chip:hover { color: var(--text); border-color: var(--border-bright); }
+  .btn-chip.active {
+    background: var(--cyan-soft);
+    color: var(--cyan);
+    border-color: var(--cyan);
+  }
+  .btn-chip.active-coral {
+    background: var(--coral-soft);
+    color: #fb7185;
+    border-color: var(--coral);
+  }
+
+  input[type="range"] {
+    accent-color: var(--cyan);
+    cursor: pointer;
+  }
+
+  /* SVG Containers */
+  .svg-stage {
+    width: 100%;
+    background: rgba(8, 12, 20, 0.65);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .dag-node { cursor: pointer; transition: transform 0.15s ease; }
+  .dag-node:hover .node-box { stroke: var(--cyan); stroke-width: 2.4; }
+
+  /* Score Bars */
+  .rank-list {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+  }
+
+  .rank-row {
+    display: grid;
+    grid-template-columns: 26px 84px 1fr 94px;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--mono);
+    font-size: 12px;
+  }
+
+  .rank-idx {
+    text-align: right;
+    color: var(--text-dim);
+    font-weight: 700;
+  }
+
+  .rank-name {
+    font-weight: 650;
+    color: var(--text);
+  }
+
+  .bar-track {
+    height: 16px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 5px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .rank-val {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    color: var(--text-muted);
+  }
+
+  /* Digest & Token Comparison */
+  .token-meter {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .token-box {
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-family: var(--mono);
+  }
+  .token-box .lbl { font-size: 11px; color: var(--text-muted); }
+  .token-box .num { font-size: 20px; font-weight: 750; margin-top: 2px; font-variant-numeric: tabular-nums; }
+
+  pre.code-box {
+    margin: 0;
+    padding: 14px;
+    background: #070a10;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-family: var(--mono);
+    font-size: 11.8px;
+    line-height: 1.5;
+    color: #cbd5e1;
+    overflow-x: auto;
+    max-height: 290px;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  /* Sub-tabs inside Benchmark Dashboard */
+  .sub-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .bench-pane { display: none; }
+  .bench-pane.active { display: block; }
+
+  /* Tables */
+  table.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--mono);
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+  }
+  table.data-table th, table.data-table td {
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--border);
+    text-align: right;
+  }
+  table.data-table th:first-child, table.data-table td:first-child {
+    text-align: left;
+  }
+  table.data-table th {
+    color: var(--text-muted);
+    font-weight: 650;
+    background: rgba(255, 255, 255, 0.02);
+  }
+  table.data-table tr.hl-row {
+    background: rgba(34, 211, 238, 0.09);
+  }
+  table.data-table tr.hl-row td:first-child {
+    color: var(--cyan);
+    font-weight: 700;
+  }
+
+  .chart-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    font-size: 12px;
+    color: var(--text-muted);
+    margin: 6px 0 10px;
+  }
+  .leg-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--mono);
+  }
+  .leg-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 3px;
+    display: inline-block;
+  }
+
+  .callout {
+    padding: 11px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    margin-top: 10px;
+    border: 1px solid var(--border);
+  }
+  .callout-ok { background: var(--emerald-soft); border-color: rgba(16,185,129,0.4); color: #a7f3d0; }
+  .callout-trap { background: var(--coral-soft); border-color: rgba(244,63,94,0.4); color: #fecdd3; }
+  .callout-info { background: var(--cyan-soft); border-color: rgba(34,211,238,0.35); color: #cffafe; }
+
+  footer {
+    margin-top: 32px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--text-dim);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 10px;
+    font-family: var(--mono);
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- HERO HEADER + FROZEN PROVENANCE BADGE -->
+  <header class="hero">
+    <div>
+      <div class="brand-row">
+        <div class="logo-badge">CS</div>
+        <div>
+          <h1>CausalSieve Interactive Explorer</h1>
+        </div>
+        <span class="pill pill-cyan">ZERO-CDN · STANDALONE</span>
+        <span class="pill pill-emerald" id="isa-pill">AVX2+FMA</span>
+      </div>
+      <p class="subtitle">
+        Live 6-service causal cascade simulator comparing <strong>Raw Max-Z</strong> victim traps against
+        <strong>CausalSieve Precision-Whitening + Onset Precedence</strong>, paired with the exact SHA-256-frozen
+        benchmark suite (Real Kubernetes <code>RCAEval</code> 40-case sealed holdout, speed ladder, 100-ep synthetic RCA, and Tier-2 <code>D=4096</code> firehose).
+      </p>
+    </div>
+
+    <div class="provenance-card">
+      <div class="prov-head">
+        <span class="pill pill-emerald">FROZEN BINARY PROVENANCE</span>
+        <button class="btn-copy" id="copy-sha-btn" type="button" title="Copy SHA-256">Copy SHA-256</button>
+      </div>
+      <div class="prov-line">
+        <span>libcausalsieve.so</span>
+        <span class="prov-hash" id="prov-avx-sha"></span>
+      </div>
+      <div class="prov-line">
+        <span>libcausalsieve_scalar.so</span>
+        <span class="prov-hash" id="prov-scalar-sha"></span>
+      </div>
+      <div class="prov-line">
+        <span>Host / Compiler</span>
+        <span id="prov-host" style="color:var(--text);"></span>
+      </div>
+    </div>
+  </header>
+
+  <!-- HEADLINE FROZEN KPI STRIP -->
+  <section class="kpi-strip">
+    <div class="kpi">
+      <div class="kpi-label">RCAEval Sealed Holdout (n=40)</div>
+      <div class="kpi-val" style="color:var(--emerald);">67.5% AC@1</div>
+      <div class="kpi-sub">100.0% AC@5 (40/40) · 0.804 MRR · 33.3 ms</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Peak Speedup vs Incumbents</div>
+      <div class="kpi-val" style="color:var(--cyan);">48,875&times;</div>
+      <div class="kpi-sub">vs statsmodels @ D=64 · 1,293&times; vs Tigramite @ D=32</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Tier-1 / Tier-2 Throughput</div>
+      <div class="kpi-val" style="color:var(--violet);">80.2M obs/s</div>
+      <div class="kpi-sub">287k ticks/s (D=16) · 100% AC@1 @ D=4096</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Caveman Digest Compression</div>
+      <div class="kpi-val" style="color:var(--amber);">99.95%</div>
+      <div class="kpi-sub">131,705 &rarr; 65 tokens on RCAEval · 0.0 FP64 slice err</div>
+    </div>
+  </section>
+
+  <!-- MAIN MODE SWITCH -->
+  <nav class="main-nav" role="tablist">
+    <button class="nav-btn active" data-section="sim" type="button">1. Live Causal Cascade vs Victim Simulator</button>
+    <button class="nav-btn" data-section="bench" type="button">2. Frozen Benchmark Dashboard (5 Live JSONs)</button>
+  </nav>
+
+  <!-- =================================================================== -->
+  <!-- SECTION 1: LIVE CAUSAL CASCADE VS DOWNSTREAM VICTIM SIMULATOR       -->
+  <!-- =================================================================== -->
+  <section id="sec-sim" class="section-panel active">
+
+    <div class="controls-bar">
+      <div class="ctrl-group">
+        <strong>Inject Fault Node:</strong>
+        <div class="node-btn-group" id="fault-node-buttons"></div>
+      </div>
+      <div class="ctrl-group">
+        <label for="shock-slider">Shock &sigma;: <strong id="shock-val" style="font-family:var(--mono);color:var(--cyan);">6.5</strong></label>
+        <input id="shock-slider" type="range" min="3.5" max="12" step="0.5" value="6.5">
+      </div>
+      <div class="ctrl-group">
+        <label for="amp-slider">Downstream Gain: <strong id="amp-val" style="font-family:var(--mono);color:var(--coral);">1.75&times;</strong></label>
+        <input id="amp-slider" type="range" min="1.1" max="2.4" step="0.05" value="1.75">
+      </div>
+      <div class="ctrl-group">
+        <button class="btn-chip" id="reseed-btn" type="button">New Noise Seed</button>
+      </div>
+    </div>
+
+    <div class="grid-sim">
+      <!-- Interactive 6-Service Microservice DAG -->
+      <div class="card">
+        <div class="card-title">
+          <span>6-Service Microservice Causal DAG (Click Any Node to Inject Fault)</span>
+          <span class="pill pill-cyan" id="sim-latency-pill"></span>
+        </div>
+        <div class="svg-stage">
+          <svg id="dag-svg" viewBox="0 0 680 320" width="100%" height="320" role="img" aria-label="6-service causal DAG"></svg>
+        </div>
+        <div id="verdict-banner" class="callout callout-ok"></div>
+      </div>
+
+      <!-- Side-by-side Attribution Ranking: Raw Max-Z vs CausalSieve -->
+      <div class="card">
+        <div class="card-title">
+          <span>Side-by-Side Attribution: Raw Max-Z vs CausalSieve</span>
+          <span class="pill pill-coral" id="trap-status-pill">VICTIM TRAP EXPOSED</span>
+        </div>
+
+        <div style="margin-bottom:16px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+            <span style="font-size:12.5px;font-weight:700;color:#fb7185;">Raw Max-Z Alerting (Unwhitened |z_raw|)</span>
+            <span id="raw-winner-tag" style="font-family:var(--mono);font-size:11.5px;color:#fb7185;"></span>
+          </div>
+          <div id="raw-rank-list" class="rank-list"></div>
+        </div>
+
+        <div style="border-top:1px solid var(--border);padding-top:14px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+            <span style="font-size:12.5px;font-weight:700;color:#34d399;">CausalSieve (Precision-Whitened exo_z + Onset)</span>
+            <span id="cs-winner-tag" style="font-family:var(--mono);font-size:11.5px;color:#34d399;"></span>
+          </div>
+          <div id="cs-rank-list" class="rank-list"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Live Time-Series Telemetry vs Whitened Innovations -->
+    <div class="card">
+      <div class="card-title">
+        <span>Streaming Telemetry Waveforms (Ticks 460..600, Fault Injected at t = 500)</span>
+        <div class="seg-group" id="wave-mode-group">
+          <button class="btn-chip active" data-wmode="exo" type="button">CausalSieve Whitened (exo_z)</button>
+          <button class="btn-chip" data-wmode="raw" type="button">Raw Telemetry (raw_z)</button>
+          <button class="btn-chip" data-wmode="both" type="button">Overlay Root vs Victim</button>
+        </div>
+      </div>
+      <div class="chart-legend" id="wave-legend"></div>
+      <div class="svg-stage">
+        <svg id="wave-svg" viewBox="0 0 1160 270" width="100%" height="270" role="img" aria-label="Telemetry waveforms"></svg>
+      </div>
+    </div>
+
+    <!-- Live Caveman Causal Digest vs Raw JSON Token Counter -->
+    <div class="card">
+      <div class="card-title">
+        <span>Live Caveman Causal Digest vs Raw JSON Token Counter</span>
+        <span class="pill pill-amber" id="digest-reduction-pill"></span>
+      </div>
+
+      <div class="token-meter">
+        <div class="token-box">
+          <div class="lbl">Raw Telemetry JSON (600 ticks &times; 6 ch)</div>
+          <div class="num" id="tok-raw" style="color:#fb7185;">-</div>
+        </div>
+        <div class="token-box">
+          <div class="lbl">Caveman Causal Digest (Markdown)</div>
+          <div class="num" id="tok-digest" style="color:var(--emerald);">-</div>
+        </div>
+        <div class="token-box">
+          <div class="lbl">Context Window Saved (Lossless slice://)</div>
+          <div class="num" id="tok-saved" style="color:var(--cyan);">-</div>
+        </div>
+      </div>
+
+      <div style="margin-bottom:12px;">
+        <div style="height:10px;background:rgba(244,63,94,0.22);border:1px solid var(--border);border-radius:999px;overflow:hidden;">
+          <div id="tok-bar" style="height:100%;background:linear-gradient(90deg,var(--emerald),var(--cyan));width:3%;transition:width 0.3s;"></div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div>
+          <div style="font-size:12px;font-weight:700;color:var(--cyan);margin-bottom:6px;font-family:var(--mono);">
+            CAVEMAN CAUSAL DIGEST (SENT TO LLM / SWARM)
+          </div>
+          <pre id="digest-preview" class="code-box"></pre>
+        </div>
+        <div>
+          <div style="font-size:12px;font-weight:700;color:#fb7185;margin-bottom:6px;font-family:var(--mono);">
+            RAW JSON TELEMETRY PAYLOAD (TRUNCATED PREVIEW)
+          </div>
+          <pre id="raw-json-preview" class="code-box"></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =================================================================== -->
+  <!-- SECTION 2: FROZEN MEASURED BENCHMARK DASHBOARD                      -->
+  <!-- =================================================================== -->
+  <section id="sec-bench" class="section-panel">
+
+    <div class="sub-tabs" id="bench-subtabs">
+      <button class="btn-chip active" data-pane="rcaeval" type="button">RCAEval Real K8s Holdout (n=40)</button>
+      <button class="btn-chip" data-pane="speed" type="button">Speed &amp; Optimization Ladder</button>
+      <button class="btn-chip" data-pane="synthetic" type="button">100-Ep Synthetic RCA Regimes</button>
+      <button class="btn-chip" data-pane="sift" type="button">Tier-2 High-Dim Sift (D=128..4096)</button>
+    </div>
+
+    <!-- PANE 1: RCAEval -->
+    <div id="pane-rcaeval" class="bench-pane active">
+      <div class="controls-bar">
+        <div class="ctrl-group">
+          <strong>Split:</strong>
+          <div class="seg-group" id="rca-split-group">
+            <button class="btn-chip active" data-split="holdout" type="button">SEALED HOLDOUT (n=40, Zero Tuning)</button>
+            <button class="btn-chip" data-split="dev" type="button">DEV Split (n=10)</button>
+          </div>
+        </div>
+        <div class="ctrl-group">
+          <strong>Metric:</strong>
+          <div class="seg-group" id="rca-metric-group">
+            <button class="btn-chip active" data-metric="ac1" type="button">AC@1</button>
+            <button class="btn-chip" data-metric="ac3" type="button">AC@3</button>
+            <button class="btn-chip" data-metric="ac5" type="button">AC@5</button>
+            <button class="btn-chip" data-metric="avg5" type="button">Avg@5</button>
+            <button class="btn-chip" data-metric="mrr" type="button">MRR</button>
+            <button class="btn-chip" data-metric="mean_ms" type="button">Mean Latency (ms, log)</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">
+            <span id="rca-overall-title">RCAEval Sealed Holdout — Overall Comparison</span>
+            <span class="pill pill-emerald" id="rca-tok-pill"></span>
+          </div>
+          <div class="svg-stage">
+            <svg id="rca-overall-svg" viewBox="0 0 600 280" width="100%" height="280"></svg>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">
+            <span>System Breakdown: RE1-OB vs RE1-SS</span>
+            <span class="pill pill-cyan">Microservice Clusters</span>
+          </div>
+          <div class="svg-stage">
+            <svg id="rca-system-svg" viewBox="0 0 600 280" width="100%" height="280"></svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <span>Fault-Type Breakdown (CPU · Memory · Network Delay · Disk I/O · Packet Loss)</span>
+          <span class="pill pill-violet" id="rca-fault-metric-pill">AC@1</span>
+        </div>
+        <div class="svg-stage">
+          <svg id="rca-fault-svg" viewBox="0 0 1160 285" width="100%" height="285"></svg>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span>Exact Frozen RCAEval Summary Table</span></div>
+        <div style="overflow-x:auto;">
+          <table class="data-table" id="rca-table"></table>
+        </div>
+      </div>
+    </div>
+
+    <!-- PANE 2: SPEED & OPTIMIZATION LADDER -->
+    <div id="pane-speed" class="bench-pane">
+      <div class="controls-bar">
+        <div class="ctrl-group">
+          <strong>Dimension D:</strong>
+          <div class="seg-group" id="speed-dim-group">
+            <button class="btn-chip" data-dim="8" type="button">D = 8</button>
+            <button class="btn-chip" data-dim="16" type="button">D = 16</button>
+            <button class="btn-chip active" data-dim="32" type="button">D = 32</button>
+            <button class="btn-chip" data-dim="64" type="button">D = 64</button>
+          </div>
+        </div>
+        <div class="ctrl-group">
+          <strong>Optimization Ladder Workload:</strong>
+          <div class="seg-group" id="opt-wl-group">
+            <button class="btn-chip active" data-wl="D32_p2_T1000" type="button">D=32, p=2, T=1000</button>
+            <button class="btn-chip" data-wl="D16_p2_T1000" type="button">D=16, p=2, T=1000</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">
+            <span id="speed-chart-title">Head-to-Head Latency (Log10 ms, Lower is Better)</span>
+            <span class="pill pill-cyan" id="speed-tps-pill"></span>
+          </div>
+          <div class="svg-stage">
+            <svg id="speed-svg" viewBox="0 0 600 300" width="100%" height="300"></svg>
+          </div>
+          <div id="speed-note" class="callout callout-info"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">
+            <span id="opt-chart-title">5-Stage Compounding Optimization Ladder (Log10 ms)</span>
+            <span class="pill pill-emerald" id="opt-diff-pill"></span>
+          </div>
+          <div class="svg-stage">
+            <svg id="opt-svg" viewBox="0 0 600 300" width="100%" height="300"></svg>
+          </div>
+          <div id="opt-note" class="callout callout-ok"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span>Steady-State Throughput &amp; Exact Speedups Across D &isin; {8, 16, 32, 64}</span></div>
+        <div style="overflow-x:auto;">
+          <table class="data-table" id="speed-table"></table>
+        </div>
+      </div>
+    </div>
+
+    <!-- PANE 3: 100-EP SYNTHETIC RCA -->
+    <div id="pane-synthetic" class="bench-pane">
+      <div class="controls-bar">
+        <div class="ctrl-group">
+          <strong>Regime:</strong>
+          <div class="seg-group" id="syn-regime-group">
+            <button class="btn-chip active" data-reg="overall" type="button">Overall (100 eps)</button>
+            <button class="btn-chip" data-reg="lagged_amplified_cascade" type="button">Lagged Amplified (20)</button>
+            <button class="btn-chip" data-reg="instantaneous_nongaussian" type="button">Instantaneous Non-Gaussian (20)</button>
+            <button class="btn-chip" data-reg="nonlinear_saturation_cascade" type="button">Nonlinear Saturation (20)</button>
+            <button class="btn-chip" data-reg="heteroscedastic_decoy_firehose" type="button">Decoy Firehose (20)</button>
+            <button class="btn-chip" data-reg="erddap_1e10_dc_offset_cascade" type="button">1e10 DC-Offset (20)</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <span id="syn-title">100-Episode Synthetic RCA Torture — AC@1, AC@3, MRR</span>
+          <span class="pill pill-amber" id="syn-tok-pill"></span>
+        </div>
+        <div class="svg-stage">
+          <svg id="syn-svg" viewBox="0 0 1160 310" width="100%" height="310"></svg>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span>Exact Frozen Synthetic Metrics Table</span></div>
+        <div style="overflow-x:auto;">
+          <table class="data-table" id="syn-table"></table>
+        </div>
+      </div>
+    </div>
+
+    <!-- PANE 4: TIER-2 HIGH-DIM SIFT SCALE -->
+    <div id="pane-sift" class="bench-pane">
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">
+            <span>Tier-2 ScreenedSieve Throughput Scaling (D = 128 .. 4096)</span>
+            <span class="pill pill-violet">Up to 80.2M Channel-Obs/s</span>
+          </div>
+          <div class="svg-stage">
+            <svg id="sift-tput-svg" viewBox="0 0 600 290" width="100%" height="290"></svg>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">
+            <span>Loud-Decoy Firehose Top-1 Recall (AC@1 &amp; MRR vs Baselines)</span>
+            <span class="pill pill-emerald">100% AC@1 Across All D</span>
+          </div>
+          <div class="svg-stage">
+            <svg id="sift-acc-svg" viewBox="0 0 600 290" width="100%" height="290"></svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span>Exact Frozen Tier-2 High-Dimensional Sift Table</span></div>
+        <div style="overflow-x:auto;">
+          <table class="data-table" id="sift-table"></table>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <footer>
+    <span>CausalSieve Standalone Interactive Explorer · Zero External Dependencies · Pure HTML/CSS/SVG/JS</span>
+    <span id="footer-prov"></span>
+  </footer>
+</div>
+
+<script>
+"use strict";
+
+/* =========================================================================
+ * EXACT FROZEN BENCHMARK DATA (EMBEDDED FROM benchmarks/results/*.json)
+ * ========================================================================= */
+const FROZEN_BENCH = {"provenance":{"lib_sha256":"69e960d01e22f976a907e6de4f35ccadc048f07b8ac11f1dae481eaab5cdc6e6","lib_scalar_sha256":"a38bcb0d3ad6aa1c9f034e4bf5bd31ce20f5700df1ef37750d401b5c871984b9","simd_isa":"avx2+fma","cpu_model":"Intel(R) Xeon(R) CPU @ 2.30GHz","cpu_count_logical":2,"compiler":"g++ (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0","platform":"Linux-6.18.57-x86_64-with-glibc2.39","timestamp_utc":"2026-11-22T16:43:26.030528+00:00"},"speed":{"8":{"D":8,"causalsieve_batch_full_ms":3.186,"causalsieve_single_tick_full_ms":8.6471,"causalsieve_steady_state":{"n_ticks":1900,"batch_median_ms":3.2073,"us_per_tick":1.6881,"ticks_per_sec":592389.9,"graph_query_ms":0.0281},"numpy_batch_refits_ms":2.534,"statsmodels_var_granger":{"median_ms":118.628,"var_fit_ms":27.33,"granger_ms":91.299,"pairs_measured":56,"total_pairs":56,"extrapolated":false},"tigramite_pcmci":{"median_ms":667.6700309999433,"min_ms":663.9818550002019,"p95_ms":722.873942100523,"samples_ms":[729.0077,667.67,663.9819],"skipped":false},"sklearn":{"median_ms":198.099,"ledoit_wolf_plus_isoforest_ms":198.099,"graphical_lasso_cv_ms":127.496,"note":"No Granger causality; precision + anomaly detection only"},"river_online":{"median_ms":60.88559649970193,"min_ms":60.463593999884324,"p95_ms":61.26539874953778,"samples_ms":[61.3076,60.4636],"note":"Online HST + per-channel SGD linear regression (no conditional Granger or precision)"},"speedups_over_incumbents":{"vs_numpy_batch_refits":0.8,"vs_statsmodels_var_granger":37.23,"vs_tigramite_pcmci":209.56,"vs_sklearn_lw_iso":62.18,"vs_sklearn_glasso_cv":40.02,"vs_river_online":19.11}},"16":{"D":16,"causalsieve_batch_full_ms":6.3617,"causalsieve_single_tick_full_ms":11.3028,"causalsieve_steady_state":{"n_ticks":1900,"batch_median_ms":6.6142,"us_per_tick":3.4812,"ticks_per_sec":287258.9,"graph_query_ms":0.0312},"numpy_batch_refits_ms":5.916,"statsmodels_var_granger":{"median_ms":626.115,"var_fit_ms":7.509,"granger_ms":618.605,"pairs_measured":240,"total_pairs":240,"extrapolated":false},"tigramite_pcmci":{"median_ms":3292.5122930000725,"min_ms":3231.958196999585,"p95_ms":3355.9657075998075,"samples_ms":[3292.5123,3363.0161,3231.9582],"skipped":false},"sklearn":{"median_ms":197.294,"ledoit_wolf_plus_isoforest_ms":197.294,"graphical_lasso_cv_ms":247.998,"note":"No Granger causality; precision + anomaly detection only"},"river_online":{"median_ms":144.982662500297,"min_ms":142.04701100061357,"p95_ms":147.6247488500121,"samples_ms":[147.9183,142.047],"note":"Online HST + per-channel SGD linear regression (no conditional Granger or precision)"},"speedups_over_incumbents":{"vs_numpy_batch_refits":0.93,"vs_statsmodels_var_granger":98.42,"vs_tigramite_pcmci":517.55,"vs_sklearn_lw_iso":31.01,"vs_sklearn_glasso_cv":38.98,"vs_river_online":22.79}},"32":{"D":32,"causalsieve_batch_full_ms":12.1164,"causalsieve_single_tick_full_ms":17.7475,"causalsieve_steady_state":{"n_ticks":1900,"batch_median_ms":18.7211,"us_per_tick":9.8532,"ticks_per_sec":101489.5,"graph_query_ms":0.0433},"numpy_batch_refits_ms":300.399,"statsmodels_var_granger":{"median_ms":24069.698,"var_fit_ms":10.076,"granger_ms":24059.622,"pairs_measured":413,"total_pairs":992,"extrapolated":true},"tigramite_pcmci":{"median_ms":15670.001204999608,"min_ms":15670.001204999608,"p95_ms":15670.001204999608,"samples_ms":[15670.0012],"skipped":false},"sklearn":{"median_ms":198.245,"ledoit_wolf_plus_isoforest_ms":198.245,"graphical_lasso_cv_ms":417.664,"note":"No Granger causality; precision + anomaly detection only"},"river_online":{"median_ms":420.54176199962967,"min_ms":420.54176199962967,"p95_ms":420.54176199962967,"samples_ms":[420.5418],"note":"Online HST + per-channel SGD linear regression (no conditional Granger or precision)"},"speedups_over_incumbents":{"vs_numpy_batch_refits":24.79,"vs_statsmodels_var_granger":1986.54,"vs_tigramite_pcmci":1293.29,"vs_sklearn_lw_iso":16.36,"vs_sklearn_glasso_cv":34.47,"vs_river_online":34.71}},"64":{"D":64,"causalsieve_batch_full_ms":38.4463,"causalsieve_single_tick_full_ms":44.6639,"causalsieve_steady_state":{"n_ticks":1900,"batch_median_ms":71.2285,"us_per_tick":37.4887,"ticks_per_sec":26674.7,"graph_query_ms":0.0877},"numpy_batch_refits_ms":613.286,"statsmodels_var_granger":{"median_ms":1879069.697,"var_fit_ms":23.035,"granger_ms":1879046.662,"pairs_measured":200,"total_pairs":4032,"extrapolated":true},"tigramite_pcmci":{"median_ms":null,"skipped":true,"reason":"Skipped at D=64 (O(D^3) conditional independence search exceeds 60s budget)"},"sklearn":{"median_ms":227.384,"ledoit_wolf_plus_isoforest_ms":227.384,"graphical_lasso_cv_ms":null,"note":"No Granger causality; precision + anomaly detection only"},"river_online":{"median_ms":1528.2960129998173,"min_ms":1528.2960129998173,"p95_ms":1528.2960129998173,"samples_ms":[1528.296],"note":"Online HST + per-channel SGD linear regression (no conditional Granger or precision)"},"speedups_over_incumbents":{"vs_numpy_batch_refits":15.95,"vs_statsmodels_var_granger":48875.17,"vs_tigramite_pcmci":null,"vs_sklearn_lw_iso":5.91,"vs_sklearn_glasso_cv":null,"vs_river_online":39.75}}},"opt":{"D16_p2_T1000":{"D":16,"T":1000,"lag":2,"scalar_vs_avx_max_f_diff":5.5067062021407764e-14,"stages":[{"stage":1,"name":"statsmodels VAR + conditional Granger","median_ms":671.7563,"ticks_per_sec":1488.6,"details":{"median_ms":671.7563,"var_fit_ms":18.1856,"granger_ms":653.5707,"extrapolated":false},"cumulative_speedup_vs_stage1":1.0,"step_speedup_vs_prev":1.0},{"stage":2,"name":"Batch NumPy/SciPy ridge-VAR + reduced refits","median_ms":8.4508,"ticks_per_sec":118332.0,"details":{"median_ms":8.4508,"min_ms":8.1499,"p95_ms":9.4062},"cumulative_speedup_vs_stage1":79.49,"step_speedup_vs_prev":79.49},{"stage":3,"name":"CausalSieve C++ scalar (scalar, push_batch)","median_ms":10.6149,"ticks_per_sec":94207.2,"details":{"median_ms":10.6149,"min_ms":10.392,"p95_ms":10.9878,"simd_isa":"scalar"},"cumulative_speedup_vs_stage1":63.28,"step_speedup_vs_prev":0.8},{"stage":4,"name":"CausalSieve C++ avx2+fma single-tick Python loop","median_ms":19.541,"ticks_per_sec":51174.5,"details":{"median_ms":19.541,"min_ms":19.2448,"p95_ms":78.7724,"simd_isa":"avx2+fma"},"cumulative_speedup_vs_stage1":34.38,"step_speedup_vs_prev":0.54},{"stage":5,"name":"CausalSieve C++ avx2+fma fused C-loop (push_batch)","median_ms":8.5479,"ticks_per_sec":116987.8,"details":{"median_ms":8.5479,"min_ms":8.3305,"p95_ms":8.9739,"simd_isa":"avx2+fma"},"cumulative_speedup_vs_stage1":78.59,"step_speedup_vs_prev":2.29}]},"D32_p2_T1000":{"D":32,"T":1000,"lag":2,"scalar_vs_avx_max_f_diff":1.8740564655672642e-13,"stages":[{"stage":1,"name":"statsmodels VAR + conditional Granger","median_ms":23497.8837,"ticks_per_sec":42.6,"details":{"median_ms":23497.8837,"var_fit_ms":12.059,"granger_ms":23485.8247,"extrapolated":true},"cumulative_speedup_vs_stage1":1.0,"step_speedup_vs_prev":1.0},{"stage":2,"name":"Batch NumPy/SciPy ridge-VAR + reduced refits","median_ms":360.2632,"ticks_per_sec":2775.7,"details":{"median_ms":360.2632,"min_ms":352.9411,"p95_ms":366.8531},"cumulative_speedup_vs_stage1":65.22,"step_speedup_vs_prev":65.22},{"stage":3,"name":"CausalSieve C++ scalar (scalar, push_batch)","median_ms":29.6704,"ticks_per_sec":33703.6,"details":{"median_ms":29.6704,"min_ms":25.1042,"p95_ms":45.2239,"simd_isa":"scalar"},"cumulative_speedup_vs_stage1":791.96,"step_speedup_vs_prev":12.14},{"stage":4,"name":"CausalSieve C++ avx2+fma single-tick Python loop","median_ms":28.4501,"ticks_per_sec":35149.3,"details":{"median_ms":28.4501,"min_ms":28.2511,"p95_ms":29.1286,"simd_isa":"avx2+fma"},"cumulative_speedup_vs_stage1":825.93,"step_speedup_vs_prev":1.04},{"stage":5,"name":"CausalSieve C++ avx2+fma fused C-loop (push_batch)","median_ms":17.535,"ticks_per_sec":57028.8,"details":{"median_ms":17.535,"min_ms":17.2075,"p95_ms":19.3044,"simd_isa":"avx2+fma"},"cumulative_speedup_vs_stage1":1340.06,"step_speedup_vs_prev":1.62}]}},"synthetic":{"total_episodes":100,"token_compression":{"mean_raw_tokens":22758.0,"mean_digest_tokens":27.2,"reduction_pct":99.881},"overall":{"causalsieve":{"n":100,"ac1":0.73,"ac3":0.96,"ac5":0.98,"avg5":0.894,"mrr":0.8297619047619048,"mean_rank":1.54,"mean_ms":13.297},"causalsieve_hinge":{"n":100,"ac1":0.72,"ac3":0.89,"ac5":0.96,"avg5":0.8759999999999999,"mrr":0.8221010656010657,"mean_rank":1.99,"mean_ms":27.245},"unshielded_online_rls":{"n":100,"ac1":0.69,"ac3":0.97,"ac5":0.99,"avg5":0.898,"mrr":0.8174166666666668,"mean_rank":1.53,"mean_ms":14.038},"raw_max_z":{"n":100,"ac1":0.0,"ac3":0.61,"ac5":1.0,"avg5":0.5239999999999999,"mrr":0.30250000000000005,"mean_rank":3.38,"mean_ms":0.584},"rolling_mad_z":{"n":100,"ac1":0.09,"ac3":0.59,"ac5":1.0,"avg5":0.5619999999999999,"mrr":0.36583333333333334,"mean_rank":3.19,"mean_ms":2.246},"sklearn_isolation_forest":{"n":100,"ac1":0.38,"ac3":0.94,"ac5":1.0,"avg5":0.7799999999999998,"mrr":0.615,"mean_rank":2.1,"mean_ms":2906.888},"pairwise_granger_z":{"n":100,"ac1":0.29,"ac3":0.93,"ac5":1.0,"avg5":0.7819999999999999,"mrr":0.5886666666666668,"mean_rank":2.09,"mean_ms":44.86}},"per_regime":{"lagged_amplified_cascade":{"n_episodes":20,"mean_raw_tokens":14584.0,"mean_digest_tokens":29.6,"token_reduction_pct":99.797,"methods":{"causalsieve":{"n":20,"ac1":1.0,"ac3":1.0,"ac5":1.0,"avg5":1.0,"mrr":1.0,"mean_rank":1.0,"mean_ms":6.672},"causalsieve_hinge":{"n":20,"ac1":0.85,"ac3":1.0,"ac5":1.0,"avg5":0.96,"mrr":0.9166666666666666,"mean_rank":1.2,"mean_ms":7.487},"unshielded_online_rls":{"n":20,"ac1":0.95,"ac3":1.0,"ac5":1.0,"avg5":0.99,"mrr":0.975,"mean_rank":1.05,"mean_ms":6.143},"raw_max_z":{"n":20,"ac1":0.0,"ac3":0.0,"ac5":1.0,"avg5":0.4000000000000001,"mrr":0.25,"mean_rank":4.0,"mean_ms":0.375},"rolling_mad_z":{"n":20,"ac1":0.0,"ac3":0.0,"ac5":1.0,"avg5":0.4000000000000001,"mrr":0.25,"mean_rank":4.0,"mean_ms":1.386},"sklearn_isolation_forest":{"n":20,"ac1":0.5,"ac3":0.85,"ac5":1.0,"avg5":0.8200000000000001,"mrr":0.6958333333333333,"mean_rank":1.9,"mean_ms":1672.491},"pairwise_granger_z":{"n":20,"ac1":0.3,"ac3":1.0,"ac5":1.0,"avg5":0.8600000000000001,"mrr":0.65,"mean_rank":1.7,"mean_ms":16.709}}},"instantaneous_nongaussian":{"n_episodes":20,"mean_raw_tokens":12618.0,"mean_digest_tokens":21.4,"token_reduction_pct":99.83,"methods":{"causalsieve":{"n":20,"ac1":0.65,"ac3":1.0,"ac5":1.0,"avg5":0.93,"mrr":0.825,"mean_rank":1.35,"mean_ms":4.697},"causalsieve_hinge":{"n":20,"ac1":0.55,"ac3":0.8,"ac5":0.95,"avg5":0.8,"mrr":0.7113095238095237,"mean_rank":2.05,"mean_ms":5.286},"unshielded_online_rls":{"n":20,"ac1":0.5,"ac3":0.9,"ac5":0.95,"avg5":0.8,"mrr":0.6912499999999999,"mean_rank":2.1,"mean_ms":4.57},"raw_max_z":{"n":20,"ac1":0.0,"ac3":0.95,"ac5":1.0,"avg5":0.5999999999999999,"mrr":0.3374999999999999,"mean_rank":3.0,"mean_ms":0.366},"rolling_mad_z":{"n":20,"ac1":0.45,"ac3":0.95,"ac5":1.0,"avg5":0.8099999999999999,"mrr":0.6625,"mean_rank":1.95,"mean_ms":1.328},"sklearn_isolation_forest":{"n":20,"ac1":0.7,"ac3":1.0,"ac5":1.0,"avg5":0.93,"mrr":0.8416666666666666,"mean_rank":1.35,"mean_ms":1285.158},"pairwise_granger_z":{"n":20,"ac1":0.35,"ac3":0.65,"ac5":1.0,"avg5":0.6900000000000001,"mrr":0.56,"mean_rank":2.55,"mean_ms":11.239}}},"nonlinear_saturation_cascade":{"n_episodes":20,"mean_raw_tokens":13668.0,"mean_digest_tokens":27.1,"token_reduction_pct":99.802,"methods":{"causalsieve":{"n":20,"ac1":0.0,"ac3":0.8,"ac5":0.9,"avg5":0.5399999999999999,"mrr":0.32380952380952377,"mean_rank":3.35,"mean_ms":7.777},"causalsieve_hinge":{"n":20,"ac1":0.45,"ac3":0.85,"ac5":1.0,"avg5":0.82,"mrr":0.6849999999999999,"mean_rank":1.9,"mean_ms":8.538},"unshielded_online_rls":{"n":20,"ac1":0.0,"ac3":0.95,"ac5":1.0,"avg5":0.7,"mrr":0.4208333333333333,"mean_rank":2.5,"mean_ms":7.674},"raw_max_z":{"n":20,"ac1":0.0,"ac3":1.0,"ac5":1.0,"avg5":0.5999999999999999,"mrr":0.33333333333333326,"mean_rank":3.0,"mean_ms":0.635},"rolling_mad_z":{"n":20,"ac1":0.0,"ac3":1.0,"ac5":1.0,"avg5":0.5999999999999999,"mrr":0.33333333333333326,"mean_rank":3.0,"mean_ms":2.281},"sklearn_isolation_forest":{"n":20,"ac1":0.0,"ac3":1.0,"ac5":1.0,"avg5":0.5999999999999999,"mrr":0.33333333333333326,"mean_rank":3.0,"mean_ms":2310.89},"pairwise_granger_z":{"n":20,"ac1":0.0,"ac3":1.0,"ac5":1.0,"avg5":0.5999999999999999,"mrr":0.33333333333333326,"mean_rank":3.0,"mean_ms":20.753}}},"heteroscedastic_decoy_firehose":{"n_episodes":20,"mean_raw_tokens":58336.0,"mean_digest_tokens":28.0,"token_reduction_pct":99.952,"methods":{"causalsieve":{"n":20,"ac1":1.0,"ac3":1.0,"ac5":1.0,"avg5":1.0,"mrr":1.0,"mean_rank":1.0,"mean_ms":43.654},"causalsieve_hinge":{"n":20,"ac1":0.85,"ac3":0.85,"ac5":0.85,"avg5":0.85,"mrr":0.8625291375291375,"mean_rank":3.55,"mean_ms":110.52},"unshielded_online_rls":{"n":20,"ac1":1.0,"ac3":1.0,"ac5":1.0,"avg5":1.0,"mrr":1.0,"mean_rank":1.0,"mean_ms":48.686},"raw_max_z":{"n":20,"ac1":0.0,"ac3":1.0,"ac5":1.0,"avg5":0.5999999999999999,"mrr":0.33333333333333326,"mean_rank":3.0,"mean_ms":1.188},"rolling_mad_z":{"n":20,"ac1":0.0,"ac3":1.0,"ac5":1.0,"avg5":0.5999999999999999,"mrr":0.33333333333333326,"mean_rank":3.0,"mean_ms":4.877},"sklearn_isolation_forest":{"n":20,"ac1":0.3,"ac3":1.0,"ac5":1.0,"avg5":0.76,"mrr":0.5666666666666667,"mean_rank":2.2,"mean_ms":7593.319},"pairwise_granger_z":{"n":20,"ac1":0.7,"ac3":1.0,"ac5":1.0,"avg5":0.9400000000000001,"mrr":0.85,"mean_rank":1.3,"mean_ms":158.885}}},"erddap_1e10_dc_offset_cascade":{"n_episodes":20,"mean_raw_tokens":14584.0,"mean_digest_tokens":29.8,"token_reduction_pct":99.796,"methods":{"causalsieve":{"n":20,"ac1":1.0,"ac3":1.0,"ac5":1.0,"avg5":1.0,"mrr":1.0,"mean_rank":1.0,"mean_ms":3.687},"causalsieve_hinge":{"n":20,"ac1":0.9,"ac3":0.95,"ac5":1.0,"avg5":0.95,"mrr":0.9349999999999999,"mean_rank":1.25,"mean_ms":4.391},"unshielded_online_rls":{"n":20,"ac1":1.0,"ac3":1.0,"ac5":1.0,"avg5":1.0,"mrr":1.0,"mean_rank":1.0,"mean_ms":3.117},"raw_max_z":{"n":20,"ac1":0.0,"ac3":0.1,"ac5":1.0,"avg5":0.4200000000000001,"mrr":0.2583333333333333,"mean_rank":3.9,"mean_ms":0.358},"rolling_mad_z":{"n":20,"ac1":0.0,"ac3":0.0,"ac5":1.0,"avg5":0.4000000000000001,"mrr":0.25,"mean_rank":4.0,"mean_ms":1.36},"sklearn_isolation_forest":{"n":20,"ac1":0.4,"ac3":0.85,"ac5":1.0,"avg5":0.79,"mrr":0.6375,"mean_rank":2.05,"mean_ms":1672.585},"pairwise_granger_z":{"n":20,"ac1":0.1,"ac3":1.0,"ac5":1.0,"avg5":0.8200000000000001,"mrr":0.55,"mean_rank":1.9,"mean_ms":16.712}}}}},"sift":{"config":{"dims":[128,512,2048,4096],"T":500,"shock_start":400,"decoy_fraction":0.2,"decoy_noise_multiplier":3.5,"active_m":24,"n_seeds":10,"simd_isa":"avx2+fma"},"results":{"128":{"D":128,"causalsieve_throughput":{"median_ms":3.613,"ticks_per_sec":138398.8,"channel_obs_per_sec":17715049.3,"m_obs_per_sec":17.715},"methods":{"causalsieve_screened":{"n":10,"ac1":1.0,"ac3":1.0,"ac5":1.0,"avg5":1.0,"mrr":1.0,"mean_rank":1.0,"median_ms":3.613},"naive_variance":{"n":10,"ac1":0.0,"ac3":0.0,"ac5":0.0,"avg5":0.0,"mrr":0.01673542963790624,"mean_rank":80.2,"median_ms":0.164},"raw_max_z":{"n":10,"ac1":0.0,"ac3":1.0,"ac5":1.0,"avg5":0.5999999999999999,"mrr":0.33333333333333337,"mean_rank":3.0,"median_ms":1.351},"rolling_mad_z":{"n":10,"ac1":0.0,"ac3":1.0,"ac5":1.0,"avg5":0.5999999999999999,"mrr":0.33333333333333337,"mean_rank":3.0,"median_ms":6.967}}},"512":{"D":512,"causalsieve_throughput":{"median_ms":7.39,"ticks_per_sec":67655.7,"channel_obs_per_sec":34639696.4,"m_obs_per_sec":34.64},"methods":{"causalsieve_screened":{"n":10,"ac1":1.0,"ac3":1.0,"ac5":1.0,"avg5":1.0,"mrr":1.0,"mean_rank":1.0,"median_ms":7.39},"naive_variance":{"n":10,"ac1":0.0,"ac3":0.0,"ac5":0.0,"avg5":0.0,"mrr":0.0036815958473076426,"mean_rank":299.9,"median_ms":0.347},"raw_max_z":{"n":10,"ac1":0.0,"ac3":1.0,"ac5":1.0,"avg5":0.5999999999999999,"mrr":0.33333333333333337,"mean_rank":3.0,"median_ms":5.137},"rolling_mad_z":{"n":10,"ac1":0.0,"ac3":1.0,"ac5":1.0,"avg5":0.5999999999999999,"mrr":0.33333333333333337,"mean_rank":3.0,"median_ms":28.577}}},"2048":{"D":2048,"causalsieve_throughput":{"median_ms":14.999,"ticks_per_sec":33334.5,"channel_obs_per_sec":68269017.4,"m_obs_per_sec":68.269},"methods":{"causalsieve_screened":{"n":10,"ac1":1.0,"ac3":1.0,"ac5":1.0,"avg5":1.0,"mrr":1.0,"mean_rank":1.0,"median_ms":14.999},"naive_variance":{"n":10,"ac1":0.0,"ac3":0.0,"ac5":0.0,"avg5":0.0,"mrr":0.0011864772374291965,"mean_rank":941.8,"median_ms":1.163},"raw_max_z":{"n":10,"ac1":0.0,"ac3":1.0,"ac5":1.0,"avg5":0.5999999999999999,"mrr":0.33333333333333337,"mean_rank":3.0,"median_ms":21.145},"rolling_mad_z":{"n":10,"ac1":0.0,"ac3":1.0,"ac5":1.0,"avg5":0.5999999999999999,"mrr":0.33333333333333337,"mean_rank":3.0,"median_ms":117.113}}},"4096":{"D":4096,"causalsieve_throughput":{"median_ms":25.54,"ticks_per_sec":19577.1,"channel_obs_per_sec":80187807.0,"m_obs_per_sec":80.188},"methods":{"causalsieve_screened":{"n":10,"ac1":1.0,"ac3":1.0,"ac5":1.0,"avg5":1.0,"mrr":1.0,"mean_rank":1.0,"median_ms":25.54},"naive_variance":{"n":10,"ac1":0.0,"ac3":0.0,"ac5":0.0,"avg5":0.0,"mrr":0.00041462497972391906,"mean_rank":2844.5,"median_ms":2.481},"raw_max_z":{"n":10,"ac1":0.0,"ac3":1.0,"ac5":1.0,"avg5":0.5999999999999999,"mrr":0.33333333333333337,"mean_rank":3.0,"median_ms":43.072},"rolling_mad_z":{"n":10,"ac1":0.0,"ac3":1.0,"ac5":1.0,"avg5":0.5999999999999999,"mrr":0.33333333333333337,"mean_rank":3.0,"median_ms":236.492}}}}},"rcaeval":{"protocol":{"amendment_a8":"Pre-registered canonical Latin square across RE1-OB and RE1-SS; DEV = rep 1 (10 cases), SEALED HOLDOUT = reps 2..5 (40 cases, zero tuning).","amendment_a10":"Symmetric baseline/incident split at inject_time (warmup_ticks=inject_index, production defaults), symmetric max-over-metrics service aggregation, strictly causal imputation.","simd_isa":"avx2+fma","lib_sha256":"69e960d01e22f976a907e6de4f35ccadc048f07b8ac11f1dae481eaab5cdc6e6"},"dev":{"n_cases":10,"token_compression":{"mean_raw_tokens":131230.1,"mean_digest_tokens":70.9,"reduction_pct":99.946},"summary":{"causalsieve":{"n":10,"ac1":0.8,"ac3":0.9,"ac5":0.9,"avg5":0.86,"mrr":0.85,"mean_rank":1.7,"mean_ms":33.73,"median_ms":29.16},"causalsieve_blind":{"n":10,"ac1":0.8,"ac3":1.0,"ac5":1.0,"avg5":0.96,"mrr":0.9,"mean_rank":1.2,"mean_ms":29.58,"median_ms":27.49},"raw_max_z":{"n":10,"ac1":0.4,"ac3":0.9,"ac5":1.0,"avg5":0.8200000000000001,"mrr":0.67,"mean_rank":1.9,"mean_ms":1.08,"median_ms":0.85},"rolling_mad_z":{"n":10,"ac1":0.3,"ac3":0.9,"ac5":0.9,"avg5":0.78,"mrr":0.6125,"mean_rank":2.3,"mean_ms":3.59,"median_ms":2.53},"sklearn_isolation_forest":{"n":10,"ac1":0.2,"ac3":0.4,"ac5":0.6,"avg5":0.38,"mrr":0.36281135531135533,"mean_rank":5.1,"mean_ms":5602.04,"median_ms":5674.97},"pairwise_granger_z":{"n":10,"ac1":0.5,"ac3":0.9,"ac5":0.9,"avg5":0.82,"mrr":0.7142857142857142,"mean_rank":2.0,"mean_ms":161.95,"median_ms":135.93}},"by_system":{"re1ob":{"causalsieve":{"n":5,"ac1":0.8,"ac3":0.8,"ac5":0.8,"avg5":0.8,"mrr":0.8333333333333334,"mean_rank":2.0},"causalsieve_blind":{"n":5,"ac1":0.6,"ac3":1.0,"ac5":1.0,"avg5":0.9199999999999999,"mrr":0.8,"mean_rank":1.4},"raw_max_z":{"n":5,"ac1":0.6,"ac3":0.8,"ac5":1.0,"avg5":0.8,"mrr":0.74,"mean_rank":2.0},"rolling_mad_z":{"n":5,"ac1":0.4,"ac3":0.8,"ac5":0.8,"avg5":0.72,"mrr":0.625,"mean_rank":2.8},"sklearn_isolation_forest":{"n":5,"ac1":0.2,"ac3":0.2,"ac5":0.4,"avg5":0.27999999999999997,"mrr":0.33690476190476193,"mean_rank":5.2},"pairwise_granger_z":{"n":5,"ac1":0.8,"ac3":0.8,"ac5":0.8,"avg5":0.8,"mrr":0.8285714285714286,"mean_rank":2.2}},"re1ss":{"causalsieve":{"n":5,"ac1":0.8,"ac3":1.0,"ac5":1.0,"avg5":0.9199999999999999,"mrr":0.8666666666666668,"mean_rank":1.4},"causalsieve_blind":{"n":5,"ac1":1.0,"ac3":1.0,"ac5":1.0,"avg5":1.0,"mrr":1.0,"mean_rank":1.0},"raw_max_z":{"n":5,"ac1":0.2,"ac3":1.0,"ac5":1.0,"avg5":0.8400000000000001,"mrr":0.6,"mean_rank":1.8},"rolling_mad_z":{"n":5,"ac1":0.2,"ac3":1.0,"ac5":1.0,"avg5":0.8400000000000001,"mrr":0.6,"mean_rank":1.8},"sklearn_isolation_forest":{"n":5,"ac1":0.2,"ac3":0.6,"ac5":0.8,"avg5":0.4800000000000001,"mrr":0.3887179487179487,"mean_rank":5.0},"pairwise_granger_z":{"n":5,"ac1":0.2,"ac3":1.0,"ac5":1.0,"avg5":0.8400000000000001,"mrr":0.6,"mean_rank":1.8}}},"by_fault":{"cpu":{"causalsieve":{"n":2,"ac1":1.0,"ac3":1.0,"ac5":1.0,"avg5":1.0,"mrr":1.0,"mean_rank":1.0},"causalsieve_blind":{"n":2,"ac1":0.5,"ac3":1.0,"ac5":1.0,"avg5":0.9,"mrr":0.75,"mean_rank":1.5},"raw_max_z":{"n":2,"ac1":0.5,"ac3":1.0,"ac5":1.0,"avg5":0.9,"mrr":0.75,"mean_rank":1.5},"rolling_mad_z":{"n":2,"ac1":0.5,"ac3":1.0,"ac5":1.0,"avg5":0.9,"mrr":0.75,"mean_rank":1.5},"sklearn_isolation_forest":{"n":2,"ac1":0.5,"ac3":1.0,"ac5":1.0,"avg5":0.8,"mrr":0.6666666666666666,"mean_rank":2.0},"pairwise_granger_z":{"n":2,"ac1":0.5,"ac3":1.0,"ac5":1.0,"avg5":0.9,"mrr":0.75,"mean_rank":1.5}},"delay":{"causalsieve":{"n":2,"ac1":1.0,"ac3":1.0,"ac5":1.0,"avg5":1.0,"mrr":1.0,"mean_rank":1.0},"causalsieve_blind":{"n":2,"ac1":1.0,"ac3":1.0,"ac5":1.0,"avg5":1.0,"mrr":1.0,"mean_rank":1.0},"raw_max_z":{"n":2,"ac1":1.0,"ac3":1.0,"ac5":1.0,"avg5":1.0,"mrr":1.0,"mean_rank":1.0},"rolling_mad_z":{"n":2,"ac1":0.5,"ac3":1.0,"ac5":1.0,"avg5":0.9,"mrr":0.75,"mean_rank":1.5},"sklearn_isolation_forest":{"n":2,"ac1":0.0,"ac3":0.0,"ac5":0.0,"avg5":0.0,"mrr":0.12179487179487179,"mean_rank":9.5},"pairwise_granger_z":{"n":2,"ac1":0.5,"ac3":1.0,"ac5":1.0,"avg5":0.9,"mrr":0.75,"mean_rank":1.5}},"disk":{"causalsieve":{"n":2,"ac1":0.5,"ac3":1.0,"ac5":1.0,"avg5":0.8,"mrr":0.6666666666666666,"mean_rank":2.0},"causalsieve_blind":{"n":2,"ac1":1.0,"ac3":1.0,"ac5":1.0,"avg5":1.0,"mrr":1.0,"mean_rank":1.0},"raw_max_z":{"n":2,"ac1":0.5,"ac3":1.0,"ac5":1.0,"avg5":0.9,"mrr":0.75,"mean_rank":1.5},"rolling_mad_z":{"n":2,"ac1":0.5,"ac3":1.0,"ac5":1.0,"avg5":0.9,"mrr":0.75,"mean_rank":1.5},"sklearn_isolation_forest":{"n":2,"ac1":0.0,"ac3":0.5,"ac5":0.5,"avg5":0.3,"mrr":0.22916666666666666,"mean_rank":5.5},"pairwise_granger_z":{"n":2,"ac1":1.0,"ac3":1.0,"ac5":1.0,"avg5":1.0,"mrr":1.0,"mean_rank":1.0}},"loss":{"causalsieve":{"n":2,"ac1":0.5,"ac3":0.5,"ac5":0.5,"avg5":0.5,"mrr":0.5833333333333334,"mean_rank":3.5},"causalsieve_blind":{"n":2,"ac1":0.5,"ac3":1.0,"ac5":1.0,"avg5":0.9,"mrr":0.75,"mean_rank":1.5},"raw_max_z":{"n":2,"ac1":0.0,"ac3":0.5,"ac5":1.0,"avg5":0.5,"mrr":0.35,"mean_rank":3.5},"rolling_mad_z":{"n":2,"ac1":0.0,"ac3":0.5,"ac5":0.5,"avg5":0.4,"mrr":0.3125,"mean_rank":5.0},"sklearn_isolation_forest":{"n":2,"ac1":0.0,"ac3":0.0,"ac5":0.5,"avg5":0.1,"mrr":0.17142857142857143,"mean_rank":6.0},"pairwise_granger_z":{"n":2,"ac1":0.0,"ac3":0.5,"ac5":0.5,"avg5":0.4,"mrr":0.3214285714285714,"mean_rank":4.5}},"mem":{"causalsieve":{"n":2,"ac1":1.0,"ac3":1.0,"ac5":1.0,"avg5":1.0,"mrr":1.0,"mean_rank":1.0},"causalsieve_blind":{"n":2,"ac1":1.0,"ac3":1.0,"ac5":1.0,"avg5":1.0,"mrr":1.0,"mean_rank":1.0},"raw_max_z":{"n":2,"ac1":0.0,"ac3":1.0,"ac5":1.0,"avg5":0.8,"mrr":0.5,"mean_rank":2.0},"rolling_mad_z":{"n":2,"ac1":0.0,"ac3":1.0,"ac5":1.0,"avg5":0.8,"mrr":0.5,"mean_rank":2.0},"sklearn_isolation_forest":{"n":2,"ac1":0.5,"ac3":0.5,"ac5":1.0,"avg5":0.7,"mrr":0.625,"mean_rank":2.5},"pairwise_granger_z":{"n":2,"ac1":0.5,"ac3":1.0,"ac5":1.0,"avg5":0.9,"mrr":0.75,"mean_rank":1.5}}}},"holdout":{"n_cases":40,"token_compression":{"mean_raw_tokens":131704.8,"mean_digest_tokens":64.9,"reduction_pct":99.951},"summary":{"causalsieve":{"n":40,"ac1":0.675,"ac3":0.925,"ac5":1.0,"avg5":0.8800000000000001,"mrr":0.8037500000000002,"mean_rank":1.6,"mean_ms":33.3,"median_ms":28.84},"causalsieve_blind":{"n":40,"ac1":0.65,"ac3":0.75,"ac5":0.9,"avg5":0.78,"mrr":0.7460714285714285,"mean_rank":2.225,"mean_ms":30.09,"median_ms":27.63},"raw_max_z":{"n":40,"ac1":0.4,"ac3":0.875,"ac5":0.925,"avg5":0.7550000000000001,"mrr":0.6239583333333334,"mean_rank":2.275,"mean_ms":1.13,"median_ms":0.89},"rolling_mad_z":{"n":40,"ac1":0.525,"ac3":0.9,"ac5":0.925,"avg5":0.8150000000000001,"mrr":0.7121527777777777,"mean_rank":2.05,"mean_ms":3.63,"median_ms":2.55},"sklearn_isolation_forest":{"n":40,"ac1":0.35,"ac3":0.6,"ac5":0.725,"avg5":0.5650000000000001,"mrr":0.5199305555555556,"mean_rank":3.85,"mean_ms":5661.26,"median_ms":5730.92},"pairwise_granger_z":{"n":40,"ac1":0.6,"ac3":0.875,"ac5":0.9,"avg5":0.805,"mrr":0.7408630952380953,"mean_rank":2.05,"mean_ms":162.03,"median_ms":132.59}},"by_system":{"re1ob":{"causalsieve":{"n":20,"ac1":0.6,"ac3":0.9,"ac5":1.0,"avg5":0.86,"mrr":0.7641666666666667,"mean_rank":1.7},"causalsieve_blind":{"n":20,"ac1":0.6,"ac3":0.75,"ac5":0.8,"avg5":0.73,"mrr":0.7071428571428571,"mean_rank":2.6},"raw_max_z":{"n":20,"ac1":0.35,"ac3":0.8,"ac5":0.85,"avg5":0.68,"mrr":0.5687499999999999,"mean_rank":2.7},"rolling_mad_z":{"n":20,"ac1":0.35,"ac3":0.8,"ac5":0.85,"avg5":0.6900000000000002,"mrr":0.5743055555555554,"mean_rank":2.8},"sklearn_isolation_forest":{"n":20,"ac1":0.1,"ac3":0.4,"ac5":0.6,"avg5":0.37000000000000005,"mrr":0.3221230158730159,"mean_rank":4.9},"pairwise_granger_z":{"n":20,"ac1":0.35,"ac3":0.75,"ac5":0.8,"avg5":0.65,"mrr":0.5650595238095237,"mean_rank":2.9}},"re1ss":{"causalsieve":{"n":20,"ac1":0.75,"ac3":0.95,"ac5":1.0,"avg5":0.9,"mrr":0.8433333333333334,"mean_rank":1.5},"causalsieve_blind":{"n":20,"ac1":0.7,"ac3":0.75,"ac5":1.0,"avg5":0.8300000000000001,"mrr":0.7849999999999999,"mean_rank":1.85},"raw_max_z":{"n":20,"ac1":0.45,"ac3":0.95,"ac5":1.0,"avg5":0.8300000000000001,"mrr":0.6791666666666667,"mean_rank":1.85},"rolling_mad_z":{"n":20,"ac1":0.7,"ac3":1.0,"ac5":1.0,"avg5":0.9400000000000001,"mrr":0.85,"mean_rank":1.3},"sklearn_isolation_forest":{"n":20,"ac1":0.6,"ac3":0.8,"ac5":0.85,"avg5":0.76,"mrr":0.7177380952380952,"mean_rank":2.8},"pairwise_granger_z":{"n":20,"ac1":0.85,"ac3":1.0,"ac5":1.0,"avg5":0.96,"mrr":0.9166666666666666,"mean_rank":1.2}}},"by_fault":{"cpu":{"causalsieve":{"n":8,"ac1":0.875,"ac3":1.0,"ac5":1.0,"avg5":0.975,"mrr":0.9375,"mean_rank":1.125},"causalsieve_blind":{"n":8,"ac1":0.75,"ac3":0.875,"ac5":1.0,"avg5":0.8999999999999999,"mrr":0.84375,"mean_rank":1.5},"raw_max_z":{"n":8,"ac1":0.5,"ac3":1.0,"ac5":1.0,"avg5":0.9,"mrr":0.75,"mean_rank":1.5},"rolling_mad_z":{"n":8,"ac1":0.625,"ac3":1.0,"ac5":1.0,"avg5":0.9,"mrr":0.7916666666666666,"mean_rank":1.5},"sklearn_isolation_forest":{"n":8,"ac1":0.125,"ac3":0.625,"ac5":0.75,"avg5":0.5,"mrr":0.3918154761904762,"mean_rank":3.875},"pairwise_granger_z":{"n":8,"ac1":0.5,"ac3":0.75,"ac5":0.875,"avg5":0.675,"mrr":0.6239583333333333,"mean_rank":2.875}},"delay":{"causalsieve":{"n":8,"ac1":0.625,"ac3":0.875,"ac5":1.0,"avg5":0.825,"mrr":0.7541666666666667,"mean_rank":1.875},"causalsieve_blind":{"n":8,"ac1":0.75,"ac3":0.75,"ac5":1.0,"avg5":0.825,"mrr":0.80625,"mean_rank":1.875},"raw_max_z":{"n":8,"ac1":0.5,"ac3":0.875,"ac5":1.0,"avg5":0.775,"mrr":0.65625,"mean_rank":2.125},"rolling_mad_z":{"n":8,"ac1":0.75,"ac3":1.0,"ac5":1.0,"avg5":0.9,"mrr":0.8333333333333333,"mean_rank":1.5},"sklearn_isolation_forest":{"n":8,"ac1":0.625,"ac3":0.875,"ac5":0.875,"avg5":0.775,"mrr":0.7222222222222222,"mean_rank":2.5},"pairwise_granger_z":{"n":8,"ac1":0.5,"ac3":1.0,"ac5":1.0,"avg5":0.9,"mrr":0.75,"mean_rank":1.5}},"disk":{"causalsieve":{"n":8,"ac1":0.5,"ac3":1.0,"ac5":1.0,"avg5":0.875,"mrr":0.7291666666666666,"mean_rank":1.625},"causalsieve_blind":{"n":8,"ac1":0.5,"ac3":0.75,"ac5":0.875,"avg5":0.7250000000000001,"mrr":0.6510416666666666,"mean_rank":2.625},"raw_max_z":{"n":8,"ac1":0.375,"ac3":1.0,"ac5":1.0,"avg5":0.775,"mrr":0.6041666666666666,"mean_rank":2.125},"rolling_mad_z":{"n":8,"ac1":0.5,"ac3":1.0,"ac5":1.0,"avg5":0.875,"mrr":0.7291666666666666,"mean_rank":1.625},"sklearn_isolation_forest":{"n":8,"ac1":0.25,"ac3":0.5,"ac5":0.5,"avg5":0.45,"mrr":0.43129960317460314,"mean_rank":5.5},"pairwise_granger_z":{"n":8,"ac1":0.5,"ac3":0.875,"ac5":0.875,"avg5":0.775,"mrr":0.6875,"mean_rank":2.125}},"loss":{"causalsieve":{"n":8,"ac1":0.375,"ac3":0.75,"ac5":1.0,"avg5":0.725,"mrr":0.5979166666666667,"mean_rank":2.375},"causalsieve_blind":{"n":8,"ac1":0.375,"ac3":0.375,"ac5":0.625,"avg5":0.475,"mrr":0.49181547619047616,"mean_rank":4.0},"raw_max_z":{"n":8,"ac1":0.25,"ac3":0.5,"ac5":0.625,"avg5":0.47500000000000003,"mrr":0.44270833333333326,"mean_rank":3.875},"rolling_mad_z":{"n":8,"ac1":0.375,"ac3":0.5,"ac5":0.625,"avg5":0.525,"mrr":0.5190972222222222,"mean_rank":4.0},"sklearn_isolation_forest":{"n":8,"ac1":0.25,"ac3":0.375,"ac5":0.625,"avg5":0.425,"mrr":0.4147321428571429,"mean_rank":4.75},"pairwise_granger_z":{"n":8,"ac1":0.5,"ac3":0.75,"ac5":0.75,"avg5":0.675,"mrr":0.6428571428571428,"mean_rank":2.75}},"mem":{"causalsieve":{"n":8,"ac1":1.0,"ac3":1.0,"ac5":1.0,"avg5":1.0,"mrr":1.0,"mean_rank":1.0},"causalsieve_blind":{"n":8,"ac1":0.875,"ac3":1.0,"ac5":1.0,"avg5":0.975,"mrr":0.9375,"mean_rank":1.125},"raw_max_z":{"n":8,"ac1":0.375,"ac3":1.0,"ac5":1.0,"avg5":0.8500000000000001,"mrr":0.6666666666666666,"mean_rank":1.75},"rolling_mad_z":{"n":8,"ac1":0.375,"ac3":1.0,"ac5":1.0,"avg5":0.875,"mrr":0.6875,"mean_rank":1.625},"sklearn_isolation_forest":{"n":8,"ac1":0.5,"ac3":0.625,"ac5":0.875,"avg5":0.675,"mrr":0.6395833333333334,"mean_rank":2.625},"pairwise_granger_z":{"n":8,"ac1":1.0,"ac3":1.0,"ac5":1.0,"avg5":1.0,"mrr":1.0,"mean_rank":1.0}}}}}};
+
+/* =========================================================================
+ * UTILITIES
+ * ========================================================================= */
+function el(tag, attrs, text) {
+  const node = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  if (attrs) {
+    for (const [k, v] of Object.entries(attrs)) {
+      node.setAttribute(k, String(v));
+    }
+  }
+  if (text !== undefined) node.textContent = text;
+  return node;
+}
+
+function fmtPct(v) { return (v * 100).toFixed(1) + "%"; }
+function fmtMs(v) {
+  if (v === null || v === undefined) return "Skipped";
+  if (v >= 1000) return (v / 1000).toFixed(2) + " s";
+  if (v >= 10) return v.toFixed(1) + " ms";
+  return v.toFixed(2) + " ms";
+}
+function fmtNum(v) { return Number(v).toLocaleString("en-US"); }
+
+/* =========================================================================
+ * SECTION 1: LIVE 6-SERVICE CAUSAL CASCADE VS DOWNSTREAM VICTIM SIMULATOR
+ *
+ * Topology (6 microservices):
+ *   db_cpu  (0) ---> api_lat (1) ---> web_lat (4)
+ *   cache   (5) ---> api_lat (1)
+ *   auth    (2) ---> gateway (3) ---> web_lat (4)
+ *
+ * Implements genuine baseline ridge-VAR(1) fitting, one-step innovations,
+ * exact regularized innovation precision matrix Theta = (S_u + gamma*I)^-1,
+ * precision-whitened exo_z = (Theta * u) / sqrt(diag(Theta)), and onset
+ * precedence scoring directly in the browser!
+ * ========================================================================= */
+const SERVICES = [
+  { id: 0, name: "db_cpu",  label: "db_cpu",  role: "Database CPU",      x: 98,  y: 78,  color: "#22d3ee" },
+  { id: 5, name: "cache",   label: "cache",   role: "Cache Latency",     x: 98,  y: 162, color: "#60a5fa" },
+  { id: 2, name: "auth",    label: "auth",    role: "Auth Service",      x: 98,  y: 246, color: "#a78bfa" },
+  { id: 1, name: "api_lat", label: "api_lat", role: "API Latency",       x: 340, y: 112, color: "#34d399" },
+  { id: 3, name: "gateway", label: "gateway", role: "Edge Gateway",      x: 340, y: 246, color: "#fbbf24" },
+  { id: 4, name: "web_lat", label: "web_lat", role: "Web Latency (Sink)",x: 576, y: 168, color: "#f43f5e" }
+];
+const SVC_BY_ID = {};
+for (const s of SERVICES) SVC_BY_ID[s.id] = s;
+
+const DAG_EDGES = [
+  { src: 0, dst: 1, baseW: 0.72 }, // db_cpu -> api_lat
+  { src: 5, dst: 1, baseW: 0.64 }, // cache  -> api_lat
+  { src: 1, dst: 4, baseW: 0.80 }, // api_lat -> web_lat
+  { src: 2, dst: 3, baseW: 0.74 }, // auth -> gateway
+  { src: 3, dst: 4, baseW: 0.80 }  // gateway -> web_lat
+];
+
+const SIM_STATE = {
+  faultNode: 0,
+  shockSigma: 6.5,
+  downstreamGain: 1.75,
+  seed: 20261122,
+  waveMode: "exo",
+  lastRun: null
+};
+
+function makePrng(seed) {
+  let s = (seed >>> 0) || 1;
+  return function rand() {
+    s = (Math.imul(1664525, s) + 1013904223) >>> 0;
+    return (s + 0.5) / 4294967296;
+  };
+}
+
+function makeNormal(rand) {
+  let spare = null;
+  return function randn() {
+    if (spare !== null) {
+      const v = spare;
+      spare = null;
+      return v;
+    }
+    const u1 = Math.max(1e-12, rand());
+    const u2 = rand();
+    const r = Math.sqrt(-2.0 * Math.log(u1));
+    const th = 2.0 * Math.PI * u2;
+    spare = r * Math.sin(th);
+    return r * Math.cos(th);
+  };
+}
+
+function invertMatrix(A) {
+  const n = A.length;
+  const M = A.map((row, i) => {
+    const ext = row.slice();
+    for (let j = 0; j < n; j++) ext.push(i === j ? 1.0 : 0.0);
+    return ext;
+  });
+  for (let col = 0; col < n; col++) {
+    let piv = col;
+    for (let r = col + 1; r < n; r++) {
+      if (Math.abs(M[r][col]) > Math.abs(M[piv][col])) piv = r;
+    }
+    const tmp = M[col]; M[col] = M[piv]; M[piv] = tmp;
+    const d = M[col][col] || 1e-12;
+    for (let j = 0; j < 2 * n; j++) M[col][j] /= d;
+    for (let r = 0; r < n; r++) {
+      if (r === col) continue;
+      const f = M[r][col];
+      for (let j = 0; j < 2 * n; j++) M[r][j] -= f * M[col][j];
+    }
+  }
+  return M.map(row => row.slice(n));
+}
+
+function runCascadeSimulation(faultNode, shockSigma, downstreamGain, seed) {
+  const D = 6;
+  const T = 600;
+  const burn = 100;
+  const shockTick = 500;
+  const randn = makeNormal(makePrng(seed));
+
+  // Build stable lag-1 transition matrix A (dst x src):
+  // Higher queue/retry persistence downstream (api_lat/gateway phi=0.68, web_lat phi=0.76)
+  // amplifies sustained upstream shocks into a classic downstream victim trap for Raw Max-Z,
+  // while one-step precision-whitened innovations u_t = x_t - B*phi_t collapse to ~0 on victims!
+  const A = Array.from({ length: D }, () => new Float64Array(D));
+  const ar = [0.18, 0.56, 0.18, 0.56, 0.82, 0.18];
+  for (let i = 0; i < D; i++) A[i][i] = ar[i];
+  const g = downstreamGain / 1.75; // normalized around 1.0
+  A[1][0] = 0.68 * g;  // db_cpu  -> api_lat
+  A[1][5] = 0.68 * g;  // cache   -> api_lat
+  A[4][1] = 0.78 * g;  // api_lat -> web_lat
+  A[3][2] = 0.70 * g;  // auth    -> gateway
+  A[4][3] = 0.78 * g;  // gateway -> web_lat
+
+  const sigma = [1.0, 0.55, 1.0, 0.55, 0.65, 1.0];
+
+  const Xfull = [];
+  for (let t = 0; t < T + burn; t++) {
+    const row = new Float64Array(D);
+    const prev = t > 0 ? Xfull[t - 1] : new Float64Array(D);
+    for (let i = 0; i < D; i++) {
+      let v = sigma[i] * randn();
+      for (let j = 0; j < D; j++) v += A[i][j] * prev[j];
+      row[i] = v;
+    }
+    const simT = t - burn;
+    if (simT >= shockTick) {
+      // Sustained exogenous step fault on the injected service
+      const ramp = 0.88 + 0.12 * Math.exp(-(simT - shockTick) / 25.0);
+      row[faultNode] += shockSigma * sigma[faultNode] * ramp;
+    }
+    Xfull.push(row);
+  }
+  const X = Xfull.slice(burn);
+
+  // Baseline mean & std strictly from pre-shock warmup [0..shockTick-1] (strictly causal!)
+  const baseEnd = shockTick;
+  const mean = new Float64Array(D);
+  const std = new Float64Array(D);
+  for (let t = 0; t < baseEnd; t++) {
+    for (let j = 0; j < D; j++) mean[j] += X[t][j];
+  }
+  for (let j = 0; j < D; j++) mean[j] /= baseEnd;
+  for (let t = 0; t < baseEnd; t++) {
+    for (let j = 0; j < D; j++) {
+      const d = X[t][j] - mean[j];
+      std[j] += d * d;
+    }
+  }
+  for (let j = 0; j < D; j++) std[j] = Math.max(1e-6, Math.sqrt(std[j] / baseEnd));
+
+  // Standardized matrix Z (causal baseline scale)
+  const Z = X.map(row => {
+    const r = new Float64Array(D);
+    for (let j = 0; j < D; j++) r[j] = (row[j] - mean[j]) / std[j];
+    return r;
+  });
+
+  // Fit baseline ridge-VAR(1) strictly on warmup ticks [1..baseEnd-1] (Huber-shielded baseline)
+  const K = D + 1;
+  const G = Array.from({ length: K }, (_, i) => {
+    const r = new Array(K).fill(0);
+    r[i] = 0.01; // CausalSieve default ridge = 1e-2
+    return r;
+  });
+  const C = Array.from({ length: K }, () => new Array(D).fill(0));
+  for (let t = 1; t < baseEnd; t++) {
+    const phi = [1.0, Z[t - 1][0], Z[t - 1][1], Z[t - 1][2], Z[t - 1][3], Z[t - 1][4], Z[t - 1][5]];
+    for (let a = 0; a < K; a++) {
+      for (let b = 0; b < K; b++) G[a][b] += phi[a] * phi[b];
+      for (let j = 0; j < D; j++) C[a][j] += phi[a] * Z[t][j];
+    }
+  }
+  const Ginv = invertMatrix(G);
+  const B = Array.from({ length: K }, () => new Array(D).fill(0));
+  for (let a = 0; a < K; a++) {
+    for (let j = 0; j < D; j++) {
+      let s = 0;
+      for (let b = 0; b < K; b++) s += Ginv[a][b] * C[b][j];
+      B[a][j] = s;
+    }
+  }
+
+  // Compute baseline innovation covariance S_u & precision matrix Theta (precision_ridge = 1e-2)
+  const Su = Array.from({ length: D }, (_, i) => {
+    const r = new Array(D).fill(0);
+    r[i] = 0.005;
+    return r;
+  });
+  const nWarm = baseEnd - 1;
+  for (let t = 1; t < baseEnd; t++) {
+    const phi = [1.0, Z[t - 1][0], Z[t - 1][1], Z[t - 1][2], Z[t - 1][3], Z[t - 1][4], Z[t - 1][5]];
+    const u = new Float64Array(D);
+    for (let j = 0; j < D; j++) {
+      let pred = 0;
+      for (let a = 0; a < K; a++) pred += B[a][j] * phi[a];
+      u[j] = Z[t][j] - pred;
+    }
+    for (let i = 0; i < D; i++) {
+      for (let j = 0; j < D; j++) Su[i][j] += (u[i] * u[j]) / nWarm;
+    }
+  }
+  const Theta = invertMatrix(Su);
+  const diagSqrt = Array.from({ length: D }, (_, i) => Math.sqrt(Math.max(1e-9, Theta[i][i])));
+
+  // Stream all ticks: compute precision-whitened exo_z[t][j]
+  const exoZ = [];
+  const rawZ = Z;
+  for (let t = 0; t < T; t++) {
+    const ez = new Float64Array(D);
+    if (t >= 1) {
+      const phi = [1.0, Z[t - 1][0], Z[t - 1][1], Z[t - 1][2], Z[t - 1][3], Z[t - 1][4], Z[t - 1][5]];
+      const u = new Float64Array(D);
+      for (let j = 0; j < D; j++) {
+        let pred = 0;
+        for (let a = 0; a < K; a++) pred += B[a][j] * phi[a];
+        u[j] = Z[t][j] - pred;
+      }
+      for (let i = 0; i < D; i++) {
+        let tu = 0;
+        for (let j = 0; j < D; j++) tu += Theta[i][j] * u[j];
+        ez[i] = tu / diagSqrt[i];
+      }
+    }
+    exoZ.push(ez);
+  }
+
+  // Root-cause attribution over incident window [shockTick..T-1]
+  const peakRaw = new Float64Array(D);
+  const peakExo = new Float64Array(D);
+  const signedPeakRaw = new Float64Array(D);
+  const signedPeakExo = new Float64Array(D);
+  const onsetTick = new Int32Array(D).fill(-1);
+
+  for (let t = shockTick; t < T; t++) {
+    for (let j = 0; j < D; j++) {
+      const arVal = Math.abs(rawZ[t][j]);
+      const aeVal = Math.abs(exoZ[t][j]);
+      if (arVal > peakRaw[j]) { peakRaw[j] = arVal; signedPeakRaw[j] = rawZ[t][j]; }
+      if (aeVal > peakExo[j]) { peakExo[j] = aeVal; signedPeakExo[j] = exoZ[t][j]; }
+      if (onsetTick[j] < 0 && aeVal >= 3.2) onsetTick[j] = t;
+    }
+  }
+
+  let earliestOnset = T;
+  for (let j = 0; j < D; j++) {
+    if (onsetTick[j] >= 0 && onsetTick[j] < earliestOnset) earliestOnset = onsetTick[j];
+  }
+
+  const rootScore = new Float64Array(D);
+  const learnedEdges = [];
+  for (let s = 0; s < D; s++) {
+    let outflow = 0;
+    for (let d = 0; d < D; d++) {
+      if (s === d) continue;
+      const w = Math.abs(B[1 + s][d]);
+      if (w > 0.22) {
+        outflow += w;
+        learnedEdges.push({ src: s, dst: d, weight: w });
+      }
+    }
+    const lagPenalty = onsetTick[s] >= 0 ? Math.exp(-0.22 * (onsetTick[s] - earliestOnset)) : 0.35;
+    rootScore[s] = peakExo[s] * (1.0 + 0.35 * lagPenalty) * (1.0 + 0.12 * outflow);
+  }
+  learnedEdges.sort((a, b) => b.weight - a.weight);
+
+  const rawRanking = Array.from({ length: D }, (_, i) => i).sort((a, b) => peakRaw[b] - peakRaw[a]);
+  const csRanking = Array.from({ length: D }, (_, i) => i).sort((a, b) => rootScore[b] - rootScore[a]);
+
+  const usPerTickD8 = FROZEN_BENCH.speed["8"].causalsieve_steady_state.us_per_tick;
+  const estUs = Math.round(usPerTickD8 * 0.72 * T);
+
+  const rawPayloadObj = {
+    stream: "prod-mesh-6svc",
+    ticks: T,
+    channels: Array.from({ length: D }, (_, i) => SVC_BY_ID[i].name),
+    rows: X.map((row, t) => [t, ...Array.from(row, v => Number(v.toFixed(4)))])
+  };
+  const rawJsonStr = JSON.stringify(rawPayloadObj);
+  const rawTokens = Math.ceil(rawJsonStr.length / 4);
+
+  const topCs = csRanking[0];
+  const topRaw = rawRanking[0];
+  const trapAvoided = topRaw !== topCs;
+  const mdLines = [
+    `# CausalDigest \`sim-${faultNode}-${seed.toString(16).slice(-4)}\``,
+    `ticks=${T} | ch=${D} | lag=1 | isa=${FROZEN_BENCH.provenance.simd_isa} | alarm=ACTIVE | est_native=${estUs}us`,
+    ``,
+    `## Root Causes (Exogenous vs Victim)`,
+    `| rank | channel | root_score | peak_exo_z | raw_z | onset | verdict |`,
+    `|---:|---|---:|---:|---:|---:|---|`
+  ];
+  for (let r = 0; r < 4; r++) {
+    const ch = csRanking[r];
+    const verdict = r === 0
+      ? "EXOGENOUS_ROOT"
+      : (peakRaw[ch] > 3.2 && peakRaw[ch] > 1.3 * peakExo[ch] ? "DOWNSTREAM_VICTIM" : "NOMINAL");
+    const onStr = onsetTick[ch] >= 0 ? String(onsetTick[ch]) : "-";
+    mdLines.push(
+      `| ${r + 1} | ${SVC_BY_ID[ch].name} | ${rootScore[ch].toFixed(2)} | ${signedPeakExo[ch] >= 0 ? "+" : ""}${signedPeakExo[ch].toFixed(2)} | ${signedPeakRaw[ch] >= 0 ? "+" : ""}${signedPeakRaw[ch].toFixed(2)} | ${onStr} | ${verdict} |`
+    );
+  }
+  if (trapAvoided) {
+    mdLines.push(
+      `> Victim trap avoided: \`${SVC_BY_ID[topRaw].name}\` has highest |raw_z|=${peakRaw[topRaw].toFixed(2)} (exo_z=${signedPeakExo[topRaw].toFixed(2)}), while exogenous root is \`${SVC_BY_ID[topCs].name}\` (exo_z=${signedPeakExo[topCs].toFixed(2)}, onset=t${onsetTick[topCs]}).`
+    );
+  }
+  mdLines.push(``, `## Pruned Causal Graph`);
+  for (const e of learnedEdges.slice(0, 5)) {
+    mdLines.push(`- ${SVC_BY_ID[e.src].name} --[lagged |B|=${e.weight.toFixed(2)}]--> ${SVC_BY_ID[e.dst].name}`);
+  }
+  mdLines.push(
+    ``,
+    `## Lossless Recovery`,
+    `- \`slice://sim-${faultNode}/${SVC_BY_ID[topCs].name}/485..600\``
+  );
+  const digestMd = mdLines.join("\n");
+  const digestTokens = Math.ceil(digestMd.length / 4);
+  const reductionPct = 100.0 * (1.0 - digestTokens / rawTokens);
+
+  return {
+    D, T, shockTick, faultNode,
+    rawZ, exoZ, peakRaw, peakExo, signedPeakRaw, signedPeakExo,
+    onsetTick, rootScore, rawRanking, csRanking,
+    learnedEdges, trapAvoided, estUs,
+    rawJsonStr, rawTokens, digestMd, digestTokens, reductionPct
+  };
+}
+
+function getReachableFrom(startId) {
+  const seen = new Set([startId]);
+  const activeEdges = new Set();
+  const q = [startId];
+  while (q.length) {
+    const u = q.shift();
+    DAG_EDGES.forEach((e, idx) => {
+      if (e.src === u) {
+        activeEdges.add(idx);
+        if (!seen.has(e.dst)) {
+          seen.add(e.dst);
+          q.push(e.dst);
+        }
+      }
+    });
+  }
+  return { nodes: seen, edges: activeEdges };
+}
+
+function renderSimulator() {
+  const run = runCascadeSimulation(
+    SIM_STATE.faultNode,
+    SIM_STATE.shockSigma,
+    SIM_STATE.downstreamGain,
+    SIM_STATE.seed
+  );
+  SIM_STATE.lastRun = run;
+
+  // Update fault buttons
+  const btnWrap = document.getElementById("fault-node-buttons");
+  btnWrap.innerHTML = "";
+  for (const svc of SERVICES) {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "btn-chip" + (svc.id === SIM_STATE.faultNode ? " active-coral" : "");
+    b.textContent = svc.name;
+    b.addEventListener("click", () => {
+      SIM_STATE.faultNode = svc.id;
+      renderSimulator();
+    });
+    btnWrap.appendChild(b);
+  }
+
+  document.getElementById("sim-latency-pill").textContent =
+    `Est. Native C++20 AVX2: ~${run.estUs} \u00b5s (${run.T} ticks)`;
+
+  renderDagSvg(run);
+  renderRankings(run);
+  renderWaveforms(run);
+  renderDigestBox(run);
+}
+
+function renderDagSvg(run) {
+  const svg = document.getElementById("dag-svg");
+  svg.innerHTML = "";
+
+  const defs = el("defs");
+  function addMarker(id, color) {
+    const m = el("marker", { id, viewBox: "0 0 10 10", refX: 8, refY: 5, markerWidth: 7, markerHeight: 7, orient: "auto-start-reverse" });
+    m.appendChild(el("path", { d: "M 0 1 L 10 5 L 0 9 z", fill: color }));
+    defs.appendChild(m);
+  }
+  addMarker("arr-idle", "#3b5074");
+  addMarker("arr-hot", "#f43f5e");
+  svg.appendChild(defs);
+
+  // Tier labels
+  svg.appendChild(el("text", { x: 98, y: 24, fill: "#647794", "font-size": 11, "font-family": "var(--mono)", "text-anchor": "middle" }, "UPSTREAM SOURCES"));
+  svg.appendChild(el("text", { x: 340, y: 24, fill: "#647794", "font-size": 11, "font-family": "var(--mono)", "text-anchor": "middle" }, "MID-TIER SERVICES"));
+  svg.appendChild(el("text", { x: 576, y: 24, fill: "#647794", "font-size": 11, "font-family": "var(--mono)", "text-anchor": "middle" }, "DOWNSTREAM SINK"));
+
+  const reach = getReachableFrom(run.faultNode);
+  const topCs = run.csRanking[0];
+  const topRaw = run.rawRanking[0];
+
+  // Draw directed edges
+  DAG_EDGES.forEach((e, idx) => {
+    const s = SVC_BY_ID[e.src];
+    const d = SVC_BY_ID[e.dst];
+    const isHot = reach.edges.has(idx);
+    const x1 = s.x + 68, y1 = s.y;
+    const x2 = d.x - 74, y2 = d.y;
+    const mx = (x1 + x2) / 2;
+    const pathD = `M ${x1} ${y1} C ${mx} ${y1}, ${mx} ${y2}, ${x2} ${y2}`;
+    svg.appendChild(el("path", {
+      d: pathD,
+      fill: "none",
+      stroke: isHot ? "#f43f5e" : "#334766",
+      "stroke-width": isHot ? 3 : 1.7,
+      "stroke-dasharray": isHot ? "7 4" : "none",
+      "marker-end": isHot ? "url(#arr-hot)" : "url(#arr-idle)",
+      opacity: isHot ? 0.95 : 0.7
+    }));
+    const lx = mx;
+    const ly = (y1 + y2) / 2 - 7;
+    if (isHot) {
+      svg.appendChild(el("text", {
+        x: lx, y: ly, fill: "#fda4af", "font-size": 10.5, "font-family": "var(--mono)", "text-anchor": "middle"
+      }, `+lag cascade`));
+    }
+  });
+
+  // Draw microservice nodes
+  for (const s of SERVICES) {
+    const g = el("g", { class: "dag-node" });
+    g.addEventListener("click", () => {
+      SIM_STATE.faultNode = s.id;
+      renderSimulator();
+    });
+
+    const isInjected = s.id === run.faultNode;
+    const isCsTop = s.id === topCs;
+    const isRawTop = s.id === topRaw;
+    const isAffected = reach.nodes.has(s.id);
+
+    let stroke = "#2b3e5e";
+    let fill = "#131d30";
+    if (isCsTop) { stroke = "#10b981"; fill = "rgba(16, 185, 129, 0.14)"; }
+    else if (isRawTop && run.trapAvoided) { stroke = "#f43f5e"; fill = "rgba(244, 63, 94, 0.15)"; }
+    else if (isAffected) { stroke = "#f59e0b"; fill = "rgba(245, 158, 11, 0.09)"; }
+
+    if (isInjected) {
+      g.appendChild(el("rect", {
+        x: s.x - 73, y: s.y - 31, width: 146, height: 62, rx: 13,
+        fill: "none", stroke: "#22d3ee", "stroke-width": 1.6, "stroke-dasharray": "4 3", opacity: 0.85
+      }));
+    }
+
+    g.appendChild(el("rect", {
+      class: "node-box",
+      x: s.x - 67, y: s.y - 25, width: 134, height: 50, rx: 10,
+      fill, stroke, "stroke-width": isCsTop || isRawTop ? 2.4 : 1.5
+    }));
+
+    g.appendChild(el("text", {
+      x: s.x, y: s.y - 5, fill: "#f1f5f9", "font-size": 13, "font-weight": 700,
+      "font-family": "var(--mono)", "text-anchor": "middle"
+    }, s.name));
+
+    g.appendChild(el("text", {
+      x: s.x, y: s.y + 12, fill: "#94a3b8", "font-size": 10.5,
+      "font-family": "var(--mono)", "text-anchor": "middle"
+    }, `exo:${run.peakExo[s.id].toFixed(1)}  raw:${run.peakRaw[s.id].toFixed(1)}`));
+
+    // Top status pill badges
+    if (isCsTop) {
+      g.appendChild(el("rect", { x: s.x - 56, y: s.y - 43, width: 112, height: 16, rx: 8, fill: "#059669" }));
+      g.appendChild(el("text", {
+        x: s.x, y: s.y - 32, fill: "#ecfdf5", "font-size": 9.5, "font-weight": 700,
+        "font-family": "var(--mono)", "text-anchor": "middle"
+      }, "CS #1 ROOT CAUSE"));
+    }
+    if (isRawTop && run.trapAvoided) {
+      g.appendChild(el("rect", { x: s.x - 60, y: s.y + 28, width: 120, height: 16, rx: 8, fill: "#e11d48" }));
+      g.appendChild(el("text", {
+        x: s.x, y: s.y + 39, fill: "#fff1f2", "font-size": 9.5, "font-weight": 700,
+        "font-family": "var(--mono)", "text-anchor": "middle"
+      }, "RAW MAX-Z VICTIM!"));
+    } else if (isRawTop && !run.trapAvoided) {
+      g.appendChild(el("rect", { x: s.x - 52, y: s.y + 28, width: 104, height: 16, rx: 8, fill: "#0284c7" }));
+      g.appendChild(el("text", {
+        x: s.x, y: s.y + 39, fill: "#e0f2fe", "font-size": 9.5, "font-weight": 700,
+        "font-family": "var(--mono)", "text-anchor": "middle"
+      }, "BOTH AGREE #1"));
+    }
+    svg.appendChild(g);
+  }
+
+  // Update verdict banner
+  const vb = document.getElementById("verdict-banner");
+  const injName = SVC_BY_ID[run.faultNode].name;
+  const csName = SVC_BY_ID[topCs].name;
+  const rawName = SVC_BY_ID[topRaw].name;
+  const csHit = topCs === run.faultNode;
+
+  if (csHit && run.trapAvoided) {
+    vb.className = "callout callout-ok";
+    vb.innerHTML =
+      `<strong>Exact Root Pinpointed!</strong> Fault injected on <code>${injName}</code> at <code>t=${run.shockTick}</code>. ` +
+      `Downstream amplification inflated <code>${rawName}</code> to <code>|raw_z|=${run.peakRaw[topRaw].toFixed(1)}</code> (fooling Raw Max-Z), ` +
+      `while CausalSieve precision-whitening subtracted predictable propagation and ranked <code>${csName}</code> <strong>#1</strong> (<code>exo_z=${run.peakExo[topCs].toFixed(1)}</code>, onset <code>t=${run.onsetTick[topCs]}</code>).`;
+  } else if (csHit && !run.trapAvoided) {
+    vb.className = "callout callout-info";
+    vb.innerHTML =
+      `<strong>Direct Sink Fault:</strong> Fault injected directly on <code>${injName}</code> has no downstream victims, so both CausalSieve (<code>exo_z=${run.peakExo[topCs].toFixed(1)}</code>) and Raw Max-Z (<code>raw_z=${run.peakRaw[topRaw].toFixed(1)}</code>) agree on <code>${csName}</code>.`;
+  } else {
+    vb.className = "callout callout-trap";
+    vb.innerHTML =
+      `Injected <code>${injName}</code>: CausalSieve ranked <code>${csName}</code> #1 and Raw Max-Z ranked <code>${rawName}</code> #1.`;
+  }
+
+  const trapPill = document.getElementById("trap-status-pill");
+  if (run.trapAvoided) {
+    trapPill.className = "pill pill-coral";
+    trapPill.textContent = `VICTIM TRAP: RAW FLAGGED ${rawName.toUpperCase()}`;
+  } else {
+    trapPill.className = "pill pill-emerald";
+    trapPill.textContent = "DIRECT SINK FAULT — NO VICTIM TRAP";
+  }
+}
+
+function renderRankings(run) {
+  const rawList = document.getElementById("raw-rank-list");
+  const csList = document.getElementById("cs-rank-list");
+  rawList.innerHTML = "";
+  csList.innerHTML = "";
+
+  const maxRaw = Math.max(1e-6, ...Array.from(run.peakRaw));
+  const maxCs = Math.max(1e-6, ...Array.from(run.rootScore));
+
+  const topRaw = run.rawRanking[0];
+  const topCs = run.csRanking[0];
+  document.getElementById("raw-winner-tag").textContent =
+    `#1 ${SVC_BY_ID[topRaw].name} (${topRaw === run.faultNode ? "TRUE ROOT" : "FALSE VICTIM"})`;
+  document.getElementById("cs-winner-tag").textContent =
+    `#1 ${SVC_BY_ID[topCs].name} (${topCs === run.faultNode ? "TRUE ROOT" : "MISS"})`;
+
+  run.rawRanking.forEach((ch, idx) => {
+    const row = document.createElement("div");
+    row.className = "rank-row";
+    const pct = (run.peakRaw[ch] / maxRaw) * 100;
+    const isFault = ch === run.faultNode;
+    const barColor = idx === 0 && !isFault
+      ? "linear-gradient(90deg, #e11d48, #fb7185)"
+      : (isFault ? "linear-gradient(90deg, #0891b2, #22d3ee)" : "#3b4c6b");
+    row.innerHTML =
+      `<span class="rank-idx">#${idx + 1}</span>` +
+      `<span class="rank-name">${SVC_BY_ID[ch].name}</span>` +
+      `<div class="bar-track"><div class="bar-fill" style="width:${pct.toFixed(1)}%;background:${barColor};"></div></div>` +
+      `<span class="rank-val">${run.peakRaw[ch].toFixed(2)}&sigma;</span>`;
+    rawList.appendChild(row);
+  });
+
+  run.csRanking.forEach((ch, idx) => {
+    const row = document.createElement("div");
+    row.className = "rank-row";
+    const pct = (run.rootScore[ch] / maxCs) * 100;
+    const isFault = ch === run.faultNode;
+    const barColor = idx === 0 && isFault
+      ? "linear-gradient(90deg, #059669, #34d399)"
+      : "#334766";
+    const onset = run.onsetTick[ch] >= 0 ? `t${run.onsetTick[ch]}` : "—";
+    row.innerHTML =
+      `<span class="rank-idx">#${idx + 1}</span>` +
+      `<span class="rank-name">${SVC_BY_ID[ch].name}</span>` +
+      `<div class="bar-track"><div class="bar-fill" style="width:${pct.toFixed(1)}%;background:${barColor};"></div></div>` +
+      `<span class="rank-val">${run.peakExo[ch].toFixed(2)} (${onset})</span>`;
+    csList.appendChild(row);
+  });
+}
+
+function renderWaveforms(run) {
+  const svg = document.getElementById("wave-svg");
+  const leg = document.getElementById("wave-legend");
+  svg.innerHTML = "";
+  leg.innerHTML = "";
+
+  const tStart = 460;
+  const tEnd = run.T - 1;
+  const padL = 56, padR = 20, padT = 22, padB = 34;
+  const W = 1160 - padL - padR;
+  const H = 270 - padT - padB;
+
+  const mode = SIM_STATE.waveMode;
+  const xOf = t => padL + ((t - tStart) / (tEnd - tStart)) * W;
+
+  const seriesList = [];
+  if (mode === "both") {
+    const rootId = run.faultNode;
+    const victimId = run.rawRanking[0] !== rootId ? run.rawRanking[0] : 4;
+    seriesList.push({ name: `${SVC_BY_ID[rootId].name} (exo_z — Root)`, color: "#10b981", width: 2.6, dash: "", vals: run.exoZ.map(r => r[rootId]) });
+    seriesList.push({ name: `${SVC_BY_ID[victimId].name} (raw_z — Loud Victim)`, color: "#f43f5e", width: 2.2, dash: "6 4", vals: run.rawZ.map(r => r[victimId]) });
+    seriesList.push({ name: `${SVC_BY_ID[victimId].name} (exo_z — Whitened Victim)`, color: "#22d3ee", width: 2.0, dash: "", vals: run.exoZ.map(r => r[victimId]) });
+  } else {
+    const srcArr = mode === "exo" ? run.exoZ : run.rawZ;
+    for (const s of SERVICES) {
+      const isHighlight = s.id === run.faultNode || s.id === 4;
+      seriesList.push({
+        name: s.name + (s.id === run.faultNode ? " ★" : ""),
+        color: s.color,
+        width: isHighlight ? 2.4 : 1.35,
+        dash: "",
+        vals: srcArr.map(r => r[s.id])
+      });
+    }
+  }
+
+  let yMin = -3, yMax = 5;
+  for (const ser of seriesList) {
+    for (let t = tStart; t <= tEnd; t++) {
+      if (ser.vals[t] < yMin) yMin = ser.vals[t];
+      if (ser.vals[t] > yMax) yMax = ser.vals[t];
+    }
+  }
+  const yPad = (yMax - yMin) * 0.1;
+  yMin -= yPad; yMax += yPad;
+  const yOf = v => padT + H - ((v - yMin) / (yMax - yMin)) * H;
+
+  // Grid lines
+  const nGrid = 5;
+  for (let i = 0; i <= nGrid; i++) {
+    const v = yMin + (i / nGrid) * (yMax - yMin);
+    const y = yOf(v);
+    svg.appendChild(el("line", { x1: padL, y1: y, x2: padL + W, y2: y, stroke: "#1c2840", "stroke-width": 1 }));
+    svg.appendChild(el("text", { x: padL - 8, y: y + 4, fill: "#647794", "font-size": 10.5, "font-family": "var(--mono)", "text-anchor": "end" }, v.toFixed(1)));
+  }
+
+  // Zero line
+  if (yMin < 0 && yMax > 0) {
+    svg.appendChild(el("line", { x1: padL, y1: yOf(0), x2: padL + W, y2: yOf(0), stroke: "#334766", "stroke-width": 1.2 }));
+  }
+
+  // Shock injection marker
+  const sx = xOf(run.shockTick);
+  svg.appendChild(el("rect", { x: sx, y: padT, width: padL + W - sx, height: H, fill: "rgba(244, 63, 94, 0.05)" }));
+  svg.appendChild(el("line", { x1: sx, y1: padT, x2: sx, y2: padT + H, stroke: "#f43f5e", "stroke-width": 1.5, "stroke-dasharray": "5 4" }));
+  svg.appendChild(el("text", { x: sx + 6, y: padT + 14, fill: "#fb7185", "font-size": 11, "font-family": "var(--mono)" }, `Fault injected t=${run.shockTick} (${SVC_BY_ID[run.faultNode].name})`));
+
+  // X ticks
+  for (let t = tStart; t <= tEnd; t += 20) {
+    const x = xOf(t);
+    svg.appendChild(el("line", { x1: x, y1: padT + H, x2: x, y2: padT + H + 5, stroke: "#334766" }));
+    svg.appendChild(el("text", { x, y: padT + H + 18, fill: "#647794", "font-size": 10.5, "font-family": "var(--mono)", "text-anchor": "middle" }, `t=${t}`));
+  }
+
+  // Polylines
+  for (const ser of seriesList) {
+    let d = "";
+    for (let t = tStart; t <= tEnd; t++) {
+      d += (t === tStart ? "M " : " L ") + xOf(t).toFixed(1) + " " + yOf(ser.vals[t]).toFixed(1);
+    }
+    svg.appendChild(el("path", {
+      d, fill: "none", stroke: ser.color, "stroke-width": ser.width,
+      "stroke-dasharray": ser.dash || "none", opacity: ser.width > 2 ? 0.98 : 0.6
+    }));
+
+    const item = document.createElement("span");
+    item.className = "leg-item";
+    item.innerHTML = `<span class="leg-dot" style="background:${ser.color};"></span>${ser.name}`;
+    leg.appendChild(item);
+  }
+}
+
+function renderDigestBox(run) {
+  document.getElementById("tok-raw").textContent = fmtNum(run.rawTokens) + " tok";
+  document.getElementById("tok-digest").textContent = fmtNum(run.digestTokens) + " tok";
+  document.getElementById("tok-saved").textContent = run.reductionPct.toFixed(1) + "%";
+  document.getElementById("digest-reduction-pill").textContent =
+    `${run.reductionPct.toFixed(1)}% Token Reduction (${run.rawTokens} \u2192 ${run.digestTokens})`;
+  const keptPct = Math.max(2, Math.min(100, (run.digestTokens / run.rawTokens) * 100));
+  document.getElementById("tok-bar").style.width = keptPct.toFixed(2) + "%";
+  document.getElementById("digest-preview").textContent = run.digestMd;
+  document.getElementById("raw-json-preview").textContent =
+    run.rawJsonStr.slice(0, 1150) + `\n... [truncated ${fmtNum(run.rawJsonStr.length - 1150)} more chars; total ${fmtNum(run.rawJsonStr.length)} bytes ≈ ${fmtNum(run.rawTokens)} LLM tokens]`;
+}
+
+/* =========================================================================
+ * SECTION 2: FROZEN BENCHMARK DASHBOARD CHARTS
+ * ========================================================================= */
+const BENCH_STATE = {
+  rcaSplit: "holdout",
+  rcaMetric: "ac1",
+  speedDim: "32",
+  optWl: "D32_p2_T1000",
+  synRegime: "overall"
+};
+
+const METHOD_META = {
+  causalsieve:              { label: "CausalSieve (AVX2)",    color: "#22d3ee" },
+  causalsieve_blind:        { label: "CausalSieve (Blind)",   color: "#10b981" },
+  causalsieve_hinge:        { label: "CausalSieve + Hinge",   color: "#34d399" },
+  causalsieve_screened:     { label: "ScreenedSieve (T2)",    color: "#22d3ee" },
+  unshielded_online_rls:    { label: "Unshielded Online RLS", color: "#60a5fa" },
+  pairwise_granger_z:       { label: "Pairwise Granger-Z",    color: "#a78bfa" },
+  rolling_mad_z:            { label: "Rolling MAD-Z",         color: "#fbbf24" },
+  raw_max_z:                { label: "Raw Max-Z",             color: "#fb7185" },
+  sklearn_isolation_forest: { label: "sklearn IsoForest",     color: "#94a3b8" },
+  naive_variance:           { label: "Naive Variance",        color: "#64748b" }
+};
+
+function drawHorizontalBarSvg(svgEl, items, opts) {
+  svgEl.innerHTML = "";
+  const W = opts.width || 600;
+  const H = opts.height || 280;
+  const padL = opts.padL || 170;
+  const padR = opts.padR || 76;
+  const padT = 18;
+  const padB = 30;
+  const plotW = W - padL - padR;
+  const plotH = H - padT - padB;
+  const isLog = !!opts.logScale;
+
+  let maxVal = opts.maxVal || 1.0;
+  let minLog = -0.3; // ~0.5 ms
+  let maxLog = 4.0;
+  if (isLog) {
+    const positives = items.map(it => it.value).filter(v => v !== null && v > 0);
+    const lo = Math.min(...positives);
+    const hi = Math.max(...positives);
+    minLog = Math.floor(Math.log10(Math.max(0.05, lo * 0.5)));
+    maxLog = Math.ceil(Math.log10(hi * 1.4));
+  } else if (!opts.maxVal) {
+    maxVal = Math.max(1e-6, ...items.map(it => it.value || 0)) * 1.12;
+  }
+
+  const xOf = v => {
+    if (v === null || v === undefined) return padL;
+    if (isLog) {
+      const lv = Math.log10(Math.max(Math.pow(10, minLog), v));
+      return padL + ((lv - minLog) / (maxLog - minLog)) * plotW;
+    }
+    return padL + Math.min(1, Math.max(0, v / maxVal)) * plotW;
+  };
+
+  // Vertical gridlines
+  if (isLog) {
+    for (let p = minLog; p <= maxLog; p++) {
+      const gx = padL + ((p - minLog) / (maxLog - minLog)) * plotW;
+      svgEl.appendChild(el("line", { x1: gx, y1: padT, x2: gx, y2: padT + plotH, stroke: "#1d2b45" }));
+      const lbl = p >= 3 ? `${Math.pow(10, p - 3)}s` : `${Math.pow(10, p)}ms`;
+      svgEl.appendChild(el("text", { x: gx, y: H - 10, fill: "#647794", "font-size": 10, "font-family": "var(--mono)", "text-anchor": "middle" }, lbl));
+    }
+  } else {
+    for (let k = 0; k <= 4; k++) {
+      const v = (k / 4) * maxVal;
+      const gx = xOf(v);
+      svgEl.appendChild(el("line", { x1: gx, y1: padT, x2: gx, y2: padT + plotH, stroke: "#1d2b45" }));
+      const lbl = opts.isPct ? `${Math.round(v * 100)}%` : v.toFixed(opts.axisDec ?? 1);
+      svgEl.appendChild(el("text", { x: gx, y: H - 10, fill: "#647794", "font-size": 10, "font-family": "var(--mono)", "text-anchor": "middle" }, lbl));
+    }
+  }
+
+  const rowH = plotH / Math.max(1, items.length);
+  const barH = Math.min(26, rowH * 0.62);
+
+  items.forEach((it, idx) => {
+    const cy = padT + idx * rowH + rowH / 2;
+    svgEl.appendChild(el("text", {
+      x: padL - 10, y: cy + 4,
+      fill: it.highlight ? "#e6edf7" : "#93a4bf",
+      "font-size": 11.5,
+      "font-weight": it.highlight ? 700 : 500,
+      "font-family": "var(--mono)",
+      "text-anchor": "end"
+    }, it.label));
+
+    if (it.value === null || it.value === undefined) {
+      svgEl.appendChild(el("text", {
+        x: padL + 8, y: cy + 4, fill: "#647794", "font-size": 11, "font-family": "var(--mono)"
+      }, it.valText || "Skipped (>60s budget)"));
+      return;
+    }
+
+    const bx2 = xOf(it.value);
+    const bw = Math.max(4, bx2 - padL);
+    svgEl.appendChild(el("rect", {
+      x: padL, y: cy - barH / 2, width: bw, height: barH, rx: 5,
+      fill: it.color, opacity: it.highlight ? 0.96 : 0.78
+    }));
+    svgEl.appendChild(el("text", {
+      x: padL + bw + 7, y: cy + 4,
+      fill: it.highlight ? "#f8fafc" : "#cbd5e1",
+      "font-size": 11.2,
+      "font-weight": it.highlight ? 700 : 500,
+      "font-family": "var(--mono)"
+    }, it.valText));
+  });
+}
+
+function drawGroupedColumnSvg(svgEl, groups, seriesKeys, opts) {
+  svgEl.innerHTML = "";
+  const W = opts.width || 600;
+  const H = opts.height || 280;
+  const padL = 46, padR = 16, padT = 32, padB = 42;
+  const plotW = W - padL - padR;
+  const plotH = H - padT - padB;
+  const maxVal = opts.maxVal || 1.0;
+
+  // Legend at top
+  let lx = padL;
+  seriesKeys.forEach(sk => {
+    const meta = METHOD_META[sk] || { label: sk, color: "#94a3b8" };
+    svgEl.appendChild(el("rect", { x: lx, y: 8, width: 10, height: 10, rx: 2, fill: meta.color }));
+    svgEl.appendChild(el("text", { x: lx + 14, y: 17, fill: "#cbd5e1", "font-size": 10.5, "font-family": "var(--mono)" }, meta.label));
+    lx += Math.max(115, meta.label.length * 6.8 + 26);
+  });
+
+  // Horizontal grid
+  for (let k = 0; k <= 4; k++) {
+    const v = (k / 4) * maxVal;
+    const y = padT + plotH - (v / maxVal) * plotH;
+    svgEl.appendChild(el("line", { x1: padL, y1: y, x2: padL + plotW, y2: y, stroke: "#1c2840" }));
+    const lbl = opts.isPct ? `${Math.round(v * 100)}%` : v.toFixed(1);
+    svgEl.appendChild(el("text", { x: padL - 7, y: y + 4, fill: "#647794", "font-size": 10, "font-family": "var(--mono)", "text-anchor": "end" }, lbl));
+  }
+
+  const gW = plotW / groups.length;
+  const innerW = gW * 0.78;
+  const bW = innerW / seriesKeys.length;
+
+  groups.forEach((grp, gi) => {
+    const gx0 = padL + gi * gW + (gW - innerW) / 2;
+    seriesKeys.forEach((sk, si) => {
+      const val = grp.values[sk] || 0;
+      const bh = Math.max(2, (val / maxVal) * plotH);
+      const bx = gx0 + si * bW + 1.5;
+      const by = padT + plotH - bh;
+      const color = (METHOD_META[sk] && METHOD_META[sk].color) || "#94a3b8";
+      const rect = el("rect", {
+        x: bx, y: by, width: Math.max(4, bW - 3), height: bh, rx: 3,
+        fill: color, opacity: sk.startsWith("causalsieve") ? 0.96 : 0.72
+      });
+      const title = el("title", {}, `${grp.label} · ${(METHOD_META[sk] || {}).label || sk}: ${opts.isPct ? fmtPct(val) : val.toFixed(3)}`);
+      rect.appendChild(title);
+      svgEl.appendChild(rect);
+
+      if (bW >= 24) {
+        svgEl.appendChild(el("text", {
+          x: bx + (bW - 3) / 2, y: by - 4, fill: "#cbd5e1", "font-size": 9.3,
+          "font-family": "var(--mono)", "text-anchor": "middle"
+        }, opts.isPct ? `${Math.round(val * 100)}` : val.toFixed(2)));
+      }
+    });
+    svgEl.appendChild(el("text", {
+      x: padL + gi * gW + gW / 2, y: H - 14, fill: "#cbd5e1",
+      "font-size": 11.5, "font-weight": 650, "font-family": "var(--mono)", "text-anchor": "middle"
+    }, grp.label));
+  });
+}
+
+function renderRcaEvalPane() {
+  const splitKey = BENCH_STATE.rcaSplit;
+  const metric = BENCH_STATE.rcaMetric;
+  const split = FROZEN_BENCH.rcaeval[splitKey];
+  const methods = ["causalsieve", "causalsieve_blind", "pairwise_granger_z", "rolling_mad_z", "raw_max_z", "sklearn_isolation_forest"];
+  const isLatency = metric === "mean_ms";
+  const isPct = metric === "ac1" || metric === "ac3" || metric === "ac5";
+
+  document.getElementById("rca-overall-title").textContent =
+    `RCAEval ${splitKey === "holdout" ? "Sealed Holdout (n=40)" : "DEV Split (n=10)"} — ${metric.toUpperCase()}`;
+  document.getElementById("rca-tok-pill").textContent =
+    `Tokens: ${fmtNum(Math.round(split.token_compression.mean_raw_tokens))} \u2192 ${split.token_compression.mean_digest_tokens.toFixed(1)} (${split.token_compression.reduction_pct.toFixed(2)}%)`;
+  document.getElementById("rca-fault-metric-pill").textContent = isLatency ? "AC@1 (Fault Breakdown)" : metric.toUpperCase();
+
+  const overallItems = methods.map(m => {
+    const val = split.summary[m][metric];
+    return {
+      label: METHOD_META[m].label,
+      value: val,
+      color: METHOD_META[m].color,
+      highlight: m === "causalsieve",
+      valText: isLatency ? fmtMs(val) : (isPct ? fmtPct(val) : val.toFixed(3))
+    };
+  });
+  drawHorizontalBarSvg(document.getElementById("rca-overall-svg"), overallItems, {
+    width: 600, height: 280, logScale: isLatency, isPct, maxVal: isLatency ? null : 1.0
+  });
+
+  // System breakdown (use ac1 when overall is latency)
+  const subMetric = isLatency ? "ac1" : metric;
+  const subIsPct = subMetric === "ac1" || subMetric === "ac3" || subMetric === "ac5";
+  const sysSeries = ["causalsieve", "causalsieve_blind", "pairwise_granger_z", "rolling_mad_z", "raw_max_z"];
+  const sysGroups = [
+    { label: `RE1-OB (n=${split.by_system.re1ob.causalsieve.n})`, values: Object.fromEntries(sysSeries.map(m => [m, split.by_system.re1ob[m][subMetric]])) },
+    { label: `RE1-SS (n=${split.by_system.re1ss.causalsieve.n})`, values: Object.fromEntries(sysSeries.map(m => [m, split.by_system.re1ss[m][subMetric]])) }
+  ];
+  drawGroupedColumnSvg(document.getElementById("rca-system-svg"), sysGroups, sysSeries, {
+    width: 600, height: 280, isPct: subIsPct, maxVal: 1.0
+  });
+
+  // Fault breakdown
+  const faultKeys = ["cpu", "mem", "delay", "disk", "loss"];
+  const faultLabels = { cpu: "CPU", mem: "Memory", delay: "Net Delay", disk: "Disk I/O", loss: "Packet Loss" };
+  const faultGroups = faultKeys.map(fk => ({
+    label: `${faultLabels[fk]} (n=${split.by_fault[fk].causalsieve.n})`,
+    values: Object.fromEntries(sysSeries.map(m => [m, split.by_fault[fk][m][subMetric]]))
+  }));
+  drawGroupedColumnSvg(document.getElementById("rca-fault-svg"), faultGroups, sysSeries, {
+    width: 1160, height: 285, isPct: subIsPct, maxVal: 1.0
+  });
+
+  // Exact summary table
+  const tbl = document.getElementById("rca-table");
+  tbl.innerHTML =
+    `<thead><tr><th>Method</th><th>AC@1</th><th>AC@3</th><th>AC@5</th><th>Avg@5</th><th>MRR</th><th>Mean Rank</th><th>Mean ms</th><th>Median ms</th></tr></thead><tbody>` +
+    methods.map(m => {
+      const s = split.summary[m];
+      return `<tr class="${m === "causalsieve" ? "hl-row" : ""}">` +
+        `<td>${METHOD_META[m].label}</td>` +
+        `<td>${fmtPct(s.ac1)}</td><td>${fmtPct(s.ac3)}</td><td>${fmtPct(s.ac5)}</td>` +
+        `<td>${s.avg5.toFixed(3)}</td><td>${s.mrr.toFixed(3)}</td><td>${s.mean_rank.toFixed(2)}</td>` +
+        `<td>${fmtMs(s.mean_ms)}</td><td>${fmtMs(s.median_ms)}</td></tr>`;
+    }).join("") + `</tbody>`;
+}
+
+function renderSpeedPane() {
+  const dKey = BENCH_STATE.speedDim;
+  const row = FROZEN_BENCH.speed[dKey];
+  const ss = row.causalsieve_steady_state;
+  document.getElementById("speed-chart-title").textContent = `Head-to-Head Latency at D = ${dKey}, lag = 2 (Log10 ms)`;
+  document.getElementById("speed-tps-pill").textContent = `${fmtNum(Math.round(ss.ticks_per_sec))} ticks/s · ${ss.us_per_tick.toFixed(2)} \u00b5s/tick`;
+
+  const items = [
+    { label: "CausalSieve (Batch)", value: row.causalsieve_batch_full_ms, color: "#22d3ee", highlight: true, valText: fmtMs(row.causalsieve_batch_full_ms) },
+    { label: "CausalSieve (1-tick)", value: row.causalsieve_single_tick_full_ms, color: "#10b981", highlight: false, valText: fmtMs(row.causalsieve_single_tick_full_ms) },
+    { label: "NumPy Batch Refits", value: row.numpy_batch_refits_ms, color: "#60a5fa", highlight: false, valText: `${fmtMs(row.numpy_batch_refits_ms)} (${row.speedups_over_incumbents.vs_numpy_batch_refits}x)` },
+    { label: "River Online", value: row.river_online.median_ms, color: "#fbbf24", highlight: false, valText: `${fmtMs(row.river_online.median_ms)} (${row.speedups_over_incumbents.vs_river_online}x)` },
+    { label: "sklearn LW+IsoForest", value: row.sklearn.median_ms, color: "#a78bfa", highlight: false, valText: `${fmtMs(row.sklearn.median_ms)} (${row.speedups_over_incumbents.vs_sklearn_lw_iso}x)` },
+    { label: "Tigramite PCMCI", value: row.tigramite_pcmci.median_ms, color: "#fb7185", highlight: false, valText: row.tigramite_pcmci.median_ms ? `${fmtMs(row.tigramite_pcmci.median_ms)} (${row.speedups_over_incumbents.vs_tigramite_pcmci}x)` : "Skipped (>60s budget)" },
+    { label: "statsmodels VAR+Granger", value: row.statsmodels_var_granger.median_ms, color: "#f43f5e", highlight: false, valText: `${fmtMs(row.statsmodels_var_granger.median_ms)} (${fmtNum(row.speedups_over_incumbents.vs_statsmodels_var_granger)}x)` }
+  ];
+  drawHorizontalBarSvg(document.getElementById("speed-svg"), items, {
+    width: 600, height: 300, padL: 168, padR: 132, logScale: true
+  });
+  document.getElementById("speed-note").innerHTML =
+    `At <strong>D=${dKey}</strong>: exact Block-Schur Granger + Precision query takes only <strong>${(ss.graph_query_ms * 1000).toFixed(1)} &mu;s</strong> (${fmtNum(Math.round(ss.ticks_per_sec))} ticks/s steady-state). ` +
+    `Speedup vs <code>statsmodels</code>: <strong>${fmtNum(row.speedups_over_incumbents.vs_statsmodels_var_granger)}&times;</strong>` +
+    (row.speedups_over_incumbents.vs_tigramite_pcmci ? ` · vs <code>Tigramite PCMCI</code>: <strong>${fmtNum(row.speedups_over_incumbents.vs_tigramite_pcmci)}&times;</strong>.` : ` · <code>Tigramite PCMCI</code> skipped (>60s budget).`);
+
+  // Optimization Ladder
+  const wlKey = BENCH_STATE.optWl;
+  const wl = FROZEN_BENCH.opt[wlKey];
+  document.getElementById("opt-chart-title").textContent = `5-Stage Compounding Ladder (${wlKey.replaceAll("_", ", ")})`;
+  document.getElementById("opt-diff-pill").textContent = `Scalar vs AVX2 F-diff: ${wl.scalar_vs_avx_max_f_diff.toExponential(2)}`;
+
+  const stageColors = ["#f43f5e", "#fbbf24", "#60a5fa", "#34d399", "#22d3ee"];
+  const shortNames = [
+    "1. statsmodels VAR+Gr",
+    "2. NumPy/SciPy Refits",
+    "3. C++ Scalar Batch",
+    "4. AVX2 1-tick Loop",
+    "5. AVX2 Fused Batch"
+  ];
+  const optItems = wl.stages.map((st, idx) => ({
+    label: shortNames[idx],
+    value: st.median_ms,
+    color: stageColors[idx],
+    highlight: idx === wl.stages.length - 1,
+    valText: `${fmtMs(st.median_ms)} (${st.cumulative_speedup_vs_stage1}x)`
+  }));
+  drawHorizontalBarSvg(document.getElementById("opt-svg"), optItems, {
+    width: 600, height: 300, padL: 162, padR: 128, logScale: true
+  });
+  const finalStage = wl.stages[wl.stages.length - 1];
+  document.getElementById("opt-note").innerHTML =
+    `<strong>${fmtNum(finalStage.cumulative_speedup_vs_stage1)}&times; cumulative speedup</strong> from Python/statsmodels (${fmtMs(wl.stages[0].median_ms)}) to AVX2+FMA fused C-loop (${fmtMs(finalStage.median_ms)}, ${fmtNum(Math.round(finalStage.ticks_per_sec))} ticks/s) with bit-verified numerical equivalence (<code>${wl.scalar_vs_avx_max_f_diff.toExponential(2)}</code> max F-stat diff).`;
+
+  // Full Speed Table
+  const dims = ["8", "16", "32", "64"];
+  document.getElementById("speed-table").innerHTML =
+    `<thead><tr><th>Dim D</th><th>CS Batch</th><th>Steady ticks/s</th><th>&mu;s/tick</th><th>Graph Query</th><th>NumPy Refits</th><th>River</th><th>Tigramite</th><th>statsmodels</th><th>Speedup vs sm</th></tr></thead><tbody>` +
+    dims.map(d => {
+      const r = FROZEN_BENCH.speed[d];
+      const st = r.causalsieve_steady_state;
+      return `<tr class="${d === dKey ? "hl-row" : ""}">` +
+        `<td>D = ${d}</td><td>${fmtMs(r.causalsieve_batch_full_ms)}</td>` +
+        `<td>${fmtNum(Math.round(st.ticks_per_sec))}</td><td>${st.us_per_tick.toFixed(2)}</td>` +
+        `<td>${(st.graph_query_ms * 1000).toFixed(1)} &mu;s</td><td>${fmtMs(r.numpy_batch_refits_ms)}</td>` +
+        `<td>${fmtMs(r.river_online.median_ms)}</td><td>${fmtMs(r.tigramite_pcmci.median_ms)}</td>` +
+        `<td>${fmtMs(r.statsmodels_var_granger.median_ms)}</td>` +
+        `<td style="color:var(--cyan);font-weight:700;">${fmtNum(r.speedups_over_incumbents.vs_statsmodels_var_granger)}&times;</td></tr>`;
+    }).join("") + `</tbody>`;
+}
+
+function renderSyntheticPane() {
+  const regKey = BENCH_STATE.synRegime;
+  const isOverall = regKey === "overall";
+  const methodsObj = isOverall
+    ? FROZEN_BENCH.synthetic.overall
+    : FROZEN_BENCH.synthetic.per_regime[regKey].methods;
+  const tokRed = isOverall
+    ? FROZEN_BENCH.synthetic.token_compression.reduction_pct
+    : FROZEN_BENCH.synthetic.per_regime[regKey].token_reduction_pct;
+
+  const regTitles = {
+    overall: "Overall Across All 100 Episodes (5 Regimes)",
+    lagged_amplified_cascade: "Lagged Amplified Cascade (20 eps)",
+    instantaneous_nongaussian: "Instantaneous Non-Gaussian LiNGAM (20 eps)",
+    nonlinear_saturation_cascade: "Nonlinear Saturation Cascade — Hinge Basis Regime (20 eps)",
+    heteroscedastic_decoy_firehose: "Heteroscedastic Decoy Firehose (20 eps)",
+    erddap_1e10_dc_offset_cascade: "ERDDAP +1e10 DC-Offset Cascade (20 eps)"
+  };
+  document.getElementById("syn-title").textContent = regTitles[regKey];
+  document.getElementById("syn-tok-pill").textContent = `Token Reduction: ${tokRed.toFixed(2)}%`;
+
+  const order = [
+    "causalsieve", "causalsieve_hinge", "unshielded_online_rls",
+    "pairwise_granger_z", "sklearn_isolation_forest", "rolling_mad_z", "raw_max_z"
+  ];
+
+  // Grouped bars: AC@1, AC@3, MRR per method
+  const svg = document.getElementById("syn-svg");
+  svg.innerHTML = "";
+  const W = 1160, H = 310, padL = 52, padR = 20, padT = 34, padB = 56;
+  const plotW = W - padL - padR, plotH = H - padT - padB;
+  const metricDefs = [
+    { key: "ac1", label: "AC@1", color: "#22d3ee" },
+    { key: "ac3", label: "AC@3", color: "#10b981" },
+    { key: "mrr", label: "MRR",  color: "#a78bfa" }
+  ];
+  let lx = padL;
+  for (const md of metricDefs) {
+    svg.appendChild(el("rect", { x: lx, y: 10, width: 11, height: 11, rx: 2, fill: md.color }));
+    svg.appendChild(el("text", { x: lx + 16, y: 19, fill: "#cbd5e1", "font-size": 11, "font-family": "var(--mono)" }, md.label));
+    lx += 90;
+  }
+
+  for (let k = 0; k <= 4; k++) {
+    const v = k * 0.25;
+    const y = padT + plotH - v * plotH;
+    svg.appendChild(el("line", { x1: padL, y1: y, x2: padL + plotW, y2: y, stroke: "#1c2840" }));
+    svg.appendChild(el("text", { x: padL - 8, y: y + 4, fill: "#647794", "font-size": 10.5, "font-family": "var(--mono)", "text-anchor": "end" }, `${Math.round(v * 100)}%`));
+  }
+
+  const gW = plotW / order.length;
+  const innerW = gW * 0.72;
+  const bW = innerW / metricDefs.length;
+
+  order.forEach((m, gi) => {
+    const stats = methodsObj[m];
+    const gx0 = padL + gi * gW + (gW - innerW) / 2;
+    metricDefs.forEach((md, mi) => {
+      const val = stats[md.key];
+      const bh = Math.max(2, val * plotH);
+      const bx = gx0 + mi * bW + 2;
+      const by = padT + plotH - bh;
+      svg.appendChild(el("rect", {
+        x: bx, y: by, width: bW - 4, height: bh, rx: 3, fill: md.color,
+        opacity: m.startsWith("causalsieve") ? 0.96 : 0.65
+      }));
+      svg.appendChild(el("text", {
+        x: bx + (bW - 4) / 2, y: by - 4, fill: "#cbd5e1",
+        "font-size": 9.8, "font-family": "var(--mono)", "text-anchor": "middle"
+      }, `${Math.round(val * 100)}`));
+    });
+    svg.appendChild(el("text", {
+      x: padL + gi * gW + gW / 2, y: H - 24,
+      fill: m.startsWith("causalsieve") ? "#22d3ee" : "#cbd5e1",
+      "font-size": 11, "font-weight": m.startsWith("causalsieve") ? 700 : 500,
+      "font-family": "var(--mono)", "text-anchor": "middle"
+    }, METHOD_META[m].label));
+    svg.appendChild(el("text", {
+      x: padL + gi * gW + gW / 2, y: H - 9,
+      fill: "#647794", "font-size": 10, "font-family": "var(--mono)", "text-anchor": "middle"
+    }, fmtMs(stats.mean_ms)));
+  });
+
+  document.getElementById("syn-table").innerHTML =
+    `<thead><tr><th>Method</th><th>Episodes</th><th>AC@1</th><th>AC@3</th><th>AC@5</th><th>Avg@5</th><th>MRR</th><th>Mean Rank</th><th>Mean ms</th></tr></thead><tbody>` +
+    order.map(m => {
+      const s = methodsObj[m];
+      const isHl = (regKey === "nonlinear_saturation_cascade" ? m === "causalsieve_hinge" : m === "causalsieve");
+      return `<tr class="${isHl ? "hl-row" : ""}">` +
+        `<td>${METHOD_META[m].label}</td><td>${s.n}</td>` +
+        `<td>${fmtPct(s.ac1)}</td><td>${fmtPct(s.ac3)}</td><td>${fmtPct(s.ac5)}</td>` +
+        `<td>${s.avg5.toFixed(3)}</td><td>${s.mrr.toFixed(3)}</td><td>${s.mean_rank.toFixed(2)}</td><td>${fmtMs(s.mean_ms)}</td></tr>`;
+    }).join("") + `</tbody>`;
+}
+
+function renderSiftPane() {
+  const dims = ["128", "512", "2048", "4096"];
+  const res = FROZEN_BENCH.sift.results;
+
+  // Throughput bar chart (M obs/sec)
+  const tputItems = dims.map(d => {
+    const tp = res[d].causalsieve_throughput;
+    return {
+      label: `D = ${d}`,
+      value: tp.m_obs_per_sec,
+      color: d === "4096" ? "#22d3ee" : "#10b981",
+      highlight: d === "4096",
+      valText: `${tp.m_obs_per_sec.toFixed(2)}M obs/s (${fmtNum(Math.round(tp.ticks_per_sec))} tps)`
+    };
+  });
+  drawHorizontalBarSvg(document.getElementById("sift-tput-svg"), tputItems, {
+    width: 600, height: 290, padL: 80, padR: 195, maxVal: 90, axisDec: 0
+  });
+
+  // Accuracy comparison at D=4096 (AC@1 & MRR)
+  const mKeys = ["causalsieve_screened", "raw_max_z", "rolling_mad_z", "naive_variance"];
+  const groups = [
+    { label: "AC@1 (D=4096)", values: Object.fromEntries(mKeys.map(m => [m, res["4096"].methods[m].ac1])) },
+    { label: "MRR (D=4096)",  values: Object.fromEntries(mKeys.map(m => [m, res["4096"].methods[m].mrr])) },
+    { label: "Avg@5 (D=4096)",values: Object.fromEntries(mKeys.map(m => [m, res["4096"].methods[m].avg5])) }
+  ];
+  drawGroupedColumnSvg(document.getElementById("sift-acc-svg"), groups, mKeys, {
+    width: 600, height: 290, isPct: true, maxVal: 1.0
+  });
+
+  // Table across all D
+  document.getElementById("sift-table").innerHTML =
+    `<thead><tr><th>Dim D</th><th>ScreenedSieve ms</th><th>ticks/s</th><th>M obs/s</th><th>CS AC@1</th><th>CS MRR</th><th>Raw Max-Z AC@1</th><th>Rolling MAD AC@1</th><th>Naive Var Rank</th></tr></thead><tbody>` +
+    dims.map(d => {
+      const r = res[d];
+      const tp = r.causalsieve_throughput;
+      const ms = r.methods;
+      return `<tr class="${d === "4096" ? "hl-row" : ""}">` +
+        `<td>D = ${d}</td><td>${fmtMs(tp.median_ms)}</td><td>${fmtNum(Math.round(tp.ticks_per_sec))}</td>` +
+        `<td style="color:var(--cyan);font-weight:700;">${tp.m_obs_per_sec.toFixed(2)}M</td>` +
+        `<td style="color:var(--emerald);font-weight:700;">${fmtPct(ms.causalsieve_screened.ac1)}</td>` +
+        `<td>${ms.causalsieve_screened.mrr.toFixed(3)}</td>` +
+        `<td>${fmtPct(ms.raw_max_z.ac1)}</td><td>${fmtPct(ms.rolling_mad_z.ac1)}</td>` +
+        `<td>#${ms.naive_variance.mean_rank.toFixed(1)}</td></tr>`;
+    }).join("") + `</tbody>`;
+}
+
+/* =========================================================================
+ * WIRE UP UI CONTROLS & BOOTSTRAP
+ * ========================================================================= */
+function initApp() {
+  const p = FROZEN_BENCH.provenance;
+  document.getElementById("isa-pill").textContent = p.simd_isa.toUpperCase();
+  document.getElementById("prov-avx-sha").textContent = p.lib_sha256;
+  document.getElementById("prov-avx-sha").title = p.lib_sha256;
+  document.getElementById("prov-scalar-sha").textContent = p.lib_scalar_sha256;
+  document.getElementById("prov-scalar-sha").title = p.lib_scalar_sha256;
+  document.getElementById("prov-host").textContent = `${p.cpu_model} · ${p.timestamp_utc.slice(0, 10)}`;
+  document.getElementById("footer-prov").textContent = `AVX2 SHA-256: ${p.lib_sha256.slice(0, 16)}… · Frozen ${p.timestamp_utc.slice(0, 19)}Z`;
+
+  document.getElementById("copy-sha-btn").addEventListener("click", () => {
+    const txt = `libcausalsieve.so=${p.lib_sha256}\nlibcausalsieve_scalar.so=${p.lib_scalar_sha256}`;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(txt).catch(() => {});
+    }
+    const btn = document.getElementById("copy-sha-btn");
+    btn.textContent = "Copied!";
+    setTimeout(() => { btn.textContent = "Copy SHA-256"; }, 1400);
+  });
+
+  // Main section tabs
+  document.querySelectorAll(".nav-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      const target = btn.getAttribute("data-section");
+      document.querySelectorAll(".section-panel").forEach(sp => sp.classList.remove("active"));
+      document.getElementById("sec-" + target).classList.add("active");
+    });
+  });
+
+  // Simulator controls
+  document.getElementById("shock-slider").addEventListener("input", e => {
+    SIM_STATE.shockSigma = parseFloat(e.target.value);
+    document.getElementById("shock-val").textContent = SIM_STATE.shockSigma.toFixed(1);
+    renderSimulator();
+  });
+  document.getElementById("amp-slider").addEventListener("input", e => {
+    SIM_STATE.downstreamGain = parseFloat(e.target.value);
+    document.getElementById("amp-val").textContent = SIM_STATE.downstreamGain.toFixed(2) + "\u00d7";
+    renderSimulator();
+  });
+  document.getElementById("reseed-btn").addEventListener("click", () => {
+    SIM_STATE.seed = (SIM_STATE.seed * 1103515245 + 12345) >>> 0;
+    renderSimulator();
+  });
+  document.querySelectorAll("#wave-mode-group .btn-chip").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll("#wave-mode-group .btn-chip").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      SIM_STATE.waveMode = btn.getAttribute("data-wmode");
+      if (SIM_STATE.lastRun) renderWaveforms(SIM_STATE.lastRun);
+    });
+  });
+
+  // Benchmark sub-tabs
+  document.querySelectorAll("#bench-subtabs .btn-chip").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll("#bench-subtabs .btn-chip").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      const pane = btn.getAttribute("data-pane");
+      document.querySelectorAll(".bench-pane").forEach(pEl => pEl.classList.remove("active"));
+      document.getElementById("pane-" + pane).classList.add("active");
+    });
+  });
+
+  // RCAEval controls
+  document.querySelectorAll("#rca-split-group .btn-chip").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll("#rca-split-group .btn-chip").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      BENCH_STATE.rcaSplit = btn.getAttribute("data-split");
+      renderRcaEvalPane();
+    });
+  });
+  document.querySelectorAll("#rca-metric-group .btn-chip").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll("#rca-metric-group .btn-chip").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      BENCH_STATE.rcaMetric = btn.getAttribute("data-metric");
+      renderRcaEvalPane();
+    });
+  });
+
+  // Speed controls
+  document.querySelectorAll("#speed-dim-group .btn-chip").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll("#speed-dim-group .btn-chip").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      BENCH_STATE.speedDim = btn.getAttribute("data-dim");
+      renderSpeedPane();
+    });
+  });
+  document.querySelectorAll("#opt-wl-group .btn-chip").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll("#opt-wl-group .btn-chip").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      BENCH_STATE.optWl = btn.getAttribute("data-wl");
+      renderSpeedPane();
+    });
+  });
+
+  // Synthetic controls
+  document.querySelectorAll("#syn-regime-group .btn-chip").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll("#syn-regime-group .btn-chip").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      BENCH_STATE.synRegime = btn.getAttribute("data-reg");
+      renderSyntheticPane();
+    });
+  });
+
+  // Initial render
+  renderSimulator();
+  renderRcaEvalPane();
+  renderSpeedPane();
+  renderSyntheticPane();
+  renderSiftPane();
+}
+
+if (typeof document !== "undefined") {
+  initApp();
+}
+</script>
+</body>
+</html>

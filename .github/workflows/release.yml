@@ -1,0 +1,138 @@
+name: Release Wheels & PyPI
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build_sdist:
+    name: Build Source Distribution (sdist)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Build sdist
+        run: |
+          python -m pip install --upgrade pip build
+          python -m build --sdist
+          ls -lh dist/
+
+      - name: Upload sdist artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-sdist
+          path: dist/*.tar.gz
+
+  build_wheels:
+    name: Build Wheel (${{ matrix.name }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: linux-x86_64
+            os: ubuntu-latest
+            archs: x86_64
+            portable: "1"
+          - name: linux-aarch64
+            os: ubuntu-24.04-arm
+            archs: aarch64
+            portable: "0"
+          - name: macos-arm64
+            os: macos-14
+            archs: arm64
+            portable: "0"
+          - name: macos-x86_64
+            os: macos-14
+            archs: x86_64
+            portable: "1"
+          - name: windows-x86_64
+            os: windows-latest
+            archs: AMD64
+            portable: "1"
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build platform wheel via cibuildwheel
+        uses: pypa/cibuildwheel@v2.22.0
+        env:
+          CIBW_BUILD: "cp312-*"
+          CIBW_ARCHS_LINUX: ${{ matrix.archs }}
+          CIBW_ARCHS_MACOS: ${{ matrix.archs }}
+          CIBW_ARCHS_WINDOWS: ${{ matrix.archs }}
+          CIBW_ENVIRONMENT: CAUSALSIEVE_PORTABLE=${{ matrix.portable }}
+          CIBW_TEST_COMMAND: >
+            python -c "import causalsieve as cs; s, d = cs.analyze_dataframe({'a': [float(i%5) + (9.0 if i>=35 else 0.0) for i in range(50)], 'b': [float(i%3) for i in range(50)]}, lag=2); assert d.ticks == 50 and d.dim == 2; s.close(); print(cs.__version__, cs.simd_isa(), cs.library_path())"
+            && causalsieve info --json
+
+      - name: Upload wheel artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-wheel-${{ matrix.name }}
+          path: wheelhouse/*.whl
+
+  publish_pypi:
+    name: Publish to PyPI (OIDC Trusted Publishing)
+    needs: [build_sdist, build_wheels]
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/causalsieve
+    permissions:
+      id-token: write
+    steps:
+      - name: Download all distribution artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: dist
+          pattern: dist-*
+          merge-multiple: true
+
+      - name: List distribution files
+        run: ls -lh dist/
+
+      - name: Publish distributions to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+
+  github_release:
+    name: Create GitHub Release with SHA256SUMS
+    needs: [build_sdist, build_wheels]
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download all distribution artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: dist
+          pattern: dist-*
+          merge-multiple: true
+
+      - name: Generate SHA256SUMS
+        run: |
+          cd dist
+          sha256sum *.whl *.tar.gz > SHA256SUMS
+          cat SHA256SUMS
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: |
+            dist/*.whl
+            dist/*.tar.gz
+            dist/SHA256SUMS

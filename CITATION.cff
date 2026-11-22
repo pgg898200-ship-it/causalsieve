@@ -1,0 +1,27 @@
+cff-version: 1.2.0
+message: "If you use CausalSieve in research, engineering, or benchmarks, please cite it as below."
+type: software
+title: "CausalSieve: Zero-Dependency SIMD Online Multivariate Causal Discovery, Exogenous Root-Cause Localization, and Lossless-Recoverable Stream Digests"
+version: "0.1.0"
+date-released: "2026-11-22"
+license: MIT
+repository-code: "https://github.com/pgg898200-ship-it/causalsieve"
+url: "https://pgg898200-ship-it.github.io/causalsieve/"
+authors:
+  - name: "CausalSieve Contributors"
+keywords:
+  - causal-discovery
+  - granger-causality
+  - root-cause-analysis
+  - streaming-time-series
+  - lingam
+  - e-process
+  - simd
+  - mcp
+abstract: >-
+  CausalSieve is a zero-runtime-dependency C++20 SIMD and Python streaming
+  engine for online multivariate causal discovery, precision-whitened exogenous
+  root-cause localization, exact Block-Schur conditional Granger causality,
+  online non-Gaussian contemporaneous orientation, anytime-valid Ville
+  E-process alarms, counterfactual do-interventions, and 95-99.95%
+  token-compressed stream digests with bit-exact FP64 slice recovery.

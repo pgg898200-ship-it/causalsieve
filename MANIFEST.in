@@ -1,0 +1,25 @@
+include LICENSE
+include NOTICE
+include README.md
+include BENCHMARKS.md
+include SKILL.md
+include llms.txt
+include llms-full.txt
+include CITATION.cff
+include SECURITY.md
+include CONTRIBUTING.md
+include server.json
+include pyproject.toml
+include setup.py
+include Makefile
+
+recursive-include csrc *.h *.hpp *.cpp
+recursive-include python/causalsieve *.py *.pyi py.typed
+recursive-include skills *.md
+recursive-include .claude-plugin *.json
+
+prune build
+prune dist
+prune benchmarks/data
+
+global-exclude *.pyc *.pyo __pycache__ *.so *.dylib *.dll .DS_Store

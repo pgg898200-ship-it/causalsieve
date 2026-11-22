@@ -1,0 +1,52 @@
+name: Deploy GitHub Pages (Explorer + Agent-Discoverable Markdown)
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build_and_deploy:
+    name: Publish Explorer & Pure-Markdown Agent Docs
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Assemble static site with Explorer and root-level pure Markdown
+        run: |
+          rm -rf _site
+          mkdir -p _site/skills/causalsieve
+          touch _site/.nojekyll
+          cp demo/causalsieve_explorer.html _site/index.html
+          cp llms.txt _site/llms.txt
+          cp llms-full.txt _site/llms-full.txt
+          cp SKILL.md _site/SKILL.md
+          cp README.md _site/README.md
+          cp BENCHMARKS.md _site/BENCHMARKS.md
+          cp skills/causalsieve/SKILL.md _site/skills/causalsieve/SKILL.md
+          ls -la _site/ _site/skills/causalsieve/
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

@@ -1,0 +1,250 @@
+{
+  "benchmark": "tier2_sift_scale_firehose",
+  "config": {
+    "dims": [
+      128,
+      512,
+      2048,
+      4096
+    ],
+    "T": 500,
+    "shock_start": 400,
+    "decoy_fraction": 0.2,
+    "decoy_noise_multiplier": 3.5,
+    "active_m": 24,
+    "n_seeds": 10,
+    "simd_isa": "avx2+fma"
+  },
+  "system": {
+    "timestamp_utc": "2026-11-22T16:37:47.279119+00:00",
+    "platform": "Linux-6.18.57-x86_64-with-glibc2.39",
+    "cpu_model": "Intel(R) Xeon(R) CPU @ 2.30GHz",
+    "cpu_count_logical": 2,
+    "simd_flags": [
+      "avx",
+      "avx2",
+      "fma",
+      "sse4_2"
+    ],
+    "compiler": "g++ (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+    "lib_sha256": "69e960d01e22f976a907e6de4f35ccadc048f07b8ac11f1dae481eaab5cdc6e6",
+    "lib_scalar_sha256": "a38bcb0d3ad6aa1c9f034e4bf5bd31ce20f5700df1ef37750d401b5c871984b9",
+    "versions": {
+      "python": "3.12.16",
+      "numpy": "2.5.5",
+      "scipy": "1.18.1",
+      "statsmodels": "0.15.0",
+      "sklearn": "1.9.1",
+      "pandas": "3.1.1",
+      "river": "0.27.0",
+      "pyarrow": "26.0.1",
+      "tigramite": "5.2.10.1"
+    }
+  },
+  "results": {
+    "128": {
+      "D": 128,
+      "causalsieve_throughput": {
+        "median_ms": 3.613,
+        "ticks_per_sec": 138398.8,
+        "channel_obs_per_sec": 17715049.3,
+        "m_obs_per_sec": 17.715
+      },
+      "methods": {
+        "causalsieve_screened": {
+          "n": 10,
+          "ac1": 1.0,
+          "ac3": 1.0,
+          "ac5": 1.0,
+          "avg5": 1.0,
+          "mrr": 1.0,
+          "mean_rank": 1.0,
+          "median_ms": 3.613
+        },
+        "naive_variance": {
+          "n": 10,
+          "ac1": 0.0,
+          "ac3": 0.0,
+          "ac5": 0.0,
+          "avg5": 0.0,
+          "mrr": 0.01673542963790624,
+          "mean_rank": 80.2,
+          "median_ms": 0.164
+        },
+        "raw_max_z": {
+          "n": 10,
+          "ac1": 0.0,
+          "ac3": 1.0,
+          "ac5": 1.0,
+          "avg5": 0.5999999999999999,
+          "mrr": 0.33333333333333337,
+          "mean_rank": 3.0,
+          "median_ms": 1.351
+        },
+        "rolling_mad_z": {
+          "n": 10,
+          "ac1": 0.0,
+          "ac3": 1.0,
+          "ac5": 1.0,
+          "avg5": 0.5999999999999999,
+          "mrr": 0.33333333333333337,
+          "mean_rank": 3.0,
+          "median_ms": 6.967
+        }
+      }
+    },
+    "512": {
+      "D": 512,
+      "causalsieve_throughput": {
+        "median_ms": 7.39,
+        "ticks_per_sec": 67655.7,
+        "channel_obs_per_sec": 34639696.4,
+        "m_obs_per_sec": 34.64
+      },
+      "methods": {
+        "causalsieve_screened": {
+          "n": 10,
+          "ac1": 1.0,
+          "ac3": 1.0,
+          "ac5": 1.0,
+          "avg5": 1.0,
+          "mrr": 1.0,
+          "mean_rank": 1.0,
+          "median_ms": 7.39
+        },
+        "naive_variance": {
+          "n": 10,
+          "ac1": 0.0,
+          "ac3": 0.0,
+          "ac5": 0.0,
+          "avg5": 0.0,
+          "mrr": 0.0036815958473076426,
+          "mean_rank": 299.9,
+          "median_ms": 0.347
+        },
+        "raw_max_z": {
+          "n": 10,
+          "ac1": 0.0,
+          "ac3": 1.0,
+          "ac5": 1.0,
+          "avg5": 0.5999999999999999,
+          "mrr": 0.33333333333333337,
+          "mean_rank": 3.0,
+          "median_ms": 5.137
+        },
+        "rolling_mad_z": {
+          "n": 10,
+          "ac1": 0.0,
+          "ac3": 1.0,
+          "ac5": 1.0,
+          "avg5": 0.5999999999999999,
+          "mrr": 0.33333333333333337,
+          "mean_rank": 3.0,
+          "median_ms": 28.577
+        }
+      }
+    },
+    "2048": {
+      "D": 2048,
+      "causalsieve_throughput": {
+        "median_ms": 14.999,
+        "ticks_per_sec": 33334.5,
+        "channel_obs_per_sec": 68269017.4,
+        "m_obs_per_sec": 68.269
+      },
+      "methods": {
+        "causalsieve_screened": {
+          "n": 10,
+          "ac1": 1.0,
+          "ac3": 1.0,
+          "ac5": 1.0,
+          "avg5": 1.0,
+          "mrr": 1.0,
+          "mean_rank": 1.0,
+          "median_ms": 14.999
+        },
+        "naive_variance": {
+          "n": 10,
+          "ac1": 0.0,
+          "ac3": 0.0,
+          "ac5": 0.0,
+          "avg5": 0.0,
+          "mrr": 0.0011864772374291965,
+          "mean_rank": 941.8,
+          "median_ms": 1.163
+        },
+        "raw_max_z": {
+          "n": 10,
+          "ac1": 0.0,
+          "ac3": 1.0,
+          "ac5": 1.0,
+          "avg5": 0.5999999999999999,
+          "mrr": 0.33333333333333337,
+          "mean_rank": 3.0,
+          "median_ms": 21.145
+        },
+        "rolling_mad_z": {
+          "n": 10,
+          "ac1": 0.0,
+          "ac3": 1.0,
+          "ac5": 1.0,
+          "avg5": 0.5999999999999999,
+          "mrr": 0.33333333333333337,
+          "mean_rank": 3.0,
+          "median_ms": 117.113
+        }
+      }
+    },
+    "4096": {
+      "D": 4096,
+      "causalsieve_throughput": {
+        "median_ms": 25.54,
+        "ticks_per_sec": 19577.1,
+        "channel_obs_per_sec": 80187807.0,
+        "m_obs_per_sec": 80.188
+      },
+      "methods": {
+        "causalsieve_screened": {
+          "n": 10,
+          "ac1": 1.0,
+          "ac3": 1.0,
+          "ac5": 1.0,
+          "avg5": 1.0,
+          "mrr": 1.0,
+          "mean_rank": 1.0,
+          "median_ms": 25.54
+        },
+        "naive_variance": {
+          "n": 10,
+          "ac1": 0.0,
+          "ac3": 0.0,
+          "ac5": 0.0,
+          "avg5": 0.0,
+          "mrr": 0.00041462497972391906,
+          "mean_rank": 2844.5,
+          "median_ms": 2.481
+        },
+        "raw_max_z": {
+          "n": 10,
+          "ac1": 0.0,
+          "ac3": 1.0,
+          "ac5": 1.0,
+          "avg5": 0.5999999999999999,
+          "mrr": 0.33333333333333337,
+          "mean_rank": 3.0,
+          "median_ms": 43.072
+        },
+        "rolling_mad_z": {
+          "n": 10,
+          "ac1": 0.0,
+          "ac3": 1.0,
+          "ac5": 1.0,
+          "avg5": 0.5999999999999999,
+          "mrr": 0.33333333333333337,
+          "mean_rank": 3.0,
+          "median_ms": 236.492
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,65 @@
+CausalSieve
+Copyright (c) 2026 CausalSieve Contributors
+
+This software is licensed under the MIT License (see LICENSE).
+
+===========================================================================
+Academic & Methodological Attributions
+===========================================================================
+
+CausalSieve is an independent clean-room C++20 and zero-dependency Python
+implementation building upon foundational published results in time-series
+causality, online estimation, robust statistics, sequential testing, and
+error-bounded stream compression:
+
+1. Vector Autoregression & Conditional Granger Causality
+   - C. W. J. Granger, "Investigating Causal Relations by Econometric Models
+     and Cross-spectral Methods," Econometrica, 37(3):424-438, 1969.
+   - C. A. Sims, "Macroeconomics and Reality," Econometrica, 48(1):1-48, 1980.
+   - Block-Schur complement exact leave-one-block-out ridge objective identity
+     over recursively maintained inverse Gram matrices (Sherman-Morrison /
+     Recursive Least Squares).
+
+2. Contemporaneous Non-Gaussian Causal Orientation (LiNGAM)
+   - S. Shimizu, P. O. Hoyer, A. Hyvarinen, and A. Kerminen, "A Linear
+     Non-Gaussian Acyclic Model for Causal Discovery," JMLR, 7:2003-2030, 2006.
+   - A. Hyvarinen and S. M. Smith, "Pairwise Likelihood Ratios for Estimation
+     of Non-Gaussian Structural Equation Models," JMLR, 14:111-152, 2013.
+
+3. Robust M-Estimation & Bounded-Influence Regression
+   - P. J. Huber, "Robust Estimation of a Location Parameter," Annals of
+     Mathematical Statistics, 35(1):73-101, 1964.
+   - C. L. Mallows, "On Some Topics in Robustness," Bell Laboratories Technical
+     Memorandum, 1975.
+
+4. Anytime-Valid Sequential Testing & E-Processes
+   - J. Ville, "Etude critique de la notion de collectif," Gauthier-Villars,
+     1939.
+   - A. Ramdas, P. Grunwald, V. Vovk, and G. Shafer, "Game-Theoretic Statistics
+     and Safe Anytime-Valid Inference," Statistical Science, 38(4):576-601, 2023.
+   - E. Hazan, A. Agarwal, and S. Kale, "Logarithmic Regret Algorithms for
+     Online Convex Optimization" (Online Newton Step), Machine Learning,
+     69(2-3):169-192, 2007.
+
+5. Randomized Inverse Drift Verification
+   - R. Freivalds, "Fast Probabilistic Algorithms," Mathematical Foundations
+     of Computer Science, LNCS 74:57-69, 1979.
+
+6. Error-Bounded Piecewise Linear Stream Compression
+   - H. Elmeleegy, A. K. Elmagarmid, E. Cecchet, W. G. Aref, and W. Zwaenepoel,
+     "Online Piece-Wise Linear Approximation of Numerical Streams with
+     Precision Guarantees" (Swing Filter), PVLDB, 2(1):145-156, 2009.
+
+===========================================================================
+Benchmark Dataset & Open-Source Comparator Attributions
+===========================================================================
+
+- RCAEval Kubernetes Microservice Failure Benchmark (evaluation dataset only,
+  not bundled in distributions):
+  L. Pham et al., "RCAEval: A Benchmark for Root Cause Analysis of Microservice
+  Systems," Proceedings of the ACM Web Conference (WWW), 2025.
+  Dataset source: https://huggingface.co/datasets/phamquiluan/RCAEval
+
+- Open-source benchmark comparators (invoked exclusively in optional benchmark
+  scripts under benchmarks/; NOT runtime dependencies and NOT bundled):
+  NumPy, SciPy, pandas, statsmodels, tigramite, scikit-learn, and river.

@@ -1,0 +1,36 @@
+# CausalSieve
+
+> Zero-runtime-dependency SIMD streaming engine for online multivariate causal discovery (exact Block-Schur conditional Granger, innovation precision whitening, online Hyvärinen-Smith LiNGAM orientation), anytime-valid Ville E-process alarms, multi-agent CausalBlackboard consensus, and 95-99.5% token-compressed lossless-recoverable stream digests.
+
+## Core Documentation
+
+- [README & Quickstart](README.md): Overview, headline benchmarks (`287k ticks/s` at `D=16`, `1,987x` vs `statsmodels` & `1,293x` vs `tigramite` at `D=32`, `#1` on 40 sealed `RCAEval` OB+SS outages with `67.5% AC@1` / `100% AC@5` / `0.804 MRR`, `#1` on 25 sealed 64-service Train Ticket outages `D≈217` with `48.0% AC@1` vs `12–20%` baselines and `99.98%` token reduction), and honest tradeoffs.
+- [Full Reproducible Benchmarks](BENCHMARKS.md): Complete tables, 5-stage compounding optimization ladder, binary SHA-256 provenance, synthetic & real `RCAEval` (OB/SS/Train Ticket) breakdowns, and Tier-2 `D=4,096` firehose results (`80.2M obs/s`, `100%` AC@1 vs `0%` baselines).
+- [Full Technical Reference](llms-full.txt): Single-file Markdown reference covering math specifications, Python API, CLI, JSON-RPC 2.0 MCP server schemas, C99 ABI, and honest limits.
+- [Agent Skill](skills/causalsieve/SKILL.md): Drop-in `agentskills.io` / Claude Code / Codex / Cursor skill showing the Digest -> Counterfactual Verify -> Lossless Slice Recovery workflow (also mirrored at `SKILL.md`).
+- [C99 ABI Header](csrc/causalsieve.h): Canonical C99 ABI (`CAUSALSIEVE_ABI_VERSION 1`) for Tier-1 `cs_engine_t` and Tier-2 `cs_screened_t` (x86-64 AVX2+FMA, Apple Silicon ARM64 NEON, portable scalar).
+
+## Python Package & Interfaces
+
+- [Native ctypes Bindings & High-Level API](python/causalsieve/_native.py): `CausalSieve`, `ScreenedSieve`, `analyze_csv`, zero-copy NumPy/`array('d')` buffer passing, zero runtime dependencies.
+- [Drop-In Ecosystem Adapters](python/causalsieve/adapters.py): Zero-hard-dep `analyze_dataframe` (Pandas/Polars/dict), `analyze_prometheus` (`/api/v1/query_range` JSON), and `rcaeval_rca` (`RCAEval` method contract).
+- [Causal Digest & Lossless Recovery](python/causalsieve/digest.py): `build_digest`, `CausalDigest`, `StreamStore`, `recover_slice`, `recover_handle`, `slice://<stream_id>/<channel>/<start>..<end>`.
+- [Multi-Agent Shared Blackboard](python/causalsieve/swarm.py): `CausalBlackboard`, immutable versioned `CausalSnapshot`, append-only objectively scored `HypothesisRecord`, and proper-scoring `ConsensusReport`.
+- [CLI Entry Point](python/causalsieve/cli.py): Sub-30 ms startup CLI (`rca`, `digest`, `slice`, `counterfactual`, `info`, `mcp`).
+- [MCP Stdio Server](python/causalsieve/mcp_server.py): Zero-dependency JSON-RPC 2.0 MCP server exposing `sieve_ingest_csv`, `sieve_push_ticks`, `sieve_causal_graph`, `sieve_counterfactual`, `sieve_recover_slice`, and `sieve_swarm_propose` (Official MCP Registry manifest in `server.json`).
+
+## Quickstart Commands
+
+- One-command install (auto-compiles native AVX2/NEON core): `pip install .` (or `pip install causalsieve` once published)
+- Check SIMD ISA & library path: `causalsieve info`
+- Run root-cause analysis on CSV: `causalsieve rca metrics.csv --lag 2 --top-k 5`
+- Emit token-budgeted digest: `causalsieve digest metrics.csv --tokens-budget 400`
+- Run counterfactual intervention: `causalsieve counterfactual metrics.csv --channel db_cpu --delta 3.0 --horizon 10`
+- Recover exact FP64 slice: `causalsieve slice metrics.csv --channel db_cpu --start 490 --end 530`
+- Launch MCP stdio server: `causalsieve-mcp --allowed-root /path/to/data`
+
+## Optional
+
+- [Interactive Zero-CDN Explorer](demo/causalsieve_explorer.html): Offline browser simulator & frozen benchmark dashboard.
+- [Operating Ledger & Verification Gates](COMPANY_STATE.md): Active hypotheses (H1–H6), verification gates, and bug-kill iterations.
+- [License](LICENSE): MIT License.

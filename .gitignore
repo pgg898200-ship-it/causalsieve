@@ -1,0 +1,30 @@
+# Native & Python build artifacts
+build/
+dist/
+wheelhouse/
+*.egg-info/
+*.egg
+python/causalsieve/libcausalsieve.*
+python/causalsieve/causalsieve.dll
+python/causalsieve/*.so
+python/causalsieve/*.dylib
+python/causalsieve/*.dll
+
+# Python caches & virtual environments
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.venv/
+venv/
+
+# Downloaded external benchmark datasets
+benchmarks/data/
+
+# OS & editor artifacts
+.DS_Store
+Thumbs.db
+*.swp
+*.swo

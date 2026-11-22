@@ -1,0 +1,29 @@
+{
+  "name": "causalsieve",
+  "owner": {
+    "name": "CausalSieve Contributors"
+  },
+  "metadata": {
+    "description": "Sub-millisecond SIMD online multivariate causal discovery, root-cause localization, and token-compressed telemetry digests for AI agents.",
+    "version": "0.1.0"
+  },
+  "plugins": [
+    {
+      "name": "causalsieve",
+      "source": "./",
+      "description": "Zero-dependency SIMD online causal discovery, exogenous root-cause localization, counterfactual do-interventions, and lossless-recoverable telemetry digests (CLI + MCP stdio server + Agent Skill).",
+      "version": "0.1.0",
+      "license": "MIT",
+      "homepage": "https://pgg898200-ship-it.github.io/causalsieve/",
+      "repository": "https://github.com/pgg898200-ship-it/causalsieve",
+      "keywords": [
+        "causal-discovery",
+        "root-cause-analysis",
+        "granger-causality",
+        "observability",
+        "prometheus",
+        "mcp"
+      ]
+    }
+  ]
+}

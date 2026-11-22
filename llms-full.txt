@@ -1,0 +1,293 @@
+# CausalSieve — Complete Technical Reference (`llms-full.txt`)
+
+> Zero-runtime-dependency Python + C++20/AVX2+FMA streaming engine for online multivariate causal discovery, exogenous root-cause localization, counterfactual `do()` verification, multi-agent blackboard consensus, and 95–99.5% token-compressed lossless-recoverable stream digests.
+
+---
+
+## 1. Architecture Overview
+
+CausalSieve separates fast numerical streaming math (native C99 ABI shared library `libcausalsieve.so` compiled with AVX2+FMA or portable scalar fallback) from a zero-dependency Python layer (stdlib + `ctypes`, optional zero-copy NumPy `float64` buffer passing).
+
+| Layer | File | Responsibility | Runtime Dependencies |
+|---|---|---|---|
+| Native C99 ABI | `csrc/causalsieve.h` | Tier-1 `cs_engine_t` (`D <= 128`) and Tier-2 `cs_screened_t` (`D = 128..16,384+`) | C/C++ stdlib only |
+| Python Native Binding | `python/causalsieve/_native.py` | Exact `ctypes` ABI, zero-copy `ndarray`/`array('d')` ingest, `CausalSieve`, `ScreenedSieve`, `analyze_csv` | Python >= 3.10 stdlib only |
+| Causal Digest | `python/causalsieve/digest.py` | Caveman-style Markdown/JSON digests, victim-vs-root verdicts, adaptive Swing-Filter PLA knots, `slice://` exact recovery | Python stdlib only |
+| Multi-Agent Blackboard | `python/causalsieve/swarm.py` | Thread-safe monotonic-watermark `CausalBlackboard`, immutable `CausalSnapshot`, append-only scored hypotheses, Brier/log consensus | Python stdlib only |
+| Fast CLI | `python/causalsieve/cli.py` | Lazy-import sub-20 ms CLI (`rca`, `digest`, `slice`, `counterfactual`, `info`, `mcp`) | Python stdlib only |
+| MCP Server | `python/causalsieve/mcp_server.py` | Spec-compliant newline-delimited JSON-RPC 2.0 stdio server with path sandboxing and 6 tools | Python stdlib only |
+
+---
+
+## 2. Mathematical Specification
+
+### 2.1 Online Ridge-VAR(p) with Optional Asymmetric Hinge Basis
+At tick $t$, observation $x_t \in \mathbb{R}^D$ is anchored to the initial baseline (shifted-anchor compensation for $10^{10}$ DC-offset stability) and optionally causally scaled (`normalize_scale=True`). The feature vector $\phi_t \in \mathbb{R}^K$ contains intercept + $p$ lagged vectors $x_{t-1}, \dots, x_{t-p}$ (and optional asymmetric hinge terms $\max(0, x_{t-\ell} - 1)$ when `nonlinear_hinge=True`).
+
+The engine maintains exponentially forgotten sufficient statistics with forgetting factor $\lambda \in (0, 1]$ and ridge $\alpha > 0$:
+- Regularized Gram matrix $G_t = \lambda G_{t-1} + w_t \phi_t \phi_t^\top$ (with $\alpha I$ ridge)
+- Shared inverse Gram $P_t = (G_t + \alpha I)^{-1}$ updated online via Sherman-Morrison
+- One-step-ahead innovation $\hat{u}_t = x_t - B_{t-1}^\top \phi_t$ (strictly causal: scored using state at $t-1$ before updating!)
+
+### 2.2 Exact Block-Schur Conditional Granger Causality
+For every ordered pair $(i, j) \in \{0, \dots, D-1\}^2$, let $S_i$ be the index block of channel $i$'s lags in $\phi_t$. Removing channel $i$ from the full model increases channel $j$'s residual sum of squares by the exact Block-Schur complement:
+
+$$\Delta J_{i \to j} = B_{S_i, j}^\top P_{S_i, S_i}^{-1} B_{S_i, j}$$
+
+This computes all $D^2$ conditional Granger $F$-statistics and partial $R^2$ values in $O(D p^3 + D^2 p^2)$ without refitting any reduced models, matching exact batch ridge-VAR reduced-model refits to $< 10^{-10}$.
+
+### 2.3 Precision-Whitened Exogenous Attribution
+Instead of scoring raw magnitude $z^{\text{raw}}_{j,t}$ (which misfires on high-variance downstream victims), CausalSieve maintains the online innovation precision matrix $\Theta_t = (\hat{\Sigma}_{u,t} + \gamma I)^{-1}$ and computes precision-whitened exogenous shock scores:
+
+$$z^{\text{exo}}_{j,t} = \frac{(\Theta_{t-1} \hat{u}_t)_j}{\sqrt{\Theta_{jj,t-1}}}$$
+
+Root-cause ranking (`cs_root_attribution`) combines exogenous shock intensity, earliest onset precedence, and causal graph outflow.
+
+### 2.4 Online Contemporaneous Orientation (Hyvärinen-Smith LiNGAM)
+For pairs with significant innovation partial correlation $\rho_{ij} = -\Theta_{ij} / \sqrt{\Theta_{ii}\Theta_{jj}}$, the engine estimates non-Gaussian contemporaneous direction $R_{i \to j}$ (`cs_contemporaneous_orientation`). Positive $R_{i \to j} > R_{j \to i}$ indicates instantaneous causal direction $i \to j$ under skewed or heavy-tailed shocks.
+
+### 2.5 Shock Shield, Drift Guard, and Anytime-Valid E-Process
+- **Huber/Mahalanobis shock shield**: computes $m_t^2 = \hat{u}_t^\top \Theta_{t-1} \hat{u}_t$ and down-weights severe faults via Huber weight $w_t \in [0, 1]$ so anomalies do not poison baseline VAR weights.
+- **Freivalds drift guard**: periodically verifies $\|G_{\text{reg}}(P v) - v\|_2 / \|v\|_2$ and triggers exact Cholesky refresh if Sherman-Morrison numerical drift accumulates.
+- **Anytime-valid Ville E-process**: maintains nonnegative supermartingale wealth $E_t$ raising an alarm when $E_t \ge 1/\alpha$ (default $\alpha = 0.01 \implies$ threshold $100$), valid under arbitrary optional stopping.
+
+### 2.6 Swing-Filter $L_\infty$ PLA & Lossless FP64 Ring Buffer
+- Each channel retains its last `raw_ring_capacity` raw FP64 observations (default `8192`).
+- `cs_compress_channel_pla` emits piecewise linear knots guaranteeing $|\hat{x}(t) - x(t)| \le \varepsilon$ for every tick in `[start_tick, end_tick)`.
+- `cs_get_raw_slice` returns bit-exact IEEE-754 FP64 values (`0.0` reconstruction error) for any retained range.
+
+---
+
+## 3. Installation & Library Discovery
+
+```sh
+make                  # compiles build/libcausalsieve.so
+pip install -e .      # installs causalsieve & causalsieve-mcp entry points (zero dependencies)
+```
+
+`causalsieve._native.load_library()` searches in order:
+1. Explicit path argument (`load_library(path)`).
+2. `CAUSALSIEVE_LIB` environment variable.
+3. Next to `_native.py` (`python/causalsieve/libcausalsieve.so` / `.dylib` / `.dll`).
+4. Repository `build/libcausalsieve.so`.
+5. `./build/libcausalsieve.so` in current working directory.
+6. System dynamic linker (`ctypes.util.find_library("causalsieve")`).
+
+---
+
+## 4. Python API Reference
+
+### 4.1 `CausalSieve` (Tier-1 Streaming Engine)
+
+```python
+from causalsieve import CausalSieve
+
+with CausalSieve(
+    dim=4,
+    lag=2,
+    channel_names=["db_cpu", "api_lat", "queue_depth", "err_rate"],
+    forgetting=0.995,
+    ridge=1e-2,
+    precision_ridge=1e-2,
+    shock_threshold=4.0,
+    e_alpha=0.01,
+    warmup_ticks=0,
+    refresh_interval=0,
+    nonlinear_hinge=False,
+    raw_ring_capacity=8192,
+    normalize_scale=True,
+) as sieve:
+    # Single tick (list, tuple, array('d'), or zero-copy float64 numpy ndarray)
+    res = sieve.push([0.1, 0.2, 0.0, 0.0])
+
+    # Atomic batch push (all-or-nothing NaN/Inf validation in C)
+    batch_results = sieve.push_batch(rows, return_results=True)
+
+    # Exact Block-Schur Conditional Granger (D x D, [src][dst])
+    granger = sieve.granger_matrix()
+    top_lagged = granger.top_edges(min_f=3.0, min_partial_r2=0.02, top_k=10)
+
+    # Innovation precision matrix Theta and partial correlations
+    prec = sieve.precision_matrix()
+
+    # Online Hyvarinen-Smith LiNGAM orientation R (D x D; R[i][j] > 0 => i -> j)
+    lingam_r = sieve.contemporaneous_orientation()
+
+    # Causal root-cause attribution
+    attr = sieve.root_attribution(lookback=0)
+    print(attr.top_name, attr.items[0].peak_exo_z, attr.items[0].onset_tick)
+
+    # Counterfactual do-intervention: do(db_cpu += 3.0) over 10 steps
+    traj = sieve.counterfactual_do("db_cpu", delta=3.0, horizon=10)
+
+    # Lossless exact FP64 slice recovery
+    raw = sieve.get_raw_slice("db_cpu", start_tick=480, end_tick=520)
+
+    # Certified L_inf Swing-Filter PLA knots
+    pla = sieve.compress_pla("db_cpu", start_tick=480, end_tick=520, max_abs_err=0.05)
+
+    # Internal VAR(p) weights B (K x D) and Freivalds inverse residual
+    state = sieve.inspect_state()
+    sieve.force_refresh()
+
+    # Caveman-compressed Causal Digest (auto-registers stream_id for slice:// recovery)
+    dig = sieve.digest(top_k=5, tokens_budget=400)
+    print(dig.to_markdown())
+```
+
+### 4.2 `ScreenedSieve` (Tier-2 High-Dimensional Engine, `D = 128..16,384+`)
+
+```python
+from causalsieve import ScreenedSieve
+
+with ScreenedSieve(dim=2048, active_m=32, lag=2, forgetting=0.995, ridge=1e-2) as ss:
+    batch = ss.push_batch(X_2048, top_k=10, return_all_z=False)
+    print(batch.top_names, batch.top_scores)
+    graph = ss.active_graph()
+    print(graph.active_count, graph.active_names)
+```
+
+### 4.3 `analyze_csv` (Pure-Stdlib CSV Streaming)
+
+```python
+from causalsieve import analyze_csv
+
+with analyze_csv("telemetry.csv", lag=2, nonlinear_hinge=False) as res:
+    dig = res.digest(top_k=5, tokens_budget=400)
+    print(dig.to_markdown())
+```
+
+`analyze_csv` uses only Python's standard `csv` module, automatically detects headers, timestamp/index columns, and non-numeric columns, causally forward-fills isolated missing cells after the first valid row, and switches to `ScreenedSieve` automatically when `dim >= screened_threshold` (default `128`).
+
+### 4.4 Causal Digest & Lossless Slice Recovery
+
+```python
+from causalsieve import build_digest, recover_slice, recover_handle
+
+dig = build_digest(sieve, top_k=5, max_err=0.05, tokens_budget=400)
+md = dig.to_markdown()
+js = dig.to_json()
+
+# Exact FP64 recovery via stream_id + channel + tick range
+sl = recover_slice(dig.stream_id, "db_cpu", 480, 520)
+
+# Or directly via handle printed in the digest
+sl2 = recover_handle(dig.recovery_handles[0])
+assert sl.values == sl2.values
+```
+
+### 4.5 `CausalBlackboard` (Multi-Agent Shared Blackboard)
+
+```python
+from causalsieve import CausalBlackboard
+
+bb = CausalBlackboard()
+bb.create_stream("prod-west", dim=4, lag=2, channel_names=["db", "cache", "api", "web"])
+bb.push_batch("prod-west", rows)
+
+# Immutable versioned snapshot at current monotonic watermark
+snap = bb.snapshot("prod-west")
+# Retrieve historical snapshot at a recorded watermark tick
+same_snap = bb.snapshot("prod-west", as_of_tick=snap.as_of_tick)
+
+# Concurrent agents submit append-only hypotheses (no overwrites, objectively scored)
+h1 = bb.verify_hypothesis("prod-west", "agent-a", "db", delta=3.0, horizon=10, confidence=0.85)
+h2 = bb.verify_hypothesis("prod-west", "agent-b", "web", delta=3.0, horizon=10, confidence=0.95)
+
+# Proper-scoring-calibrated consensus resists overconfident false victim proposals
+report = bb.consensus("prod-west")
+print(report.winner_name, report.winner_probability, report.agent_weights)
+```
+
+---
+
+## 5. CLI Reference
+
+```sh
+causalsieve info [--json]
+causalsieve rca <file.csv> [--lag 2] [--top-k 5] [--format md|json] [--hinge] [--max-err 0.05] [--forgetting 0.995] [--ridge 0.01] [--lookback 0] [--no-normalize] [--no-screened]
+causalsieve digest <file.csv> [--tokens-budget 400] [--lag 2] [--top-k 5] [--format md|json] [--hinge] [--max-err 0.05]
+causalsieve slice <file.csv> --channel <name> --start <t0> --end <t1> [--format json|csv|table]
+causalsieve counterfactual <file.csv> --channel <name> --delta <val> [--horizon 10] [--lag 2] [--hinge] [--format md|json]
+causalsieve mcp [--allowed-root <dir>] [--max-csv-bytes <bytes>]
+```
+
+Example Causal Digest output (`causalsieve rca incident.csv`):
+
+```markdown
+# CausalDigest `a3f9c012e4b8`
+ticks=2000 | ch=8 | lag=2 | isa=avx2+fma | alarm=ACTIVE | E=412.50 (thr=100) | drift=OK (err=1.24e-13, refreshes=0)
+
+## Root Causes (Exogenous vs Victim)
+| rank | channel | root_score | peak_exo_z | raw_z | onset_tick | verdict |
+|---:|---|---:|---:|---:|---:|---|
+| 1 | db_cpu | 8.412 | +7.92 | +6.10 | 1500 | EXOGENOUS_ROOT |
+| 2 | api_lat | 1.320 | +1.18 | +14.80 | 1501 | DOWNSTREAM_VICTIM |
+> Victim trap avoided: `api_lat` has highest |raw_z|=14.80 (rank #2, exo_z=+1.18), while exogenous root is `db_cpu` (exo_z=+7.92, onset=1500).
+
+## Causal Graph
+- db_cpu --[lagged F=184.20, pR2=0.412]--> api_lat
+- api_lat --[contemp pcorr=+0.71, LiNGAM=+0.38]--> err_rate
+
+## PLA Knots [1484..1996)
+- db_cpu: [(1484, 0.12), (1499, 0.14), (1500, 6.21), (1995, 5.98)] max_err<=0.05
+
+## Lossless Recovery
+- `slice://a3f9c012e4b8/db_cpu/1484..1996`
+tokens: raw_est=52000 | digest_est=245 | reduction=99.53%
+```
+
+---
+
+## 6. MCP Stdio Server Reference
+
+Launch via `causalsieve-mcp` or `causalsieve mcp`. Transport is newline-delimited JSON-RPC 2.0 over `stdin`/`stdout` (diagnostics only on `stderr`).
+
+### Handshake Example
+
+Request:
+```json
+{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"agent","version":"1.0"}}}
+```
+Response:
+```json
+{"jsonrpc":"2.0","id":1,"result":{"protocolVersion":"2024-11-05","capabilities":{"tools":{"listChanged":false}},"serverInfo":{"name":"causalsieve","version":"0.1.0"}}}
+```
+Notification (no response):
+```json
+{"jsonrpc":"2.0","method":"notifications/initialized"}
+```
+
+### Tool Input Schemas Summary
+
+1. **`sieve_ingest_csv`**: `{"path": str, "stream_id"?: str, "lag"?: int(1..16), "top_k"?: int(1..64), "tokens_budget"?: int(120..8000), "nonlinear_hinge"?: bool, "max_err"?: float(>=0), "forgetting"?: float(0..1], "format"?: "md"|"json"}`
+2. **`sieve_push_ticks`**: `{"stream_id": str, "rows": list[list[float]], "channel_names"?: list[str], "lag"?: int(1..16), "forgetting"?: float(0..1], "nonlinear_hinge"?: bool, "top_k"?: int(1..64)}`
+3. **`sieve_causal_graph`**: `{"stream_id": str, "min_granger_f"?: float, "min_partial_r2"?: float, "min_pcorr"?: float, "max_edges"?: int}`
+4. **`sieve_counterfactual`**: `{"stream_id": str, "channel": str|int, "delta": float, "horizon"?: int(1..500)}`
+5. **`sieve_recover_slice`**: `{"handle": "slice://<stream_id>/<channel>/<start>..<end>"}` OR `{"stream_id": str, "channel": str|int, "start_tick": int, "end_tick": int}`
+6. **`sieve_swarm_propose`**: `{"stream_id": str, "agent_id": str, "candidate_channel": str|int, "delta"?: float, "horizon"?: int(1..500), "confidence"?: float(0..1), "rationale"?: str}`
+
+### Security Controls
+- Path sandboxing: `--allowed-root <dir>` or `CAUSALSIEVE_ALLOWED_ROOTS` restricts `sieve_ingest_csv` using `Path.resolve(strict=True)` and `is_relative_to()`.
+- Rejects non-regular files (directories, FIFOs, device nodes) and null bytes.
+- Enforces size limits (`--max-csv-bytes` / `CAUSALSIEVE_MAX_CSV_BYTES`, default 100 MiB) and slice point caps (`100,000` points per call).
+
+---
+
+## 7. C99 ABI Summary (`csrc/causalsieve.h`, `CAUSALSIEVE_ABI_VERSION = 1`)
+
+- Structs: `cs_config_t`, `cs_tick_result_t`, opaque `cs_engine_t`, opaque `cs_screened_t`.
+- Tier-1 functions: `cs_config_default`, `cs_create`, `cs_destroy`, `cs_reset`, `cs_simd_isa`, `cs_last_error`, `cs_tick_count`, `cs_dim`, `cs_lag`, `cs_feature_dim`, `cs_push`, `cs_push_batch`, `cs_granger_matrix`, `cs_precision_matrix`, `cs_contemporaneous_orientation`, `cs_root_attribution`, `cs_counterfactual_do`, `cs_get_raw_slice`, `cs_compress_channel_pla`, `cs_inspect_state`, `cs_force_refresh`.
+- Tier-2 functions: `cs_screened_create`, `cs_screened_destroy`, `cs_screened_push_batch`, `cs_screened_active_graph`.
+- Atomicity guarantee: `cs_push` and `cs_push_batch` reject any NaN/Inf input with status `-1` and zero state mutation.
+
+---
+
+## 8. Honest Limits & Failure Modes
+
+1. **Sample size requirement**: reliable `VAR(p)` and precision matrix estimation needs warmup ticks exceeding `K = 1 + p * D` (or `1 + 2 * p * D` with `--hinge`). During early warmup, `top_root_channel` is `-1` and Granger F-stats are regularized toward zero.
+2. **Ring buffer retention**: exact slice recovery (`cs_get_raw_slice`) covers only the most recent `raw_ring_capacity` ticks retained in memory (default `8192`). Older ticks are evicted in FIFO order.
+3. **Contemporaneous Gaussian identifiability**: Hyvärinen-Smith LiNGAM orientation requires non-Gaussian innovations (skewness or excess kurtosis). Under purely Gaussian instantaneous shocks, partial correlation detects the undirected edge but orientation `R` approaches `0`.
+4. **Unobserved confounders**: latent common causes outside the observed `D` channels can induce apparent Granger or partial-correlation edges between observed children.
+5. **Non-monotone nonlinearities**: `VAR(p)` (with optional hinge `max(0, x-1)`) captures linear and saturation cascades, not arbitrary symmetric/periodic nonlinear interactions (e.g., `y_t = x_{t-1}^2` around zero mean).
+6. **High-dimensional Tier-2 screening**: `ScreenedSieve` promotes the top `active_m` channels by scale-free pre-whitened activity; a subtle fault whose univariate/pre-whitened signal never enters the top `active_m` will not enter the Tier-1 active subgraph.

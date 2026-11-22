@@ -1,0 +1,256 @@
+{
+  "benchmark": "head_to_head_speed",
+  "config": {
+    "dims": [
+      8,
+      16,
+      32,
+      64
+    ],
+    "lag": 2,
+    "T_window": 500,
+    "simd_isa": "avx2+fma"
+  },
+  "system": {
+    "timestamp_utc": "2026-11-22T16:35:03.023057+00:00",
+    "platform": "Linux-6.18.57-x86_64-with-glibc2.39",
+    "cpu_model": "Intel(R) Xeon(R) CPU @ 2.30GHz",
+    "cpu_count_logical": 2,
+    "simd_flags": [
+      "avx",
+      "avx2",
+      "fma",
+      "sse4_2"
+    ],
+    "compiler": "g++ (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+    "lib_sha256": "69e960d01e22f976a907e6de4f35ccadc048f07b8ac11f1dae481eaab5cdc6e6",
+    "lib_scalar_sha256": "a38bcb0d3ad6aa1c9f034e4bf5bd31ce20f5700df1ef37750d401b5c871984b9",
+    "versions": {
+      "python": "3.12.16",
+      "numpy": "2.5.5",
+      "scipy": "1.18.1",
+      "statsmodels": "0.15.0",
+      "sklearn": "1.9.1",
+      "pandas": "3.1.1",
+      "river": "0.27.0",
+      "pyarrow": "26.0.1",
+      "tigramite": "5.2.10.1"
+    }
+  },
+  "results": {
+    "8": {
+      "D": 8,
+      "causalsieve_batch_full_ms": 3.186,
+      "causalsieve_single_tick_full_ms": 8.6471,
+      "causalsieve_steady_state": {
+        "n_ticks": 1900,
+        "batch_median_ms": 3.2073,
+        "us_per_tick": 1.6881,
+        "ticks_per_sec": 592389.9,
+        "graph_query_ms": 0.0281
+      },
+      "numpy_batch_refits_ms": 2.534,
+      "statsmodels_var_granger": {
+        "median_ms": 118.628,
+        "var_fit_ms": 27.33,
+        "granger_ms": 91.299,
+        "pairs_measured": 56,
+        "total_pairs": 56,
+        "extrapolated": false
+      },
+      "tigramite_pcmci": {
+        "median_ms": 667.6700309999433,
+        "min_ms": 663.9818550002019,
+        "p95_ms": 722.873942100523,
+        "samples_ms": [
+          729.0077,
+          667.67,
+          663.9819
+        ],
+        "skipped": false
+      },
+      "sklearn": {
+        "median_ms": 198.099,
+        "ledoit_wolf_plus_isoforest_ms": 198.099,
+        "graphical_lasso_cv_ms": 127.496,
+        "note": "No Granger causality; precision + anomaly detection only"
+      },
+      "river_online": {
+        "median_ms": 60.88559649970193,
+        "min_ms": 60.463593999884324,
+        "p95_ms": 61.26539874953778,
+        "samples_ms": [
+          61.3076,
+          60.4636
+        ],
+        "note": "Online HST + per-channel SGD linear regression (no conditional Granger or precision)"
+      },
+      "speedups_over_incumbents": {
+        "vs_numpy_batch_refits": 0.8,
+        "vs_statsmodels_var_granger": 37.23,
+        "vs_tigramite_pcmci": 209.56,
+        "vs_sklearn_lw_iso": 62.18,
+        "vs_sklearn_glasso_cv": 40.02,
+        "vs_river_online": 19.11
+      }
+    },
+    "16": {
+      "D": 16,
+      "causalsieve_batch_full_ms": 6.3617,
+      "causalsieve_single_tick_full_ms": 11.3028,
+      "causalsieve_steady_state": {
+        "n_ticks": 1900,
+        "batch_median_ms": 6.6142,
+        "us_per_tick": 3.4812,
+        "ticks_per_sec": 287258.9,
+        "graph_query_ms": 0.0312
+      },
+      "numpy_batch_refits_ms": 5.916,
+      "statsmodels_var_granger": {
+        "median_ms": 626.115,
+        "var_fit_ms": 7.509,
+        "granger_ms": 618.605,
+        "pairs_measured": 240,
+        "total_pairs": 240,
+        "extrapolated": false
+      },
+      "tigramite_pcmci": {
+        "median_ms": 3292.5122930000725,
+        "min_ms": 3231.958196999585,
+        "p95_ms": 3355.9657075998075,
+        "samples_ms": [
+          3292.5123,
+          3363.0161,
+          3231.9582
+        ],
+        "skipped": false
+      },
+      "sklearn": {
+        "median_ms": 197.294,
+        "ledoit_wolf_plus_isoforest_ms": 197.294,
+        "graphical_lasso_cv_ms": 247.998,
+        "note": "No Granger causality; precision + anomaly detection only"
+      },
+      "river_online": {
+        "median_ms": 144.982662500297,
+        "min_ms": 142.04701100061357,
+        "p95_ms": 147.6247488500121,
+        "samples_ms": [
+          147.9183,
+          142.047
+        ],
+        "note": "Online HST + per-channel SGD linear regression (no conditional Granger or precision)"
+      },
+      "speedups_over_incumbents": {
+        "vs_numpy_batch_refits": 0.93,
+        "vs_statsmodels_var_granger": 98.42,
+        "vs_tigramite_pcmci": 517.55,
+        "vs_sklearn_lw_iso": 31.01,
+        "vs_sklearn_glasso_cv": 38.98,
+        "vs_river_online": 22.79
+      }
+    },
+    "32": {
+      "D": 32,
+      "causalsieve_batch_full_ms": 12.1164,
+      "causalsieve_single_tick_full_ms": 17.7475,
+      "causalsieve_steady_state": {
+        "n_ticks": 1900,
+        "batch_median_ms": 18.7211,
+        "us_per_tick": 9.8532,
+        "ticks_per_sec": 101489.5,
+        "graph_query_ms": 0.0433
+      },
+      "numpy_batch_refits_ms": 300.399,
+      "statsmodels_var_granger": {
+        "median_ms": 24069.698,
+        "var_fit_ms": 10.076,
+        "granger_ms": 24059.622,
+        "pairs_measured": 413,
+        "total_pairs": 992,
+        "extrapolated": true
+      },
+      "tigramite_pcmci": {
+        "median_ms": 15670.001204999608,
+        "min_ms": 15670.001204999608,
+        "p95_ms": 15670.001204999608,
+        "samples_ms": [
+          15670.0012
+        ],
+        "skipped": false
+      },
+      "sklearn": {
+        "median_ms": 198.245,
+        "ledoit_wolf_plus_isoforest_ms": 198.245,
+        "graphical_lasso_cv_ms": 417.664,
+        "note": "No Granger causality; precision + anomaly detection only"
+      },
+      "river_online": {
+        "median_ms": 420.54176199962967,
+        "min_ms": 420.54176199962967,
+        "p95_ms": 420.54176199962967,
+        "samples_ms": [
+          420.5418
+        ],
+        "note": "Online HST + per-channel SGD linear regression (no conditional Granger or precision)"
+      },
+      "speedups_over_incumbents": {
+        "vs_numpy_batch_refits": 24.79,
+        "vs_statsmodels_var_granger": 1986.54,
+        "vs_tigramite_pcmci": 1293.29,
+        "vs_sklearn_lw_iso": 16.36,
+        "vs_sklearn_glasso_cv": 34.47,
+        "vs_river_online": 34.71
+      }
+    },
+    "64": {
+      "D": 64,
+      "causalsieve_batch_full_ms": 38.4463,
+      "causalsieve_single_tick_full_ms": 44.6639,
+      "causalsieve_steady_state": {
+        "n_ticks": 1900,
+        "batch_median_ms": 71.2285,
+        "us_per_tick": 37.4887,
+        "ticks_per_sec": 26674.7,
+        "graph_query_ms": 0.0877
+      },
+      "numpy_batch_refits_ms": 613.286,
+      "statsmodels_var_granger": {
+        "median_ms": 1879069.697,
+        "var_fit_ms": 23.035,
+        "granger_ms": 1879046.662,
+        "pairs_measured": 200,
+        "total_pairs": 4032,
+        "extrapolated": true
+      },
+      "tigramite_pcmci": {
+        "median_ms": null,
+        "skipped": true,
+        "reason": "Skipped at D=64 (O(D^3) conditional independence search exceeds 60s budget)"
+      },
+      "sklearn": {
+        "median_ms": 227.384,
+        "ledoit_wolf_plus_isoforest_ms": 227.384,
+        "graphical_lasso_cv_ms": null,
+        "note": "No Granger causality; precision + anomaly detection only"
+      },
+      "river_online": {
+        "median_ms": 1528.2960129998173,
+        "min_ms": 1528.2960129998173,
+        "p95_ms": 1528.2960129998173,
+        "samples_ms": [
+          1528.296
+        ],
+        "note": "Online HST + per-channel SGD linear regression (no conditional Granger or precision)"
+      },
+      "speedups_over_incumbents": {
+        "vs_numpy_batch_refits": 15.95,
+        "vs_statsmodels_var_granger": 48875.17,
+        "vs_tigramite_pcmci": null,
+        "vs_sklearn_lw_iso": 5.91,
+        "vs_sklearn_glasso_cv": null,
+        "vs_river_online": 39.75
+      }
+    }
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-10-17/server.schema.json",
+  "name": "io.github.pgg898200-ship-it/causalsieve-mcp",
+  "title": "CausalSieve MCP Server",
+  "description": "Zero-dependency SIMD online multivariate causal discovery, root-cause analysis, counterfactual do-interventions, and lossless telemetry slice recovery.",
+  "version": "0.1.0",
+  "repository": {
+    "url": "https://github.com/pgg898200-ship-it/causalsieve",
+    "source": "github"
+  },
+  "websiteUrl": "https://pgg898200-ship-it.github.io/causalsieve/",
+  "packages": [
+    {
+      "registryType": "pypi",
+      "registryBaseUrl": "https://pypi.org",
+      "identifier": "causalsieve",
+      "version": "0.1.0",
+      "runtimeHint": "uvx",
+      "transport": {
+        "type": "stdio"
+      },
+      "runtimeArguments": [
+        {
+          "type": "named",
+          "name": "--from",
+          "value": "causalsieve==0.1.0",
+          "isRequired": false
+        }
+      ],
+      "packageArguments": [
+        {
+          "type": "named",
+          "name": "--allowed-root",
+          "description": "Optional directory root confining sieve_ingest_csv reads (blocks path traversal and symlink escapes).",
+          "isRequired": false
+        },
+        {
+          "type": "named",
+          "name": "--max-csv-bytes",
+          "description": "Maximum allowed CSV file size in bytes (default: 104857600).",
+          "isRequired": false
+        }
+      ]
+    }
+  ]
+}

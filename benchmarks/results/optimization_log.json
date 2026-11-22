@@ -1,0 +1,185 @@
+{
+  "benchmark": "compounding_optimization_log",
+  "system": {
+    "timestamp_utc": "2026-11-22T16:37:33.536764+00:00",
+    "platform": "Linux-6.18.57-x86_64-with-glibc2.39",
+    "cpu_model": "Intel(R) Xeon(R) CPU @ 2.30GHz",
+    "cpu_count_logical": 2,
+    "simd_flags": [
+      "avx",
+      "avx2",
+      "fma",
+      "sse4_2"
+    ],
+    "compiler": "g++ (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+    "lib_sha256": "69e960d01e22f976a907e6de4f35ccadc048f07b8ac11f1dae481eaab5cdc6e6",
+    "lib_scalar_sha256": "a38bcb0d3ad6aa1c9f034e4bf5bd31ce20f5700df1ef37750d401b5c871984b9",
+    "versions": {
+      "python": "3.12.16",
+      "numpy": "2.5.5",
+      "scipy": "1.18.1",
+      "statsmodels": "0.15.0",
+      "sklearn": "1.9.1",
+      "pandas": "3.1.1",
+      "river": "0.27.0",
+      "pyarrow": "26.0.1",
+      "tigramite": "5.2.10.1"
+    }
+  },
+  "workloads": {
+    "D16_p2_T1000": {
+      "D": 16,
+      "T": 1000,
+      "lag": 2,
+      "scalar_vs_avx_max_f_diff": 5.5067062021407764e-14,
+      "stages": [
+        {
+          "stage": 1,
+          "name": "statsmodels VAR + conditional Granger",
+          "median_ms": 671.7563,
+          "ticks_per_sec": 1488.6,
+          "details": {
+            "median_ms": 671.7563,
+            "var_fit_ms": 18.1856,
+            "granger_ms": 653.5707,
+            "extrapolated": false
+          },
+          "cumulative_speedup_vs_stage1": 1.0,
+          "step_speedup_vs_prev": 1.0
+        },
+        {
+          "stage": 2,
+          "name": "Batch NumPy/SciPy ridge-VAR + reduced refits",
+          "median_ms": 8.4508,
+          "ticks_per_sec": 118332.0,
+          "details": {
+            "median_ms": 8.4508,
+            "min_ms": 8.1499,
+            "p95_ms": 9.4062
+          },
+          "cumulative_speedup_vs_stage1": 79.49,
+          "step_speedup_vs_prev": 79.49
+        },
+        {
+          "stage": 3,
+          "name": "CausalSieve C++ scalar (scalar, push_batch)",
+          "median_ms": 10.6149,
+          "ticks_per_sec": 94207.2,
+          "details": {
+            "median_ms": 10.6149,
+            "min_ms": 10.392,
+            "p95_ms": 10.9878,
+            "simd_isa": "scalar"
+          },
+          "cumulative_speedup_vs_stage1": 63.28,
+          "step_speedup_vs_prev": 0.8
+        },
+        {
+          "stage": 4,
+          "name": "CausalSieve C++ avx2+fma single-tick Python loop",
+          "median_ms": 19.541,
+          "ticks_per_sec": 51174.5,
+          "details": {
+            "median_ms": 19.541,
+            "min_ms": 19.2448,
+            "p95_ms": 78.7724,
+            "simd_isa": "avx2+fma"
+          },
+          "cumulative_speedup_vs_stage1": 34.38,
+          "step_speedup_vs_prev": 0.54
+        },
+        {
+          "stage": 5,
+          "name": "CausalSieve C++ avx2+fma fused C-loop (push_batch)",
+          "median_ms": 8.5479,
+          "ticks_per_sec": 116987.8,
+          "details": {
+            "median_ms": 8.5479,
+            "min_ms": 8.3305,
+            "p95_ms": 8.9739,
+            "simd_isa": "avx2+fma"
+          },
+          "cumulative_speedup_vs_stage1": 78.59,
+          "step_speedup_vs_prev": 2.29
+        }
+      ]
+    },
+    "D32_p2_T1000": {
+      "D": 32,
+      "T": 1000,
+      "lag": 2,
+      "scalar_vs_avx_max_f_diff": 1.8740564655672642e-13,
+      "stages": [
+        {
+          "stage": 1,
+          "name": "statsmodels VAR + conditional Granger",
+          "median_ms": 23497.8837,
+          "ticks_per_sec": 42.6,
+          "details": {
+            "median_ms": 23497.8837,
+            "var_fit_ms": 12.059,
+            "granger_ms": 23485.8247,
+            "extrapolated": true
+          },
+          "cumulative_speedup_vs_stage1": 1.0,
+          "step_speedup_vs_prev": 1.0
+        },
+        {
+          "stage": 2,
+          "name": "Batch NumPy/SciPy ridge-VAR + reduced refits",
+          "median_ms": 360.2632,
+          "ticks_per_sec": 2775.7,
+          "details": {
+            "median_ms": 360.2632,
+            "min_ms": 352.9411,
+            "p95_ms": 366.8531
+          },
+          "cumulative_speedup_vs_stage1": 65.22,
+          "step_speedup_vs_prev": 65.22
+        },
+        {
+          "stage": 3,
+          "name": "CausalSieve C++ scalar (scalar, push_batch)",
+          "median_ms": 29.6704,
+          "ticks_per_sec": 33703.6,
+          "details": {
+            "median_ms": 29.6704,
+            "min_ms": 25.1042,
+            "p95_ms": 45.2239,
+            "simd_isa": "scalar"
+          },
+          "cumulative_speedup_vs_stage1": 791.96,
+          "step_speedup_vs_prev": 12.14
+        },
+        {
+          "stage": 4,
+          "name": "CausalSieve C++ avx2+fma single-tick Python loop",
+          "median_ms": 28.4501,
+          "ticks_per_sec": 35149.3,
+          "details": {
+            "median_ms": 28.4501,
+            "min_ms": 28.2511,
+            "p95_ms": 29.1286,
+            "simd_isa": "avx2+fma"
+          },
+          "cumulative_speedup_vs_stage1": 825.93,
+          "step_speedup_vs_prev": 1.04
+        },
+        {
+          "stage": 5,
+          "name": "CausalSieve C++ avx2+fma fused C-loop (push_batch)",
+          "median_ms": 17.535,
+          "ticks_per_sec": 57028.8,
+          "details": {
+            "median_ms": 17.535,
+            "min_ms": 17.2075,
+            "p95_ms": 19.3044,
+            "simd_isa": "avx2+fma"
+          },
+          "cumulative_speedup_vs_stage1": 1340.06,
+          "step_speedup_vs_prev": 1.62
+        }
+      ]
+    }
+  }
+}
