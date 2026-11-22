@@ -9,14 +9,25 @@ high-level Python wrapper.
 from __future__ import annotations
 
 import ctypes
+import sys
 from pathlib import Path
 from typing import Optional
 
 import numpy as np
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
-DEFAULT_LIB_PATH = REPO_ROOT / "build" / "libcausalsieve.so"
-SCALAR_LIB_PATH = REPO_ROOT / "build" / "libcausalsieve_scalar.so"
+if sys.platform == "darwin":
+    _LIB_NAME = "libcausalsieve.dylib"
+    _SCALAR_LIB_NAME = "libcausalsieve_scalar.dylib"
+elif sys.platform == "win32":
+    _LIB_NAME = "causalsieve.dll"
+    _SCALAR_LIB_NAME = "causalsieve_scalar.dll"
+else:
+    _LIB_NAME = "libcausalsieve.so"
+    _SCALAR_LIB_NAME = "libcausalsieve_scalar.so"
+
+DEFAULT_LIB_PATH = REPO_ROOT / "build" / _LIB_NAME
+SCALAR_LIB_PATH = REPO_ROOT / "build" / _SCALAR_LIB_NAME
 
 
 class CSConfig(ctypes.Structure):

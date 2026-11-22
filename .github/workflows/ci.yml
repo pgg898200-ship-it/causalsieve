@@ -73,23 +73,25 @@ jobs:
             cd /tmp
             /tmp/cs_wheel_smoke/bin/causalsieve info --json
             /tmp/cs_wheel_smoke/bin/python -c "
-          import importlib.util, json, subprocess, sys
+          import importlib.util, json, math, subprocess, sys
           assert importlib.util.find_spec('numpy') is None
           import causalsieve as cs
           assert 'site-packages' in (cs.library_path() or '')
-          df = {'time': list(range(60)), 'db_cpu': [0.1 * (t % 4) + (8.0 if t >= 40 else 0.0) for t in range(60)], 'api_lat': [0.05 * (t % 3) + (4.0 if t >= 42 else 0.0) for t in range(60)]}
+          db = [math.sin(0.37 * t) + 0.4 * math.cos(0.91 * t) + (8.0 if t >= 40 else 0.0) for t in range(60)]
+          api = [0.2 * math.sin(0.53 * t) + (1.6 * db[t - 1] if t > 0 else 0.0) for t in range(60)]
+          df = {'time': list(range(60)), 'db_cpu': db, 'api_lat': api}
           sieve, dig = cs.analyze_dataframe(df, lag=2)
           assert dig.dim == 2 and dig.ticks == 60
           sieve.close()
           prom = {'status': 'success', 'data': {'resultType': 'matrix', 'result': [
-              {'metric': {'__name__': 'cpu', 'svc': 'db'}, 'values': [[1700000000 + t, str(0.1 * (t % 4) + (8.0 if t >= 40 else 0.0))] for t in range(60)]},
-              {'metric': {'__name__': 'lat', 'svc': 'api'}, 'values': [[1700000000 + t, str(0.05 * (t % 3) + (4.0 if t >= 42 else 0.0))] for t in range(60)]},
+              {'metric': {'__name__': 'cpu', 'svc': 'db'}, 'values': [[1700000000 + t, str(db[t])] for t in range(60)]},
+              {'metric': {'__name__': 'lat', 'svc': 'api'}, 'values': [[1700000000 + t, str(api[t])] for t in range(60)]},
           ]}}
           ps, pdig = cs.analyze_prometheus(prom, lag=2)
           assert pdig.dim == 2 and pdig.ticks == 60
           ps.close()
           res = cs.rcaeval_rca(df, inject_time=40)
-          assert res['ranks'] and res['ranks'][0] == 'db'
+          assert res['ranks'] and res['ranks'][0] == 'db', res
           proc = subprocess.run(
               ['/tmp/cs_wheel_smoke/bin/causalsieve-mcp'],
               input=json.dumps({'jsonrpc': '2.0', 'id': 1, 'method': 'initialize', 'params': {}}) + '\n',
@@ -104,7 +106,7 @@ jobs:
 
   macos-arm64-neon:
     name: macOS ARM64 (Apple Silicon NEON Build, Wheel & Tests)
-    runs-on: macos-14
+    runs-on: macos-15
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
