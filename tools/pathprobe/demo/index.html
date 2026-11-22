@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>PathProbe · Critical path explorer</title>
+<style>
+:root {--paper:#f5f4ed;--card:#fffef8;--ink:#1e2822;--muted:#56635a;--hair:#cdd0c4;--accent:#215b41;--light:#e1ebd3;--signal:#f6df80;--font:"Inter",system-ui,-apple-system,sans-serif;--mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Consolas,monospace}
+* {box-sizing:border-box}
+body {margin:0;background:var(--paper);color:var(--ink);font-family:var(--font);line-height:1.45}
+main {max-width:1050px;margin:auto;padding:0 clamp(14px,4.5vw,52px) 42px}
+header {height:65px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--hair)}
+.source {margin-left:auto;border:1px solid #829780;padding:6px 11px;border-radius:6px;color:var(--accent);font-size:13px;font-weight:660;text-decoration:none;background:var(--card)}
+.source:hover,.source:focus-visible {background:var(--light)}
+.brand {font-weight:780;letter-spacing:-.075em;font-size:24px}
+.mark {width:23px;height:16px;border:2px solid var(--accent);border-radius:9px;position:relative;transform:skew(-22deg)}
+.mark:after {content:"";position:absolute;inset:4px -4px 4px 7px;background:var(--paper);border-block:2px solid var(--accent)}
+h1 {font-size:clamp(35px,5.2vw,60px);letter-spacing:-.065em;line-height:1.02;font-weight:660;max-width:740px;margin:31px 0 12px}
+.intro {margin:0 0 25px;color:var(--muted);font-size:clamp(15px,1.8vw,18px)}
+.board {background:var(--card);border:1px solid var(--hair);border-radius:15px;overflow:hidden}
+.top {display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;padding:14px 20px;border-bottom:1px solid var(--hair)}
+h2 {margin:0;font-size:16px;font-weight:680;letter-spacing:-.025em}
+select {font:inherit;background:var(--card);border:1px solid var(--hair);border-radius:6px;padding:5px 6px;color:var(--ink)}
+button,input,select {accent-color:var(--accent)}
+button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible {outline:3px solid #9a630a;outline-offset:2px}
+.preset {font-size:13px;color:var(--muted);display:flex;align-items:center;gap:8px}
+.graph {isolation:isolate;position:relative;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:repeat(2,1fr);gap:14px clamp(12px,4.6vw,55px);padding:20px clamp(9px,3vw,42px);background-color:#f7f7ee;background-image:radial-gradient(#d9dccd 1px,transparent 1px);background-size:14px 14px}
+.graph canvas {position:absolute;inset:0;width:100%;height:100%;z-index:-1}
+.node {padding:8px 4px;color:var(--ink);background:var(--card);border:1px solid #a9b4a7;border-radius:8px;text-align:center;cursor:pointer;font:inherit;min-width:0;min-height:55px}
+.node[aria-pressed=true] {outline:2px solid #926620;outline-offset:2px}
+.node.hot {background:var(--light);border-color:#658060}
+.node span {display:block;font-size:clamp(11px,2.5vw,14px);font-weight:680}
+.node small {display:block;font-family:var(--mono);font-size:11px}
+.node[data-id=Dispatch],.node[data-id=Merge] {grid-row:1/3;align-self:center}
+.node[data-id=Dispatch] {grid-column:1}
+.node[data-id=Search],.node[data-id=Fetch] {grid-column:2}
+.node[data-id=Rank],.node[data-id=Check] {grid-column:3}
+.node[data-id=Merge] {grid-column:4}
+.node[data-id=Search],.node[data-id=Rank] {grid-row:1}
+.node[data-id=Fetch],.node[data-id=Check] {grid-row:2}
+.legend {display:flex;flex-wrap:wrap;gap:14px;padding:0 clamp(9px,3vw,42px) 12px;background:#f7f7ee;color:var(--muted);font-size:12px}
+.legend span:before {content:"";display:inline-block;margin-right:5px;vertical-align:-1px;width:10px;height:10px;border-radius:2px}
+.critical:before {background:var(--light);border:1px solid #658060}
+.selected:before {outline:2px solid #926620;outline-offset:-1px}
+.panel {display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--hair)}
+.control,.result {padding:20px clamp(14px,3.1vw,30px)}
+.result {background:#203a2e;color:#f6f7eb}
+.control h2,.result h2 {font-size:15px}
+.inputs {margin-top:16px;display:flex;gap:10px;align-items:center}
+input[type=range] {flex:1;min-width:0;cursor:pointer}
+input[type=number] {font:600 16px var(--mono);width:68px;padding:7px;border:1px solid var(--hair);border-radius:6px;background:#fffef8;color:var(--ink)}
+.inputs label {font-size:13px;color:var(--muted)}
+.metrics {display:grid;grid-template-columns:auto auto;gap:7px 10px;align-items:baseline;margin:17px 0 0;font-size:13px}
+.metrics dt {color:var(--muted)}
+.metrics dd {margin:0;justify-self:end;text-align:right;font-family:var(--mono);font-weight:600}
+.numbers {display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin:7px 0}
+.old,.arrow {color:#d0dacf;font-size:clamp(18px,3vw,25px)}
+.new {font:600 clamp(29px,4.8vw,43px)/1.15 var(--mono);letter-spacing:-.08em}
+.delta {display:inline-block;background:var(--signal);color:#2b2a1c;padding:3px 7px;border-radius:4px;font-size:12px;font-weight:700}
+.why {margin:9px 0 0;font-size:14px;color:#eef1e7;max-width:44ch}
+.local {margin-top:25px;border-top:1px solid var(--hair);padding:21px 0 0}
+.local h2 {font-size:24px;letter-spacing:-.055em}
+.local p {font-size:14px;margin:7px 0;color:var(--muted)}
+.local input {display:block;max-width:100%;margin:13px 0;font:13px var(--font);color:var(--ink)}
+.local input::file-selector-button {background:var(--light);color:var(--accent);font:650 13px var(--font);border:1px solid #829780;border-radius:5px;margin-right:9px;padding:7px 11px;cursor:pointer}
+.local table {border-collapse:collapse;width:100%;max-width:650px;font-size:13px;margin:10px 0}
+.local th,.local td {text-align:right;padding:6px 8px;border-bottom:1px solid var(--hair)}
+.local th {font-weight:620}
+.local th:first-child,.local td:first-child {text-align:left;word-break:break-word}
+.local td:not(:first-child) {font-family:var(--mono)}
+.local code {font-family:var(--mono);font-size:.94em}
+.note,details {color:var(--muted);font-size:13px;margin:15px 2px}
+summary {cursor:pointer;color:var(--accent);font-weight:650;width:fit-content}
+pre {overflow-x:auto;background:var(--card);padding:15px;border:1px solid var(--hair);border-radius:8px;font:12px/1.6 var(--mono);color:var(--ink)}
+@media(max-width:620px) {.panel {grid-template-columns:1fr}.top {padding:12px}.control,.result {padding:15px}.inputs {margin-top:8px}.metrics {margin-top:9px}.graph {column-gap:10px}.legend {font-size:11px}.preset {font-size:12px}header {height:50px}h1 {margin-top:21px}}
+</style>
+</head>
+<body>
+<main>
+<header><i class="mark" aria-hidden="true"></i><span class="brand">PathProbe</span><a class="source" href="https://github.com/pgg898200-ship-it/causalsieve/tree/pathprobe-dag/tools/pathprobe" target="_blank" rel="noopener noreferrer">Source &amp; install ↗</a></header>
+<h1>Which task would actually shorten this run?</h1>
+<p class="intro">Select a task and change its duration. See when the other branch sets the pace.</p>
+<section class="board" aria-label="Critical path explorer">
+<div class="top"><h2>Parallel retrieval run</h2><label class="preset">Example <select id="preset"><option value="shift">Bottleneck shift</option><option value="tie">Tied branches</option><option value="shared">Shared span</option></select></label></div>
+<div class="graph" id="graph" role="group" aria-label="Dispatch forks into Search then Rank, and Fetch then Check. Both branches join at Merge.">
+<canvas id="wires" aria-hidden="true"></canvas>
+</div>
+<div class="legend"><span class="critical">Revised critical path</span><span class="selected">Selected task</span></div>
+<div class="panel">
+<div class="control">
+<h2>Change <span id="selected-name"></span> duration</h2>
+<div class="inputs"><input id="slider" type="range" min="0" max="160" step="1" aria-label="Revised task duration in milliseconds"><input id="duration" type="number" min="0" max="160" step="1" aria-label="Exact revised task duration in milliseconds"><label for="duration">ms</label></div>
+<dl class="metrics"><dt>Original task duration</dt><dd id="original"></dd><dt>Longest path avoiding this task</dt><dd id="bypass"></dd><dt>Maximum possible run saving</dt><dd id="cap"></dd></dl>
+</div>
+<div class="result" role="status" aria-live="polite" aria-atomic="true">
+<h2>Run completion time</h2>
+<div class="numbers"><span class="old" id="base" aria-label="Original"></span><span class="arrow" aria-hidden="true">→</span><span class="new" id="new" aria-label="Revised"></span></div>
+<span class="delta" id="delta"></span>
+<p class="why" id="reason"></p>
+</div></div>
+</section>
+<p class="note">Each task starts when its dependencies finish. The model holds all other durations fixed and assumes enough workers to run both branches concurrently.</p>
+<details><summary>Reproduce this edit in Python</summary><pre id="snippet"></pre></details>
+<section class="local" aria-labelledby="local-title">
+<h2 id="local-title">Rank tasks in your own run</h2>
+<p>Open a workflow JSON file to find its completion time and the ten tasks with the largest potential savings. Processing stays in this browser.</p>
+<input id="workflow" aria-label="Open a local workflow JSON file" type="file" accept=".json,application/json">
+<details><summary>File format and limits</summary>
+<pre>{"durations":{"plan":10,"search":80,"fetch":40,"merge":10},
+ "edges":[["plan","search"],["plan","fetch"],["search","merge"],["fetch","merge"]]}</pre>
+<p>Each edge is a prerequisite followed by its dependent task. Use nonnegative integer durations in one unit throughout. The file limit is 512 KiB, with up to 512 tasks and 4,096 edges. Each path must fit JavaScript’s safe integer range. The Python package accepts larger runs.</p></details>
+<p id="analysis-message" role="status" aria-live="polite"></p>
+<div id="analysis-output" hidden>
+<table><thead><tr><th scope="col">Task</th><th scope="col">Duration</th><th scope="col">Run if zero</th><th scope="col">Saving</th></tr></thead><tbody id="analysis-rows"></tbody></table>
+<p>Each row sets one task’s duration to zero and holds the others fixed. Savings are measured in the file’s time unit and cannot generally be added together.</p>
+</div>
+</section>
+<noscript>Enable JavaScript for the interactive comparison.</noscript>
+</main>
+<script>
+"use strict";
+const routes = [["Dispatch","Search","Rank","Merge"],["Dispatch","Fetch","Check","Merge"]];
+const scenarios = {
+  shift:{weights:{Dispatch:10,Search:80,Rank:20,Fetch:40,Check:20,Merge:10},task:"Search",value:30},
+  tie:{weights:{Dispatch:10,Search:40,Rank:20,Fetch:40,Check:20,Merge:10},task:"Search",value:10},
+  shared:{weights:{Dispatch:10,Search:80,Rank:20,Fetch:40,Check:20,Merge:24},task:"Merge",value:8}
+};
+const el = id => document.getElementById(id);
+const graph = el("graph");
+const links = routes.flatMap(route => route.slice(1).map((name,index) => [route[index],name]));
+const taskButtons = new Map();
+let weights, task, value, critical;
+function measures(weights, task, value) {
+  const baseline = routes.map(path => path.reduce((total, name) => total + weights[name], 0));
+  const uses = routes.map(path => path.includes(task));
+  const revised = baseline.map((n,i) => uses[i] ? n - weights[task] + value : n);
+  const bypass = baseline.filter((_,i) => !uses[i]);
+  const floor = Math.max(...baseline.map((n,i) => uses[i] ? n - weights[task] : n));
+  return {base:Math.max(...baseline), total:Math.max(...revised), revised, uses, floor,
+    bypass:bypass.length ? Math.max(...bypass) : null};
+}
+for (const name of Object.keys(scenarios.shift.weights)) {
+  const button = document.createElement("button");
+  button.type = "button"; button.className = "node"; button.dataset.id = name;
+  button.append(document.createElement("span"),document.createElement("small"));
+  button.firstChild.textContent = name;
+  button.addEventListener("click",() => {
+    if (task === name) return;
+    task = name; value = weights[name]; render();
+  });
+  graph.appendChild(button); taskButtons.set(name,button);
+}
+function draw() {
+  if (!critical) return;
+  const canvas = el("wires"), box = graph.getBoundingClientRect(), ratio = window.devicePixelRatio || 1;
+  canvas.width = Math.round(box.width * ratio); canvas.height = Math.round(box.height * ratio);
+  const ctx = canvas.getContext("2d");
+  ctx.scale(ratio,ratio); ctx.lineCap = "round";
+  const plans = links.map(([a,b]) => ({
+    a:taskButtons.get(a).getBoundingClientRect(), b:taskButtons.get(b).getBoundingClientRect(),
+    active:routes.some((path,i) => critical[i] && path.some((n,j) => n === a && path[j+1] === b))
+  })).sort((a,b) => Number(a.active) - Number(b.active));
+  for (const {a,b,active} of plans) {
+    const x1=a.right-box.left, y1=a.top+a.height/2-box.top;
+    const x2=b.left-box.left, y2=b.top+b.height/2-box.top, middle=(x1+x2)/2;
+    ctx.beginPath(); ctx.moveTo(x1,y1); ctx.bezierCurveTo(middle,y1,middle,y2,x2,y2);
+    ctx.lineWidth=active ? 3 : 1.5; ctx.strokeStyle=active ? "#457350" : "#88988b"; ctx.stroke();
+  }
+}
+function render() {
+  const m = measures(weights,task,value), saving=m.base-m.total;
+  critical = m.revised.map(n => n === m.total);
+  for (const [name,button] of taskButtons) {
+    button.setAttribute("aria-pressed",String(name === task));
+    button.classList.toggle("hot", routes.some((r,i) => critical[i] && r.includes(name)));
+    button.lastChild.textContent = (name === task ? value : weights[name]) + " ms";
+  }
+  el("slider").value = value; el("duration").value = value; el("selected-name").textContent=task;
+  el("original").textContent=weights[task]+" ms"; el("bypass").textContent=m.bypass === null ? "No bypass" : m.bypass+" ms";
+  el("cap").textContent=(m.base-m.floor)+" ms"; el("base").textContent=m.base+" ms"; el("new").textContent=m.total+" ms";
+  el("delta").textContent=saving>0 ? saving+" ms saved" : saving<0 ? -saving+" ms added" : "No change";
+  const labels=["Search → Rank","Fetch → Check"];
+  const through=Math.max(...m.revised.filter((n,i) => m.uses[i]));
+  let reason;
+  if (m.bypass === null) reason=task+" sits on both paths. Each millisecond it saves reduces the run by one millisecond.";
+  else if (through < m.bypass) reason=labels[m.uses[0] ? 1 : 0]+" now determines completion. Shortening "+task+" further saves no time.";
+  else if (through === m.bypass) reason="Both paths finish together. Shortening "+task+" alone leaves the other path at "+m.bypass+" ms.";
+  else reason=labels[m.uses[0] ? 0 : 1]+" determines completion. Setting "+task+" to zero would bring the run to "+m.floor+" ms.";
+  el("reason").textContent=reason;
+  el("snippet").textContent="from pathprobe import DurationIndex\n\ndurations = "+JSON.stringify(weights).replaceAll(":",": ").replaceAll(",",", ")+"\nedges = [\n"+links.map(([a,b]) => '    ("'+a+'", "'+b+'"),').join("\n")+"\n]\nindex = DurationIndex(durations, edges)\nprint(index.makespan)  # "+m.base+"\nprint(index.predict("+JSON.stringify(task)+", "+value+"))  # "+m.total;
+  draw();
+}
+function reset() {
+  const scenario = scenarios[el("preset").value];
+  weights = scenario.weights; task = scenario.task; value = scenario.value; render();
+}
+el("preset").addEventListener("change",reset);
+el("slider").addEventListener("input",e => {value=Number(e.target.value); render();});
+el("duration").addEventListener("input",e => {
+  if (e.target.validity.valid && e.target.value !== "") {value=Number(e.target.value); render();}
+});
+el("duration").addEventListener("change",() => {
+  const n=el("duration").valueAsNumber;
+  if (Number.isFinite(n)) value=Math.max(0,Math.min(160,Math.round(n)));
+  render();
+});
+el("duration").addEventListener("blur",() => {el("duration").value=value;});
+const limits = {bytes:512*1024, tasks:512, edges:4096};
+function compareTaskNames(left,right) {
+  const a=Array.from(left), b=Array.from(right);
+  for (let i=0;i<Math.min(a.length,b.length);i++) {
+    const diff=a[i].codePointAt(0)-b[i].codePointAt(0);
+    if (diff) return diff;
+  }
+  return a.length-b.length;
+}
+function analyzeWorkflow(record) {
+  if (!record || typeof record!=="object" || !record.durations ||
+      typeof record.durations!=="object" || Array.isArray(record.durations) || !Array.isArray(record.edges)) {
+    throw new Error("Provide a durations object and an edges array.");
+  }
+  const names=Object.keys(record.durations), n=names.length;
+  if (n>limits.tasks || record.edges.length>limits.edges) throw new Error("This viewer accepts up to 512 tasks and 4,096 edges.");
+  const weights=names.map(name=>record.durations[name]);
+  if (weights.some(d=>!Number.isSafeInteger(d) || d<0)) throw new Error("Task durations must be nonnegative safe integers.");
+  const ids=new Map(names.map((name,i)=>[name,i]));
+  const children=Array.from({length:n},()=>[]), degree=new Uint32Array(n);
+  for (const edge of record.edges) {
+    if (!Array.isArray(edge) || edge.length!==2 || !ids.has(edge[0]) || !ids.has(edge[1])) {
+      throw new Error("Every edge must contain two known task names.");
+    }
+    const from=ids.get(edge[0]), to=ids.get(edge[1]);
+    children[from].push(to); degree[to]++;
+  }
+  const order=[];
+  for (let i=0;i<n;i++) if (!degree[i]) order.push(i);
+  for (let i=0;i<order.length;i++) for (const to of children[order[i]]) if (--degree[to]===0) order.push(to);
+  if (order.length!==n) throw new Error("The workflow has a dependency cycle.");
+  const finish=new Float64Array(n), parent=new Int32Array(n);
+  parent.fill(-1);
+  let tail=-1;
+  function completion(zero) {
+    finish.fill(0);
+    let total=0;
+    for (const task of order) {
+      const end=finish[task]+(task===zero ? 0 : weights[task]);
+      if (!Number.isSafeInteger(end)) throw new Error("A path exceeds the safe integer range.");
+      if (end>total) {
+        total=end;
+        if (zero===-1) tail=task;
+      }
+      for (const next of children[task]) {
+        if (end>finish[next]) {
+          finish[next]=end;
+          if (zero===-1) parent[next]=task;
+        }
+      }
+    }
+    return total;
+  }
+  const baseline=completion(-1);
+  // A task outside one unchanged longest path cannot reduce the run.
+  const rows=[];
+  for (let i=tail;i!==-1;i=parent[i]) {
+    const run=completion(i);
+    if (run<baseline) rows.push({name:names[i],duration:weights[i],run,saving:baseline-run});
+  }
+  rows.sort((a,b)=>b.saving-a.saving || compareTaskNames(a.name,b.name));
+  return {baseline,count:n,rows};
+}
+function readWorkflow(raw) {
+  // Python rejects floating-point durations. Preserve this distinction before
+  // JSON.parse can round an exponent or a fractional literal to an integer.
+  const tokens=/"(?:\\[\s\S]|[^"\\])*"|-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]?\d+)?/g;
+  const source=raw.replace(tokens, token=>
+    token[0]!=='"' && /[.eE]/.test(token) ? "null" : token
+  );
+  return JSON.parse(source);
+}
+let generation=0;
+el("workflow").addEventListener("change", async e=>{
+  const id=++generation, file=e.target.files[0], msg=el("analysis-message");
+  el("analysis-output").hidden=true;
+  el("analysis-rows").replaceChildren(); msg.textContent="";
+  if (!file) return;
+  try {
+    if (file.size>limits.bytes) throw new Error("Choose a file of 512 KiB or less.");
+    msg.textContent="Reading workflow…";
+    const raw=await file.text();
+    if (id!==generation) return;
+    const input=readWorkflow(raw);
+    const report=analyzeWorkflow(input);
+    const positive=report.rows.length;
+    msg.textContent="Completion time: "+report.baseline+". "+positive+" of "+report.count+
+      " tasks can shorten this run individually."+(positive>10 ? " Showing the top ten." : "");
+    for (const row of report.rows.slice(0,10)) {
+      const tr=document.createElement("tr");
+      for (const value of [row.name,row.duration,row.run,row.saving]) {
+        const cell=document.createElement("td"); cell.textContent=String(value); tr.appendChild(cell);
+      }
+      el("analysis-rows").appendChild(tr);
+    }
+    el("analysis-output").hidden=!positive;
+  } catch(error) {
+    if (id===generation) msg.textContent=error instanceof SyntaxError ? "The file is not valid JSON." : error.message;
+  }
+});
+reset();
+new ResizeObserver(draw).observe(graph);
+</script>
+</body></html>

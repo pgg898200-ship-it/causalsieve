@@ -1,0 +1,462 @@
+[
+  {
+    "run_id": 45016316917,
+    "pr": 610,
+    "head_sha": "51caae70ede2055ae505a0b7ceda98382a4b3d73",
+    "attempt": 1,
+    "workflow_blob": "129f2ffc61524666fd8c090d152f6fe91d115cc6",
+    "created_at": "2026-11-22T11:14:14Z",
+    "jobs": {
+      "lint": {
+        "id": 137189281439,
+        "started_at": "2026-11-22T11:14:16Z",
+        "completed_at": "2026-11-22T11:15:19Z",
+        "steps": []
+      },
+      "integration (heavy)": {
+        "id": 137189281583,
+        "started_at": "2026-11-22T11:14:17Z",
+        "completed_at": "2026-11-22T11:28:20Z",
+        "steps": [
+          {
+            "name": "Run integration tests",
+            "started_at": "2026-11-22T11:16:40Z",
+            "completed_at": "2026-11-22T11:28:13Z"
+          }
+        ]
+      },
+      "aquacast-release-image-proof": {
+        "id": 137189281656,
+        "started_at": "2026-11-22T11:14:16Z",
+        "completed_at": "2026-11-22T11:43:34Z",
+        "steps": [
+          {
+            "name": "Build Aquacast app image",
+            "started_at": "2026-11-22T11:14:31Z",
+            "completed_at": "2026-11-22T11:26:26Z"
+          },
+          {
+            "name": "Trivy Aquacast image scan",
+            "started_at": "2026-11-22T11:26:26Z",
+            "completed_at": "2026-11-22T11:30:39Z"
+          },
+          {
+            "name": "Qualify disposable private-profile rehearsal",
+            "started_at": "2026-11-22T11:33:06Z",
+            "completed_at": "2026-11-22T11:38:14Z"
+          },
+          {
+            "name": "Qualify persistent private-profile installation",
+            "started_at": "2026-11-22T11:38:16Z",
+            "completed_at": "2026-11-22T11:43:01Z"
+          }
+        ]
+      },
+      "wheel-only-guard": {
+        "id": 137189281666,
+        "started_at": "2026-11-22T11:14:17Z",
+        "completed_at": "2026-11-22T11:14:33Z",
+        "steps": []
+      },
+      "unit (adapters-flows)": {
+        "id": 137189281684,
+        "started_at": "2026-11-22T11:14:17Z",
+        "completed_at": "2026-11-22T11:25:22Z",
+        "steps": []
+      },
+      "integration (rest)": {
+        "id": 137189281695,
+        "started_at": "2026-11-22T11:14:17Z",
+        "completed_at": "2026-11-22T11:31:10Z",
+        "steps": [
+          {
+            "name": "Run integration tests",
+            "started_at": "2026-11-22T11:15:30Z",
+            "completed_at": "2026-11-22T11:31:02Z"
+          }
+        ]
+      },
+      "unit (scripts)": {
+        "id": 137189281697,
+        "started_at": "2026-11-22T11:14:17Z",
+        "completed_at": "2026-11-22T11:18:30Z",
+        "steps": []
+      },
+      "unit (services)": {
+        "id": 137189281723,
+        "started_at": "2026-11-22T11:14:17Z",
+        "completed_at": "2026-11-22T11:17:15Z",
+        "steps": []
+      },
+      "unit (rest)": {
+        "id": 137189281725,
+        "started_at": "2026-11-22T11:14:16Z",
+        "completed_at": "2026-11-22T11:21:49Z",
+        "steps": []
+      },
+      "build-image-and-scan": {
+        "id": 137189281757,
+        "started_at": "2026-11-22T11:14:17Z",
+        "completed_at": "2026-11-22T11:21:30Z",
+        "steps": []
+      },
+      "unit-coverage": {
+        "id": 137192082837,
+        "started_at": "2026-11-22T11:25:24Z",
+        "completed_at": "2026-11-22T11:25:46Z",
+        "steps": []
+      },
+      "integration": {
+        "id": 137193534715,
+        "started_at": "2026-11-22T11:31:12Z",
+        "completed_at": "2026-11-22T11:31:15Z",
+        "steps": []
+      }
+    }
+  },
+  {
+    "run_id": 45010114942,
+    "pr": 607,
+    "head_sha": "bb15c9aead937c3bd06c55e99364aeb759cba3e8",
+    "attempt": 1,
+    "workflow_blob": "129f2ffc61524666fd8c090d152f6fe91d115cc6",
+    "created_at": "2026-11-22T09:58:30Z",
+    "jobs": {
+      "build-image-and-scan": {
+        "id": 137170380440,
+        "started_at": "2026-11-22T09:58:33Z",
+        "completed_at": "2026-11-22T10:05:42Z",
+        "steps": []
+      },
+      "aquacast-release-image-proof": {
+        "id": 137170380651,
+        "started_at": "2026-11-22T09:58:33Z",
+        "completed_at": "2026-11-22T10:20:31Z",
+        "steps": [
+          {
+            "name": "Build Aquacast app image",
+            "started_at": "2026-11-22T09:58:42Z",
+            "completed_at": "2026-11-22T10:06:07Z"
+          },
+          {
+            "name": "Trivy Aquacast image scan",
+            "started_at": "2026-11-22T10:06:07Z",
+            "completed_at": "2026-11-22T10:09:07Z"
+          },
+          {
+            "name": "Qualify disposable private-profile rehearsal",
+            "started_at": "2026-11-22T10:10:51Z",
+            "completed_at": "2026-11-22T10:15:29Z"
+          },
+          {
+            "name": "Qualify persistent private-profile installation",
+            "started_at": "2026-11-22T10:15:30Z",
+            "completed_at": "2026-11-22T10:20:09Z"
+          }
+        ]
+      },
+      "unit (rest)": {
+        "id": 137170380663,
+        "started_at": "2026-11-22T09:58:33Z",
+        "completed_at": "2026-11-22T10:04:27Z",
+        "steps": []
+      },
+      "lint": {
+        "id": 137170380765,
+        "started_at": "2026-11-22T09:58:33Z",
+        "completed_at": "2026-11-22T09:59:24Z",
+        "steps": []
+      },
+      "unit (services)": {
+        "id": 137170380770,
+        "started_at": "2026-11-22T09:58:33Z",
+        "completed_at": "2026-11-22T10:01:42Z",
+        "steps": []
+      },
+      "integration (rest)": {
+        "id": 137170380781,
+        "started_at": "2026-11-22T09:58:33Z",
+        "completed_at": "2026-11-22T10:18:34Z",
+        "steps": [
+          {
+            "name": "Run integration tests",
+            "started_at": "2026-11-22T09:59:30Z",
+            "completed_at": "2026-11-22T10:18:30Z"
+          }
+        ]
+      },
+      "unit (scripts)": {
+        "id": 137170380793,
+        "started_at": "2026-11-22T09:58:33Z",
+        "completed_at": "2026-11-22T10:02:46Z",
+        "steps": []
+      },
+      "unit (adapters-flows)": {
+        "id": 137170380832,
+        "started_at": "2026-11-22T09:58:33Z",
+        "completed_at": "2026-11-22T10:09:27Z",
+        "steps": []
+      },
+      "integration (heavy)": {
+        "id": 137170380918,
+        "started_at": "2026-11-22T09:58:33Z",
+        "completed_at": "2026-11-22T10:12:25Z",
+        "steps": [
+          {
+            "name": "Run integration tests",
+            "started_at": "2026-11-22T10:00:49Z",
+            "completed_at": "2026-11-22T10:12:20Z"
+          }
+        ]
+      },
+      "wheel-only-guard": {
+        "id": 137170381036,
+        "started_at": "2026-11-22T09:58:33Z",
+        "completed_at": "2026-11-22T09:58:51Z",
+        "steps": []
+      },
+      "unit-coverage": {
+        "id": 137173193192,
+        "started_at": "2026-11-22T10:09:29Z",
+        "completed_at": "2026-11-22T10:09:50Z",
+        "steps": []
+      },
+      "integration": {
+        "id": 137175523420,
+        "started_at": "2026-11-22T10:18:37Z",
+        "completed_at": "2026-11-22T10:18:41Z",
+        "steps": []
+      }
+    }
+  },
+  {
+    "run_id": 45002696542,
+    "pr": 605,
+    "head_sha": "f1085823a7542e90d7047d04ea4be4567402c669",
+    "attempt": 1,
+    "workflow_blob": "129f2ffc61524666fd8c090d152f6fe91d115cc6",
+    "created_at": "2026-11-22T08:24:55Z",
+    "jobs": {
+      "build-image-and-scan": {
+        "id": 137147479135,
+        "started_at": "2026-11-22T08:24:57Z",
+        "completed_at": "2026-11-22T08:30:25Z",
+        "steps": []
+      },
+      "unit (scripts)": {
+        "id": 137147479347,
+        "started_at": "2026-11-22T08:24:58Z",
+        "completed_at": "2026-11-22T08:29:35Z",
+        "steps": []
+      },
+      "aquacast-release-image-proof": {
+        "id": 137147479354,
+        "started_at": "2026-11-22T08:24:57Z",
+        "completed_at": "2026-11-22T08:45:57Z",
+        "steps": [
+          {
+            "name": "Build Aquacast app image",
+            "started_at": "2026-11-22T08:25:09Z",
+            "completed_at": "2026-11-22T08:32:39Z"
+          },
+          {
+            "name": "Trivy Aquacast image scan",
+            "started_at": "2026-11-22T08:32:39Z",
+            "completed_at": "2026-11-22T08:35:27Z"
+          },
+          {
+            "name": "Qualify disposable private-profile rehearsal",
+            "started_at": "2026-11-22T08:37:09Z",
+            "completed_at": "2026-11-22T08:41:17Z"
+          },
+          {
+            "name": "Qualify persistent private-profile installation",
+            "started_at": "2026-11-22T08:41:18Z",
+            "completed_at": "2026-11-22T08:45:28Z"
+          }
+        ]
+      },
+      "unit (adapters-flows)": {
+        "id": 137147479363,
+        "started_at": "2026-11-22T08:24:57Z",
+        "completed_at": "2026-11-22T08:34:59Z",
+        "steps": []
+      },
+      "integration (heavy)": {
+        "id": 137147479368,
+        "started_at": "2026-11-22T08:24:58Z",
+        "completed_at": "2026-11-22T08:39:35Z",
+        "steps": [
+          {
+            "name": "Run integration tests",
+            "started_at": "2026-11-22T08:27:33Z",
+            "completed_at": "2026-11-22T08:39:29Z"
+          }
+        ]
+      },
+      "wheel-only-guard": {
+        "id": 137147479409,
+        "started_at": "2026-11-22T08:24:58Z",
+        "completed_at": "2026-11-22T08:25:19Z",
+        "steps": []
+      },
+      "integration (rest)": {
+        "id": 137147479413,
+        "started_at": "2026-11-22T08:24:58Z",
+        "completed_at": "2026-11-22T08:42:01Z",
+        "steps": [
+          {
+            "name": "Run integration tests",
+            "started_at": "2026-11-22T08:26:20Z",
+            "completed_at": "2026-11-22T08:41:55Z"
+          }
+        ]
+      },
+      "unit (rest)": {
+        "id": 137147479421,
+        "started_at": "2026-11-22T08:24:58Z",
+        "completed_at": "2026-11-22T08:32:01Z",
+        "steps": []
+      },
+      "unit (services)": {
+        "id": 137147479452,
+        "started_at": "2026-11-22T08:24:58Z",
+        "completed_at": "2026-11-22T08:28:14Z",
+        "steps": []
+      },
+      "lint": {
+        "id": 137147479458,
+        "started_at": "2026-11-22T08:24:57Z",
+        "completed_at": "2026-11-22T08:25:54Z",
+        "steps": []
+      },
+      "unit-coverage": {
+        "id": 137149874569,
+        "started_at": "2026-11-22T08:35:01Z",
+        "completed_at": "2026-11-22T08:35:27Z",
+        "steps": []
+      },
+      "integration": {
+        "id": 137151512136,
+        "started_at": "2026-11-22T08:42:04Z",
+        "completed_at": "2026-11-22T08:42:07Z",
+        "steps": []
+      }
+    }
+  },
+  {
+    "run_id": 44997310687,
+    "pr": 603,
+    "head_sha": "390993157d04d7791eea096188e2c81fd15c3ea7",
+    "attempt": 1,
+    "workflow_blob": "129f2ffc61524666fd8c090d152f6fe91d115cc6",
+    "created_at": "2026-11-22T07:14:21Z",
+    "jobs": {
+      "integration (rest)": {
+        "id": 137131029315,
+        "started_at": "2026-11-22T07:14:24Z",
+        "completed_at": "2026-11-22T07:36:48Z",
+        "steps": [
+          {
+            "name": "Run integration tests",
+            "started_at": "2026-11-22T07:15:32Z",
+            "completed_at": "2026-11-22T07:36:42Z"
+          }
+        ]
+      },
+      "unit (services)": {
+        "id": 137131029447,
+        "started_at": "2026-11-22T07:14:24Z",
+        "completed_at": "2026-11-22T07:17:03Z",
+        "steps": []
+      },
+      "wheel-only-guard": {
+        "id": 137131029471,
+        "started_at": "2026-11-22T07:14:24Z",
+        "completed_at": "2026-11-22T07:14:40Z",
+        "steps": []
+      },
+      "aquacast-release-image-proof": {
+        "id": 137131029475,
+        "started_at": "2026-11-22T07:14:24Z",
+        "completed_at": "2026-11-22T07:36:50Z",
+        "steps": [
+          {
+            "name": "Build Aquacast app image",
+            "started_at": "2026-11-22T07:14:39Z",
+            "completed_at": "2026-11-22T07:21:52Z"
+          },
+          {
+            "name": "Trivy Aquacast image scan",
+            "started_at": "2026-11-22T07:21:52Z",
+            "completed_at": "2026-11-22T07:25:06Z"
+          },
+          {
+            "name": "Qualify disposable private-profile rehearsal",
+            "started_at": "2026-11-22T07:26:55Z",
+            "completed_at": "2026-11-22T07:31:35Z"
+          },
+          {
+            "name": "Qualify persistent private-profile installation",
+            "started_at": "2026-11-22T07:31:36Z",
+            "completed_at": "2026-11-22T07:36:23Z"
+          }
+        ]
+      },
+      "build-image-and-scan": {
+        "id": 137131029483,
+        "started_at": "2026-11-22T07:14:24Z",
+        "completed_at": "2026-11-22T07:21:38Z",
+        "steps": []
+      },
+      "unit (rest)": {
+        "id": 137131029484,
+        "started_at": "2026-11-22T07:14:24Z",
+        "completed_at": "2026-11-22T07:19:50Z",
+        "steps": []
+      },
+      "unit (adapters-flows)": {
+        "id": 137131029522,
+        "started_at": "2026-11-22T07:14:24Z",
+        "completed_at": "2026-11-22T07:24:52Z",
+        "steps": []
+      },
+      "integration (heavy)": {
+        "id": 137131029534,
+        "started_at": "2026-11-22T07:14:24Z",
+        "completed_at": "2026-11-22T07:29:03Z",
+        "steps": [
+          {
+            "name": "Run integration tests",
+            "started_at": "2026-11-22T07:16:58Z",
+            "completed_at": "2026-11-22T07:28:57Z"
+          }
+        ]
+      },
+      "lint": {
+        "id": 137131029538,
+        "started_at": "2026-11-22T07:14:23Z",
+        "completed_at": "2026-11-22T07:15:25Z",
+        "steps": []
+      },
+      "unit (scripts)": {
+        "id": 137131029543,
+        "started_at": "2026-11-22T07:14:24Z",
+        "completed_at": "2026-11-22T07:18:45Z",
+        "steps": []
+      },
+      "unit-coverage": {
+        "id": 137133482636,
+        "started_at": "2026-11-22T07:24:54Z",
+        "completed_at": "2026-11-22T07:25:16Z",
+        "steps": []
+      },
+      "integration": {
+        "id": 137136238748,
+        "started_at": "2026-11-22T07:36:50Z",
+        "completed_at": "2026-11-22T07:36:52Z",
+        "steps": []
+      }
+    }
+  }
+]

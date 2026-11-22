@@ -1,0 +1,193 @@
+{
+  "schema_version": 1,
+  "python": "3.12.14",
+  "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+  "machine": "x86_64",
+  "processor": "AMD EPYC 9V74 80-Core Processor",
+  "core_sha256": "a6afeced3fa3558cfff024aaa4895280b67f1772bfa87b4ff4f3f1edfb5fffce",
+  "benchmark_sha256": "e1526cbe6b6a44a1b616e0b5dee93363805d287e1f02c7ea9c753de593f03b94",
+  "seed": 421,
+  "repeats": 5,
+  "edits": "mixed",
+  "timing": "Independent medians in ns. Total includes fresh graph/index construction and all scalar queries. Excludes file I/O, workload generation, correctness checks and destruction. One shuffled prefix per batch, each task queried at most once; mixed alternates shortening and increasing, starting with shortening.",
+  "graphs": [
+    {
+      "graph": "cycles.json",
+      "nodes": 134,
+      "edges": 194,
+      "makespan": 214459000,
+      "batches": [
+        {
+          "queries": 1,
+          "changed_durations": 1,
+          "predictions_sha256": "83da33dbb41d900e5b266865cfd0c6b74beb01da02d2301b6d2feaf2c5b02e7e",
+          "methods": {
+            "full_dp": {
+              "build_ns": 56824,
+              "queries_ns": 17957,
+              "total_ns": 74781
+            },
+            "critical_path_lazy_cache": {
+              "build_ns": 156931,
+              "queries_ns": 1122,
+              "total_ns": 158053
+            },
+            "heap_sensitivity": {
+              "build_ns": 217392,
+              "queries_ns": 1292,
+              "total_ns": 218784
+            },
+            "pathprobe": {
+              "build_ns": 197401,
+              "queries_ns": 1392,
+              "total_ns": 198793
+            }
+          }
+        },
+        {
+          "queries": 10,
+          "changed_durations": 10,
+          "predictions_sha256": "a4ff293a4a594873547f8f058a09cafc6315878f8d850b1bf7940380f48268af",
+          "methods": {
+            "full_dp": {
+              "build_ns": 58636,
+              "queries_ns": 158104,
+              "total_ns": 216740
+            },
+            "critical_path_lazy_cache": {
+              "build_ns": 144453,
+              "queries_ns": 2934,
+              "total_ns": 147338
+            },
+            "heap_sensitivity": {
+              "build_ns": 192194,
+              "queries_ns": 2834,
+              "total_ns": 195099
+            },
+            "pathprobe": {
+              "build_ns": 240516,
+              "queries_ns": 4176,
+              "total_ns": 244692
+            }
+          }
+        },
+        {
+          "queries": 134,
+          "changed_durations": 134,
+          "predictions_sha256": "a5d71c44d693eae426483117908c616dd7e8f43f2c6de6b7738e1a28fb7af40b",
+          "methods": {
+            "full_dp": {
+              "build_ns": 58977,
+              "queries_ns": 2243223,
+              "total_ns": 2302892
+            },
+            "critical_path_lazy_cache": {
+              "build_ns": 148560,
+              "queries_ns": 58427,
+              "total_ns": 209970
+            },
+            "heap_sensitivity": {
+              "build_ns": 191964,
+              "queries_ns": 23475,
+              "total_ns": 215458
+            },
+            "pathprobe": {
+              "build_ns": 223531,
+              "queries_ns": 37846,
+              "total_ns": 261076
+            }
+          }
+        }
+      ]
+    },
+    {
+      "graph": "montage.json",
+      "nodes": 472,
+      "edges": 1284,
+      "makespan": 935823000,
+      "batches": [
+        {
+          "queries": 1,
+          "changed_durations": 1,
+          "predictions_sha256": "43b69305c5182364d61056785d3c329b6d9a79cb9481b4e983bfcc9d2671b3dd",
+          "methods": {
+            "full_dp": {
+              "build_ns": 311580,
+              "queries_ns": 74079,
+              "total_ns": 385840
+            },
+            "critical_path_lazy_cache": {
+              "build_ns": 647096,
+              "queries_ns": 1152,
+              "total_ns": 648248
+            },
+            "heap_sensitivity": {
+              "build_ns": 1019116,
+              "queries_ns": 1522,
+              "total_ns": 1021169
+            },
+            "pathprobe": {
+              "build_ns": 944555,
+              "queries_ns": 1743,
+              "total_ns": 946759
+            }
+          }
+        },
+        {
+          "queries": 10,
+          "changed_durations": 10,
+          "predictions_sha256": "36dac764928ad63ad557170c16da9f1a085730d5099514fe6af64df1d5d12b00",
+          "methods": {
+            "full_dp": {
+              "build_ns": 285171,
+              "queries_ns": 696879,
+              "total_ns": 1006497
+            },
+            "critical_path_lazy_cache": {
+              "build_ns": 666765,
+              "queries_ns": 3815,
+              "total_ns": 670951
+            },
+            "heap_sensitivity": {
+              "build_ns": 1047317,
+              "queries_ns": 4206,
+              "total_ns": 1051523
+            },
+            "pathprobe": {
+              "build_ns": 992206,
+              "queries_ns": 5368,
+              "total_ns": 997574
+            }
+          }
+        },
+        {
+          "queries": 472,
+          "changed_durations": 472,
+          "predictions_sha256": "ad0a9e41813b7f2b50da9cd031f44a4204f664eed41d1aff7dcb8e74f3b3b237",
+          "methods": {
+            "full_dp": {
+              "build_ns": 346642,
+              "queries_ns": 41282901,
+              "total_ns": 41581722
+            },
+            "critical_path_lazy_cache": {
+              "build_ns": 1010974,
+              "queries_ns": 581869,
+              "total_ns": 1592843
+            },
+            "heap_sensitivity": {
+              "build_ns": 1203097,
+              "queries_ns": 139015,
+              "total_ns": 1350795
+            },
+            "pathprobe": {
+              "build_ns": 1200784,
+              "queries_ns": 147338,
+              "total_ns": 1341662
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

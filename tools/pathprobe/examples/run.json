@@ -1,0 +1,1 @@
+{"durations":{"plan":10,"search":80,"lookup":40,"compose":30},"edges":[["plan","search"],["plan","lookup"],["search","compose"],["lookup","compose"]]}

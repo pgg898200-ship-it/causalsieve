@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pathprobe-dag"
+version = "0.1.0"
+description = "Exact single-task latency and deadline budgets for workflow DAGs"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [{name = "PGG Engineering"}]
+dependencies = []
+
+[project.scripts]
+pathprobe = "pathprobe.cli:main"
+
+[tool.setuptools]
+packages = ["pathprobe"]
