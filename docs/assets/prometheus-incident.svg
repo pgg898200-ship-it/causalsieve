@@ -2,53 +2,53 @@
 <title id="title">Database latency rises before API latency in a synthetic incident</title>
 <desc id="desc">Two aligned traces show a three-minute excerpt from 600 five-second samples. The fixture injects a database delay at time zero. The API uses the previous database measurement. The full fixture ranks latency_seconds{service=db} first and latency_seconds{service=api} second.</desc>
 <metadata>Input: examples/prometheus_incident.py, demo_response(), seed 2026. Lines show every sample at indices 468 through 504 inclusive in milliseconds. Onset is sample 480. Candidate order uses the full 600-sample run.</metadata>
-<rect width="900" height="455" fill="#f9f6ed"/>
-<text x="34" y="47" font-family="serif" font-size="32" fill="#222824" font-weight="bold" text-anchor="start">A database delay reaches the API</text>
-<text x="35" y="76" font-family="sans-serif" font-size="17" fill="#455249" font-weight="normal" text-anchor="start">Synthetic Prometheus incident  /  one sample every 5 seconds</text>
-<line x1="35" y1="94" x2="865" y2="94" stroke="#a2aa96" stroke-width="1"/>
-<line x1="610" y1="113" x2="610" y2="411" stroke="#a2aa96" stroke-width="1"/>
-<text x="35" y="146" font-family="sans-serif" font-size="19" fill="#222824" font-weight="bold" text-anchor="start">Database latency (ms)</text>
-<text x="63" y="220.9" font-family="sans-serif" font-size="14" fill="#455249" font-weight="normal" text-anchor="end">45</text>
-<line x1="76" y1="215.9" x2="580" y2="215.9" stroke="#c9ccbc" stroke-width="1"/>
-<text x="63" y="200.57" font-family="sans-serif" font-size="14" fill="#455249" font-weight="normal" text-anchor="end">55</text>
-<line x1="76" y1="195.57" x2="580" y2="195.57" stroke="#c9ccbc" stroke-width="1"/>
-<text x="63" y="180.23" font-family="sans-serif" font-size="14" fill="#455249" font-weight="normal" text-anchor="end">65</text>
-<line x1="76" y1="175.23" x2="580" y2="175.23" stroke="#c9ccbc" stroke-width="1"/>
-<line x1="244" y1="158" x2="244" y2="226" stroke="#222824" stroke-width="1.5" stroke-dasharray="4 4"/>
-<polyline points="76.0,215.84 90.0,211.72 104.0,202.52 118.0,206.26 132.0,201.21 146.0,202.75 160.0,207.19 174.0,209.89 188.0,213.16 202.0,203.15 216.0,208.78 230.0,201.17 244.0,179.29 258.0,174.19 272.0,182.83 286.0,180.06 300.0,175.27 314.0,173.46 328.0,171.35 342.0,183.26 356.0,180.71 370.0,180.87 384.0,175.91 398.0,177.18 412.0,177.52 426.0,170.39 440.0,170.89 454.0,180.10 468.0,174.30 482.0,172.82 496.0,174.00 510.0,168.19 524.0,182.73 538.0,172.42 552.0,186.16 566.0,179.82 580.0,183.55" fill="none" stroke="#a13e24" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-<text x="35" y="280" font-family="sans-serif" font-size="19" fill="#222824" font-weight="bold" text-anchor="start">API latency (ms)</text>
-<text x="63" y="354.9" font-family="sans-serif" font-size="14" fill="#455249" font-weight="normal" text-anchor="end">115</text>
-<line x1="76" y1="349.9" x2="580" y2="349.9" stroke="#c9ccbc" stroke-width="1"/>
-<text x="63" y="330.5" font-family="sans-serif" font-size="14" fill="#455249" font-weight="normal" text-anchor="end">135</text>
-<line x1="76" y1="325.5" x2="580" y2="325.5" stroke="#c9ccbc" stroke-width="1"/>
-<text x="63" y="306.1" font-family="sans-serif" font-size="14" fill="#455249" font-weight="normal" text-anchor="end">155</text>
-<line x1="76" y1="301.1" x2="580" y2="301.1" stroke="#c9ccbc" stroke-width="1"/>
-<line x1="244" y1="292" x2="244" y2="360" stroke="#222824" stroke-width="1.5" stroke-dasharray="4 4"/>
-<polyline points="76.0,340.86 90.0,346.90 104.0,350.15 118.0,345.34 132.0,345.30 146.0,343.57 160.0,342.01 174.0,342.82 188.0,346.21 202.0,349.70 216.0,346.85 230.0,348.36 244.0,344.73 258.0,332.24 272.0,322.77 286.0,320.30 300.0,317.67 314.0,313.67 328.0,309.85 342.0,309.34 356.0,312.59 370.0,311.36 384.0,312.09 398.0,310.25 412.0,310.28 426.0,309.20 440.0,307.24 454.0,305.30 468.0,307.45 482.0,306.20 496.0,305.84 510.0,305.82 524.0,302.38 538.0,306.51 552.0,304.34 566.0,309.82 580.0,310.62" fill="none" stroke="#30596c" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-<text x="244" y="122" font-family="sans-serif" font-size="15" fill="#a13e24" font-weight="bold" text-anchor="middle">Delay injected</text>
-<line x1="244" y1="127" x2="244" y2="138" stroke="#222824" stroke-width="1.5" stroke-dasharray="4 4"/>
-<line x1="76" y1="368" x2="580" y2="368" stroke="#a2aa96" stroke-width="1"/>
-<line x1="76" y1="368" x2="76" y2="375" stroke="#a2aa96" stroke-width="1"/>
-<text x="76" y="396" font-family="sans-serif" font-size="16" fill="#455249" font-weight="normal" text-anchor="middle">−60 s</text>
-<line x1="244" y1="368" x2="244" y2="375" stroke="#a2aa96" stroke-width="1"/>
-<text x="244" y="396" font-family="sans-serif" font-size="16" fill="#455249" font-weight="normal" text-anchor="middle">0</text>
-<line x1="412" y1="368" x2="412" y2="375" stroke="#a2aa96" stroke-width="1"/>
-<text x="412" y="396" font-family="sans-serif" font-size="16" fill="#455249" font-weight="normal" text-anchor="middle">+60 s</text>
-<line x1="580" y1="368" x2="580" y2="375" stroke="#a2aa96" stroke-width="1"/>
-<text x="580" y="396" font-family="sans-serif" font-size="16" fill="#455249" font-weight="normal" text-anchor="middle">+120 s</text>
-<text x="665" y="147" font-family="sans-serif" font-size="21" fill="#222824" font-weight="bold" text-anchor="start">Investigation order</text>
-<text x="665" y="173" font-family="sans-serif" font-size="16" fill="#455249" font-weight="normal" text-anchor="start">From all 600 samples</text>
-<circle cx="651" cy="213" r="15" fill="#a13e24"/>
-<text x="651" y="219" font-family="sans-serif" font-size="17" fill="#ffffff" font-weight="bold" text-anchor="middle">1</text>
-<text x="680" y="220" font-family="serif" font-size="24" fill="#222824" font-weight="bold" text-anchor="start">Database</text>
-<text x="680" y="244" font-family="monospace" font-size="16" fill="#455249" font-weight="normal" text-anchor="start">service=db</text>
-<circle cx="651" cy="277" r="15" fill="#30596c"/>
-<text x="651" y="283" font-family="sans-serif" font-size="17" fill="#ffffff" font-weight="bold" text-anchor="middle">2</text>
-<text x="680" y="284" font-family="serif" font-size="24" fill="#222824" font-weight="bold" text-anchor="start">API</text>
-<text x="680" y="308" font-family="monospace" font-size="16" fill="#455249" font-weight="normal" text-anchor="start">service=api</text>
-<line x1="636" y1="333" x2="865" y2="333" stroke="#a2aa96" stroke-width="1"/>
-<text x="636" y="365" font-family="sans-serif" font-size="16" fill="#222824" font-weight="normal" text-anchor="start">Start with database traces</text>
-<text x="636" y="388" font-family="sans-serif" font-size="16" fill="#222824" font-weight="normal" text-anchor="start">and recent changes.</text>
-<line x1="35" y1="416" x2="865" y2="416" stroke="#a2aa96" stroke-width="1"/>
-<text x="35" y="441" font-family="sans-serif" font-size="15" fill="#455249" font-weight="normal" text-anchor="start">Time relative to the injected delay. Each line uses its own latency scale.</text>
+<rect width="900" height="455" fill="#fff3d7"/>
+<text x="34" y="47" font-family="serif" font-size="32" fill="#171729" font-weight="bold" text-anchor="start">A database delay reaches the API</text>
+<text x="35" y="76" font-family="sans-serif" font-size="17" fill="#585560" font-weight="normal" text-anchor="start">Synthetic Prometheus incident  /  one sample every 5 seconds</text>
+<line x1="35" y1="94" x2="865" y2="94" stroke="#bcb5a7" stroke-width="1"/>
+<line x1="610" y1="113" x2="610" y2="411" stroke="#bcb5a7" stroke-width="1"/>
+<text x="35" y="146" font-family="sans-serif" font-size="19" fill="#171729" font-weight="bold" text-anchor="start">Database latency (ms)</text>
+<text x="63" y="220.9" font-family="sans-serif" font-size="14" fill="#585560" font-weight="normal" text-anchor="end">45</text>
+<line x1="76" y1="215.9" x2="580" y2="215.9" stroke="#d7d0bf" stroke-width="1"/>
+<text x="63" y="200.57" font-family="sans-serif" font-size="14" fill="#585560" font-weight="normal" text-anchor="end">55</text>
+<line x1="76" y1="195.57" x2="580" y2="195.57" stroke="#d7d0bf" stroke-width="1"/>
+<text x="63" y="180.23" font-family="sans-serif" font-size="14" fill="#585560" font-weight="normal" text-anchor="end">65</text>
+<line x1="76" y1="175.23" x2="580" y2="175.23" stroke="#d7d0bf" stroke-width="1"/>
+<line x1="244" y1="158" x2="244" y2="226" stroke="#171729" stroke-width="1.5" stroke-dasharray="4 4"/>
+<polyline points="76.0,215.84 90.0,211.72 104.0,202.52 118.0,206.26 132.0,201.21 146.0,202.75 160.0,207.19 174.0,209.89 188.0,213.16 202.0,203.15 216.0,208.78 230.0,201.17 244.0,179.29 258.0,174.19 272.0,182.83 286.0,180.06 300.0,175.27 314.0,173.46 328.0,171.35 342.0,183.26 356.0,180.71 370.0,180.87 384.0,175.91 398.0,177.18 412.0,177.52 426.0,170.39 440.0,170.89 454.0,180.10 468.0,174.30 482.0,172.82 496.0,174.00 510.0,168.19 524.0,182.73 538.0,172.42 552.0,186.16 566.0,179.82 580.0,183.55" fill="none" stroke="#ef543c" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="35" y="280" font-family="sans-serif" font-size="19" fill="#171729" font-weight="bold" text-anchor="start">API latency (ms)</text>
+<text x="63" y="354.9" font-family="sans-serif" font-size="14" fill="#585560" font-weight="normal" text-anchor="end">115</text>
+<line x1="76" y1="349.9" x2="580" y2="349.9" stroke="#d7d0bf" stroke-width="1"/>
+<text x="63" y="330.5" font-family="sans-serif" font-size="14" fill="#585560" font-weight="normal" text-anchor="end">135</text>
+<line x1="76" y1="325.5" x2="580" y2="325.5" stroke="#d7d0bf" stroke-width="1"/>
+<text x="63" y="306.1" font-family="sans-serif" font-size="14" fill="#585560" font-weight="normal" text-anchor="end">155</text>
+<line x1="76" y1="301.1" x2="580" y2="301.1" stroke="#d7d0bf" stroke-width="1"/>
+<line x1="244" y1="292" x2="244" y2="360" stroke="#171729" stroke-width="1.5" stroke-dasharray="4 4"/>
+<polyline points="76.0,340.86 90.0,346.90 104.0,350.15 118.0,345.34 132.0,345.30 146.0,343.57 160.0,342.01 174.0,342.82 188.0,346.21 202.0,349.70 216.0,346.85 230.0,348.36 244.0,344.73 258.0,332.24 272.0,322.77 286.0,320.30 300.0,317.67 314.0,313.67 328.0,309.85 342.0,309.34 356.0,312.59 370.0,311.36 384.0,312.09 398.0,310.25 412.0,310.28 426.0,309.20 440.0,307.24 454.0,305.30 468.0,307.45 482.0,306.20 496.0,305.84 510.0,305.82 524.0,302.38 538.0,306.51 552.0,304.34 566.0,309.82 580.0,310.62" fill="none" stroke="#384cfa" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="244" y="122" font-family="sans-serif" font-size="15" fill="#171729" font-weight="bold" text-anchor="middle">Delay injected</text>
+<line x1="244" y1="127" x2="244" y2="138" stroke="#171729" stroke-width="1.5" stroke-dasharray="4 4"/>
+<line x1="76" y1="368" x2="580" y2="368" stroke="#bcb5a7" stroke-width="1"/>
+<line x1="76" y1="368" x2="76" y2="375" stroke="#bcb5a7" stroke-width="1"/>
+<text x="76" y="396" font-family="sans-serif" font-size="16" fill="#585560" font-weight="normal" text-anchor="middle">−60 s</text>
+<line x1="244" y1="368" x2="244" y2="375" stroke="#bcb5a7" stroke-width="1"/>
+<text x="244" y="396" font-family="sans-serif" font-size="16" fill="#585560" font-weight="normal" text-anchor="middle">0</text>
+<line x1="412" y1="368" x2="412" y2="375" stroke="#bcb5a7" stroke-width="1"/>
+<text x="412" y="396" font-family="sans-serif" font-size="16" fill="#585560" font-weight="normal" text-anchor="middle">+60 s</text>
+<line x1="580" y1="368" x2="580" y2="375" stroke="#bcb5a7" stroke-width="1"/>
+<text x="580" y="396" font-family="sans-serif" font-size="16" fill="#585560" font-weight="normal" text-anchor="middle">+120 s</text>
+<text x="665" y="147" font-family="sans-serif" font-size="21" fill="#171729" font-weight="bold" text-anchor="start">Investigation order</text>
+<text x="665" y="173" font-family="sans-serif" font-size="16" fill="#585560" font-weight="normal" text-anchor="start">From all 600 samples</text>
+<circle cx="651" cy="213" r="15" fill="#ef543c"/>
+<text x="651" y="219" font-family="sans-serif" font-size="17" fill="#171729" font-weight="bold" text-anchor="middle">1</text>
+<text x="680" y="220" font-family="serif" font-size="24" fill="#171729" font-weight="bold" text-anchor="start">Database</text>
+<text x="680" y="244" font-family="monospace" font-size="16" fill="#585560" font-weight="normal" text-anchor="start">service=db</text>
+<circle cx="651" cy="277" r="15" fill="#384cfa"/>
+<text x="651" y="283" font-family="sans-serif" font-size="17" fill="#fff3d7" font-weight="bold" text-anchor="middle">2</text>
+<text x="680" y="284" font-family="serif" font-size="24" fill="#171729" font-weight="bold" text-anchor="start">API</text>
+<text x="680" y="308" font-family="monospace" font-size="16" fill="#585560" font-weight="normal" text-anchor="start">service=api</text>
+<line x1="636" y1="333" x2="865" y2="333" stroke="#bcb5a7" stroke-width="1"/>
+<text x="636" y="365" font-family="sans-serif" font-size="16" fill="#171729" font-weight="normal" text-anchor="start">Start with database traces</text>
+<text x="636" y="388" font-family="sans-serif" font-size="16" fill="#171729" font-weight="normal" text-anchor="start">and recent changes.</text>
+<line x1="35" y1="416" x2="865" y2="416" stroke="#bcb5a7" stroke-width="1"/>
+<text x="35" y="441" font-family="sans-serif" font-size="15" fill="#585560" font-weight="normal" text-anchor="start">Time relative to the injected delay. Each line uses its own latency scale.</text>
 </svg>

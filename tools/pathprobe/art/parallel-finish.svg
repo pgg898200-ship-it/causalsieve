@@ -1,38 +1,38 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 442" role="img" aria-labelledby="title desc">
   <title id="title">PathProbe DAG: speeding up a parallel search</title>
   <desc id="desc">Before, planning takes 10 milliseconds, search and lookup take 80 and 40 in parallel, and composition takes 30. The run finishes at 120. After search drops to 30, lookup finishes last and the run ends at 80 milliseconds. The dotted lines show idle time before the join.</desc>
-  <rect width="800" height="442" rx="12" fill="#f8f5ed"/>
-  <g font-family="system-ui, sans-serif" fill="#202d36">
+  <rect width="800" height="442" rx="12" fill="#fff3d7"/>
+  <g font-family="system-ui, sans-serif" fill="#171729">
     <text x="32" y="46" font-size="30" font-weight="720">Where the 40 ms comes from</text>
-    <text x="33" y="74" font-size="17">Search and lookup run in parallel. Compose waits for both.</text>
-    <g font-family="ui-monospace,monospace" font-size="14" fill="#495761">
+    <text x="33" y="74" font-size="23">Search and lookup run in parallel. Compose waits for both.</text>
+    <g font-family="ui-monospace,monospace" font-size="22" fill="#171729">
       <text x="137" y="112">0</text><text x="316" y="112">40</text><text x="496" y="112">80</text><text x="668" y="112">120 ms</text>
     </g>
-    <g stroke="#aab3b4" stroke-dasharray="3 6"><path d="M142 122v246 M322 122v246 M502 122v246 M682 122v246"/></g>
-    <g stroke="#202d36" stroke-width="2">
+    <g stroke="#b6aea0" stroke-dasharray="3 6"><path d="M142 122v246 M322 122v246 M502 122v246 M682 122v246"/></g>
+    <g stroke="#171729" stroke-width="2">
       <path d="M367 217h180" stroke-dasharray="5 5"/>
       <path d="M322 296h45" stroke-dasharray="5 5"/>
     </g>
-    <g font-size="19" font-weight="700">
+    <g font-size="24" font-weight="700">
       <text x="33" y="153">Before</text><text x="33" y="281">After</text>
     </g>
-    <g font-size="15" fill="#495761">
+    <g font-size="22" fill="#171729">
       <text x="33" y="179">Search</text><text x="33" y="222">Lookup</text>
       <text x="33" y="307">Search</text><text x="33" y="350">Lookup</text>
     </g>
-    <g fill="#233843">
+    <g fill="#171729">
       <rect x="142" y="151" width="45" height="82" rx="4"/><rect x="547" y="151" width="135" height="82" rx="4"/>
       <rect x="142" y="279" width="45" height="82" rx="4"/><rect x="367" y="279" width="135" height="82" rx="4"/>
     </g>
-    <g fill="#c85438"><rect x="187" y="151" width="360" height="38" rx="3"/><rect x="187" y="279" width="135" height="38" rx="3"/></g>
-    <g fill="#96c9b5"><rect x="187" y="195" width="180" height="38" rx="3"/><rect x="187" y="323" width="180" height="38" rx="3"/></g>
-    <g font-size="15" font-weight="620" text-anchor="middle">
-      <g fill="white"><text x="164.5" y="195" transform="rotate(-90 164.5 192)">Plan 10</text><text x="164.5" y="323" transform="rotate(-90 164.5 320)">Plan 10</text>
+    <g fill="#ef543c"><rect x="187" y="151" width="360" height="38" rx="3"/><rect x="187" y="279" width="135" height="38" rx="3"/></g>
+    <g fill="#384cfa"><rect x="187" y="195" width="180" height="38" rx="3"/><rect x="187" y="323" width="180" height="38" rx="3"/></g>
+    <g font-size="22" font-weight="620" text-anchor="middle">
+      <g fill="#fff3d7"><text x="164.5" y="195" transform="rotate(-90 164.5 192)">Plan 10</text><text x="164.5" y="323" transform="rotate(-90 164.5 320)">Plan 10</text>
         <text x="614.5" y="197">Compose 30</text><text x="434.5" y="325">Compose 30</text>
-        <text x="367" y="176">80 ms</text><text x="254.5" y="304">30 ms</text></g>
-      <text x="277" y="220">40 ms</text><text x="277" y="348">40 ms</text>
+        <text x="367" y="176" fill="#171729">80 ms</text><text x="254.5" y="304" fill="#171729">30 ms</text></g>
+      <text x="277" y="220" fill="#fff3d7">40 ms</text><text x="277" y="348" fill="#fff3d7">40 ms</text>
     </g>
-    <path d="M502 378v9h180v-9" fill="none" stroke="#202d36" stroke-width="2"/>
-    <text x="592" y="416" text-anchor="middle" font-size="18" font-weight="700">40 ms saved</text>
+    <path d="M502 378v9h180v-9" fill="none" stroke="#171729" stroke-width="2"/>
+    <text x="592" y="416" text-anchor="middle" font-size="23" font-weight="700">40 ms saved</text>
   </g>
 </svg>
