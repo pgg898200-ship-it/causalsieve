@@ -1,11 +1,14 @@
 # CausalSieve
 
-> Zero-runtime-dependency C++20 SIMD engine (runtime CPUID AVX2+FMA dispatch on x86-64, native NEON on ARM64) for online multivariate causal discovery (exact Block-Schur conditional Granger, innovation precision whitening, online Hyvärinen-Smith LiNGAM orientation), anytime-valid Ville E-process alarms, multi-agent CausalBlackboard consensus, and 99.90%–99.98% token-compressed lossless-recoverable stream digests.
+CausalSieve ranks possible sources of a multivariate telemetry incident. Use it after an alert when several metrics changed and a responder needs an investigation order. The Python adapters accept a Prometheus range-query matrix, OpenTelemetry metrics, JSON Lines, or a numeric table. The CLI can read CSV.
+
+For a Prometheus response, call `sieve, digest = analyze_prometheus(payload)` and read `[row.name for row in digest.root_causes]`. Each candidate retains its metric name and labels. Check the leading candidates against traces and deployment history. Close the returned sieve when you finish using it.
 
 ## Core Documentation
 
-- [README & Quickstart](README.md): Overview, v0.2.0 benchmarks (`746.8k ticks/s` at `D=8`, `385.3k` at `D=16`, `154.2k` at `D=32` — `2,334×` vs `statsmodels` & `1,467×` vs `tigramite`, `71,514×` vs `statsmodels` at `D=64`; `#1` across all 645 real Kubernetes `RCAEval` RE1+RE2 outages with `75.7%` micro / `76.5%` macro AC@1 & `0.839/0.844` MRR beating `BARO`, `N-Sigma`, `CIRCA`; `0.0%` context overflow at 8k vs `100%` CSV/JSON overflow at 128k with `0.0` FP64 `slice://` recovery), and honest tradeoffs.
-- [Full Reproducible Benchmarks](BENCHMARKS.md): Complete v0.2.0 tables, 5-stage optimization ladder, SHA-256 provenance across all 8 frozen JSONs, 645-case `RCAEval` RE1+RE2 breakdowns, Agent BPE Token & Adversarial Blackboard benchmark, and Tier-2 `D=4,096` firehose (`75.7M obs/s`, `100%` AC@1 vs `0%` baselines).
+- [README and runnable example](README.md#try-a-prometheus-incident) shows the input and JSON output for a simulated database delay that propagates to an API.
+- [Benchmark results](BENCHMARKS.md) reports service-ranking accuracy on RCAEval incidents, run times, and comparisons with baselines.
+
 - [Full Technical Reference](llms-full.txt): Single-file Markdown reference covering math specifications, Python API, CLI, JSON-RPC 2.0 MCP server schemas, C99 ABI, and honest limits.
 - [CausalSieve vs statsmodels, tigramite, sklearn & river](docs/vs-statsmodels-tigramite.md): Drop-in migration code, complexity analysis, and honest crossovers.
 - [Runnable Prometheus incident example](examples/prometheus_incident.py) accepts a saved `/api/v1/query_range` matrix or generates an offline fixture. Its JSON output contains the tick count, series count and ranked metric names.

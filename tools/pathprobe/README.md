@@ -8,6 +8,8 @@
 
 A planner takes 10 ms, launches an 80 ms search and a 40 ms lookup in parallel, then spends 30 ms composing the result. Cutting search to 30 ms takes the workflow from **120 to 80 ms**. Lookup now sets the floor. Making search instantaneous still buys only 40 ms. Accelerating a task common to both branches can save its entire duration.
 
+![Before and after timelines. Cutting search from 80 to 30 ms moves workflow completion from 120 to 80 ms because lookup takes 40 ms.](art/parallel-finish.svg)
+
 Install the zero-dependency Python package from this repository (Python 3.10+).
 
 ```sh

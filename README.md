@@ -1,8 +1,10 @@
 # CausalSieve
 
-**Which service should you investigate first?** CausalSieve ranks possible sources of an incident from time series that change together. Feed it a Prometheus range query after an alert. It returns the metric names to inspect first, keeping their service labels so you can find them in your dashboard.
+**Rank the metrics to investigate after an incident alert.** Give CausalSieve a Prometheus range-query response that covers normal operation and the incident. It learns how the metrics usually move together and ranks the changes those relationships explain least well. The output keeps the metric names and service labels, so a responder can open the relevant traces or an incident agent can look up the same series.
 
-An API slowdown can start at the database. CausalSieve learns how each metric usually follows the others, then looks for changes that the earlier measurements fail to explain. An on-call engineer can check the ranked candidates against traces and deployments. An incident agent can read the same results as structured data.
+In the synthetic example below, both the database and the API slow down. CausalSieve ranks database latency first. Start there and check traces and deployment history to establish what happened.
+
+[![Three minutes of synthetic Prometheus latency data around an injected database delay. The API follows the database. Across all 600 samples, CausalSieve ranks database latency first and API latency second.](docs/assets/prometheus-incident.svg)](examples/prometheus_incident.py)
 
 [Try the interactive explorer](https://pgg898200-ship-it.github.io/causalsieve/) · [Python package](https://pypi.org/project/causalsieve/) · [Benchmark results](BENCHMARKS.md) · [Agent reference](llms.txt)
 
@@ -38,7 +40,7 @@ python examples/prometheus_incident.py query_range.json
 
 The adapter accepts a Prometheus matrix of timestamp/value pairs. It aligns samples by time and carries each series’ last value forward across gaps. [Prometheus and Kubernetes integration guide](docs/kubernetes-prometheus-rca.md) · [Example source](examples/prometheus_incident.py)
 
-## Headline Verified Results (`v0.2.0`)
+## Benchmark results for v0.2.0
 
 Measured live on **1× Intel Xeon @ 2.30 GHz** against frozen runtime-dispatched `libcausalsieve.so` (`avx2+fma`, `sha256: e97025de...` — exact same binary architecture shipped inside PyPI wheels!):
 
@@ -62,9 +64,9 @@ Measured live on **1× Intel Xeon @ 2.30 GHz** against frozen runtime-dispatched
 
 ---
 
-## 3-Line Quickstart
+## Installation and usage
 
-### One-Command Install (Zero Runtime Dependencies, Automatic AVX2/NEON Dispatch)
+### Install the Python package
 ```sh
 pip install causalsieve        # prebuilt multi-ISA wheel (auto runtime AVX2+FMA on x86-64, NEON on ARM64; 0 runtime deps)
 causalsieve info               # verify active SIMD ISA (avx2+fma / neon / scalar)
@@ -93,9 +95,9 @@ from causalsieve import (
 # 1. Streaming / batch core (zero-copy if NumPy float64 C-contiguous passed)
 with CausalSieve(dim=16, lag=2, channel_names=[f"svc_{i}" for i in range(16)]) as sieve:
     sieve.push_batch(rows)                          # 385k ticks/s on 1 Xeon core
-    attr = sieve.root_attribution()                 # ranked exogenous root causes (not victims)
+    attr = sieve.root_attribution()                 # ranked candidate sources
     granger = sieve.granger_matrix()                # exact Block-Schur D x D F-stats & partial R^2
-    cf = sieve.counterfactual_do("svc_0", 4.0, 10)  # quantitative do-intervention propagation
+    cf = sieve.counterfactual_do("svc_0", 4.0, 10)  # responses predicted by the fitted model
     digest = build_digest(sieve, top_k=5)           # 99.9%+ token reduction + lossless handles
 
 # 2. Zero-dependency adapters for Pandas/Polars, Prometheus, OpenTelemetry OTLP, JSONL & RCAEval
@@ -131,7 +133,7 @@ Exposes 6 tools backed by a thread-safe multi-agent `CausalBlackboard`:
 - `sieve_ingest_csv` — stream a CSV and return a 99%+ compressed Causal Digest + `stream_id`
 - `sieve_push_ticks` — push live rows and receive instant exogenous root-cause & Ville E-value alerts
 - `sieve_causal_graph` — return pruned lagged Granger + contemporaneous partial-corr / LiNGAM edges
-- `sieve_counterfactual` — simulate `do(channel += delta)` to verify root-cause hypotheses
+- `sieve_counterfactual` — estimate how a change to one channel propagates in the fitted model
 - `sieve_recover_slice` — recover 100% lossless IEEE-754 FP64 raw points via `slice://...` handle (`65 µs` median)
 - `sieve_swarm_propose` — append & objectively score multi-agent hypotheses (no overwrite churn, proper-scoring consensus)
 
