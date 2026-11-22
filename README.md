@@ -142,6 +142,10 @@ We report failures and crossovers alongside wins:
 
 ---
 
+## Optional latency planning
+
+CausalSieve identifies suspected upstream causes in telemetry. For a workflow with recorded task durations and finish-to-start dependencies, estimate how much a faster task could shorten the run with the independent [PathProbe toolkit](tools/pathprobe).
+
 ## Reproduce Everything
 
 ```sh

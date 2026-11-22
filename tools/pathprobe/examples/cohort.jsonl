@@ -1,0 +1,3 @@
+{"deadline":100,"durations":{"plan":10,"search":80,"lookup":40,"compose":30},"edges":[["plan","search"],["plan","lookup"],["search","compose"],["lookup","compose"]]}
+{"deadline":100,"durations":{"plan":20,"search":80,"lookup":20,"compose":40},"edges":[["plan","search"],["plan","lookup"],["search","compose"],["lookup","compose"]]}
+{"deadline":100,"durations":{"plan":10,"search":70,"lookup":100,"compose":10},"edges":[["plan","search"],["plan","lookup"],["search","compose"],["lookup","compose"]]}
