@@ -56,7 +56,13 @@ python -m pathprobe fleet examples/actions/agents-sdk-releases.jsonl checks --du
 
 The October 2 run also shows where the model stops. A 300-second wait between two jobs contributed to an observed span of 1,353 seconds. The dependency-only critical path was 1,048 seconds. These three public records supply example inputs, and the deadline is a scenario assumption.
 
+### A CI optimization case study
+
+In an independent analysis of four public SAPPHIRE workflow runs, speeding up a single unit-test shard saved zero modeled wall time in every run. A two-minute improvement to the Aquacast image-proof job saved between zero and two minutes, depending on the parallel integration path. The case study includes the pinned workflow, measured job timings and an offline script. [Reproduce the SAPPHIRE analysis](examples/sapphire-ci/README.md).
+
 ## Capture a workflow
+
+To capture a completed GitHub Actions run, supply its repository, run and attempt numbers, and an explicit map of job dependencies. The [Actions capture guide](examples/actions/CAPTURE.md) shows how to replay the result and compare modeled completion with observed elapsed time.
 
 The optional Dask Distributed adapter captures a fresh computation and joins the scheduler’s optimized task dependencies to worker compute intervals. It rejects incomplete measurements and ambiguous attempts. The adapter was exercised end-to-end with 1,023 tasks on four local workers.
 
@@ -101,6 +107,8 @@ python bench/export_native.py --input bench/data/cycles.json --input bench/data/
 python bench/capacity.py
 python bench/compare.py --input bench/data/cycles.json --input bench/data/montage.json
 ```
+
+If you benchmark your own workflow, share the graph size, comparison method, query count and timings including index construction. We welcome cases where PathProbe wins or loses. [Report an independent reproduction](https://github.com/pgg898200-ship-it/causalsieve/issues/new).
 
 ## Model and prior work
 

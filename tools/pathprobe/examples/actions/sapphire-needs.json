@@ -1,0 +1,23 @@
+{
+  "aquacast-release-image-proof": [],
+  "build-image-and-scan": [],
+  "integration": [
+    "integration (heavy)",
+    "integration (rest)"
+  ],
+  "integration (heavy)": [],
+  "integration (rest)": [],
+  "lint": [],
+  "unit (adapters-flows)": [],
+  "unit (rest)": [],
+  "unit (scripts)": [],
+  "unit (services)": [],
+  "unit-coverage": [
+    "unit (scripts)",
+    "unit (services)",
+    "unit (adapters-flows)",
+    "unit (rest)"
+  ],
+  "wheel-only-guard": [],
+  "ci-attest": null
+}
