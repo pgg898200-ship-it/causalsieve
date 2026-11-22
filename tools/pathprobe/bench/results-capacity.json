@@ -1,0 +1,433 @@
+{
+  "compiler": "c++ (Debian 14.2.0-19) 14.2.0",
+  "flags": [
+    "-std=c++17",
+    "-O3",
+    "-DNDEBUG"
+  ],
+  "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+  "machine": "x86_64",
+  "processor": "AMD EPYC 9V74 80-Core Processor",
+  "header_sha256": "c0da91e8a3660d2eefc8535e729dbae5fb54936f0c9701f87e74632f9452440b",
+  "benchmark_sha256": "3a88b126d6a713c9b2b6478975c9c2cbdfbec25f79ee359b58e7256a452e90bd",
+  "seed": 421,
+  "nodes": 1000002,
+  "repeats": 9,
+  "timing": "One fresh process per method and trial. Each task receives one shuffled scalar edit. Edits alternate halving and increasing duration by ~50%. Build and queries timed; input graph and output-vector allocation, correctness verification and destruction excluded. build_queries_cpu_ns also records process CPU time over the same construction + query window. Rotating trial order; unpinned CPU.",
+  "memory": "Linux /proc/self/status process peak resident KiB, including executable, input graph, query and answer buffers, and transient construction. Input RSS sampled after generating fixtures. A reading of -1 means unavailable.",
+  "oracle": "Every result equals its family's analytical makespan. Each family's 2,046-task fixture is first checked against full topological DP for every edit. The eager max-heap competitor has the same O(1) lookup contract.",
+  "graphs": [
+    {
+      "shape": "series_diamonds",
+      "edges": 1333334,
+      "methods": {
+        "pathprobe": {
+          "build_ns": 65004294,
+          "queries_ns": 14057943,
+          "total_ns": 80848363,
+          "build_queries_cpu_ns": 80860889,
+          "input_rss_kib": 53824,
+          "process_peak_rss_kib": 143188,
+          "trials": [
+            {
+              "nodes": 1000002,
+              "edges": 1333334,
+              "build_ns": 56698325,
+              "queries_ns": 11291960,
+              "total_ns": 67990285,
+              "build_queries_cpu_ns": 67690607,
+              "input_rss_kib": 53824,
+              "process_peak_rss_kib": 143188
+            },
+            {
+              "nodes": 1000002,
+              "edges": 1333334,
+              "build_ns": 62207638,
+              "queries_ns": 18640725,
+              "total_ns": 80848363,
+              "build_queries_cpu_ns": 80860889,
+              "input_rss_kib": 53820,
+              "process_peak_rss_kib": 143176
+            },
+            {
+              "nodes": 1000002,
+              "edges": 1333334,
+              "build_ns": 153912777,
+              "queries_ns": 13872839,
+              "total_ns": 167785616,
+              "build_queries_cpu_ns": 166446116,
+              "input_rss_kib": 53824,
+              "process_peak_rss_kib": 143168
+            },
+            {
+              "nodes": 1000002,
+              "edges": 1333334,
+              "build_ns": 49707181,
+              "queries_ns": 13190473,
+              "total_ns": 62897654,
+              "build_queries_cpu_ns": 62911338,
+              "input_rss_kib": 53820,
+              "process_peak_rss_kib": 143184
+            },
+            {
+              "nodes": 1000002,
+              "edges": 1333334,
+              "build_ns": 206513981,
+              "queries_ns": 15613204,
+              "total_ns": 222127185,
+              "build_queries_cpu_ns": 217651771,
+              "input_rss_kib": 53824,
+              "process_peak_rss_kib": 143188
+            },
+            {
+              "nodes": 1000002,
+              "edges": 1333334,
+              "build_ns": 287906508,
+              "queries_ns": 17928195,
+              "total_ns": 305834703,
+              "build_queries_cpu_ns": 283022171,
+              "input_rss_kib": 53824,
+              "process_peak_rss_kib": 143188
+            },
+            {
+              "nodes": 1000002,
+              "edges": 1333334,
+              "build_ns": 656626603,
+              "queries_ns": 20556507,
+              "total_ns": 677183110,
+              "build_queries_cpu_ns": 661751293,
+              "input_rss_kib": 53824,
+              "process_peak_rss_kib": 143188
+            },
+            {
+              "nodes": 1000002,
+              "edges": 1333334,
+              "build_ns": 52933560,
+              "queries_ns": 11411293,
+              "total_ns": 64344853,
+              "build_queries_cpu_ns": 64359939,
+              "input_rss_kib": 53820,
+              "process_peak_rss_kib": 143184
+            },
+            {
+              "nodes": 1000002,
+              "edges": 1333334,
+              "build_ns": 65004294,
+              "queries_ns": 14057943,
+              "total_ns": 79062237,
+              "build_queries_cpu_ns": 78602645,
+              "input_rss_kib": 53824,
+              "process_peak_rss_kib": 143188
+            }
+          ]
+        },
+        "heap_sensitivity": {
+          "build_ns": 134684398,
+          "queries_ns": 12520808,
+          "total_ns": 145714419,
+          "build_queries_cpu_ns": 143313677,
+          "input_rss_kib": 53820,
+          "process_peak_rss_kib": 158800,
+          "trials": [
+            {
+              "nodes": 1000002,
+              "edges": 1333334,
+              "build_ns": 94673182,
+              "queries_ns": 9075641,
+              "total_ns": 103748823,
+              "build_queries_cpu_ns": 102589155,
+              "input_rss_kib": 53824,
+              "process_peak_rss_kib": 158804
+            },
+            {
+              "nodes": 1000002,
+              "edges": 1333334,
+              "build_ns": 205775952,
+              "queries_ns": 49939162,
+              "total_ns": 255715114,
+              "build_queries_cpu_ns": 239741304,
+              "input_rss_kib": 53824,
+              "process_peak_rss_kib": 158804
+            },
+            {
+              "nodes": 1000002,
+              "edges": 1333334,
+              "build_ns": 172989999,
+              "queries_ns": 12520808,
+              "total_ns": 185510807,
+              "build_queries_cpu_ns": 185423405,
+              "input_rss_kib": 53824,
+              "process_peak_rss_kib": 158804
+            },
+            {
+              "nodes": 1000002,
+              "edges": 1333334,
+              "build_ns": 67235349,
+              "queries_ns": 10931356,
+              "total_ns": 78166705,
+              "build_queries_cpu_ns": 78211223,
+              "input_rss_kib": 53820,
+              "process_peak_rss_kib": 158800
+            },
+            {
+              "nodes": 1000002,
+              "edges": 1333334,
+              "build_ns": 135192201,
+              "queries_ns": 15489201,
+              "total_ns": 150681402,
+              "build_queries_cpu_ns": 145281959,
+              "input_rss_kib": 53820,
+              "process_peak_rss_kib": 158800
+            },
+            {
+              "nodes": 1000002,
+              "edges": 1333334,
+              "build_ns": 282938213,
+              "queries_ns": 17118672,
+              "total_ns": 300056885,
+              "build_queries_cpu_ns": 292198867,
+              "input_rss_kib": 53820,
+              "process_peak_rss_kib": 158800
+            },
+            {
+              "nodes": 1000002,
+              "edges": 1333334,
+              "build_ns": 134684398,
+              "queries_ns": 11030021,
+              "total_ns": 145714419,
+              "build_queries_cpu_ns": 143313677,
+              "input_rss_kib": 53820,
+              "process_peak_rss_kib": 158800
+            },
+            {
+              "nodes": 1000002,
+              "edges": 1333334,
+              "build_ns": 59983056,
+              "queries_ns": 8308742,
+              "total_ns": 68291798,
+              "build_queries_cpu_ns": 68056431,
+              "input_rss_kib": 53824,
+              "process_peak_rss_kib": 158804
+            },
+            {
+              "nodes": 1000002,
+              "edges": 1333334,
+              "build_ns": 80373269,
+              "queries_ns": 14506398,
+              "total_ns": 94879667,
+              "build_queries_cpu_ns": 94623437,
+              "input_rss_kib": 53820,
+              "process_peak_rss_kib": 158800
+            }
+          ]
+        }
+      }
+    },
+    {
+      "shape": "parallel_chains",
+      "edges": 999746,
+      "methods": {
+        "pathprobe": {
+          "build_ns": 70475195,
+          "queries_ns": 14213051,
+          "total_ns": 92583078,
+          "build_queries_cpu_ns": 91885545,
+          "input_rss_kib": 48608,
+          "process_peak_rss_kib": 135412,
+          "trials": [
+            {
+              "nodes": 1000002,
+              "edges": 999746,
+              "build_ns": 139612279,
+              "queries_ns": 15974280,
+              "total_ns": 155586559,
+              "build_queries_cpu_ns": 154916428,
+              "input_rss_kib": 48608,
+              "process_peak_rss_kib": 135424
+            },
+            {
+              "nodes": 1000002,
+              "edges": 999746,
+              "build_ns": 125590925,
+              "queries_ns": 13003128,
+              "total_ns": 138594053,
+              "build_queries_cpu_ns": 138582673,
+              "input_rss_kib": 48612,
+              "process_peak_rss_kib": 135416
+            },
+            {
+              "nodes": 1000002,
+              "edges": 999746,
+              "build_ns": 100615432,
+              "queries_ns": 13286166,
+              "total_ns": 113901598,
+              "build_queries_cpu_ns": 113899484,
+              "input_rss_kib": 48608,
+              "process_peak_rss_kib": 135404
+            },
+            {
+              "nodes": 1000002,
+              "edges": 999746,
+              "build_ns": 70475195,
+              "queries_ns": 22107883,
+              "total_ns": 92583078,
+              "build_queries_cpu_ns": 91885545,
+              "input_rss_kib": 48608,
+              "process_peak_rss_kib": 135412
+            },
+            {
+              "nodes": 1000002,
+              "edges": 999746,
+              "build_ns": 81074942,
+              "queries_ns": 23667540,
+              "total_ns": 104742482,
+              "build_queries_cpu_ns": 104646310,
+              "input_rss_kib": 48612,
+              "process_peak_rss_kib": 135416
+            },
+            {
+              "nodes": 1000002,
+              "edges": 999746,
+              "build_ns": 62680496,
+              "queries_ns": 14213051,
+              "total_ns": 76893547,
+              "build_queries_cpu_ns": 76909515,
+              "input_rss_kib": 48608,
+              "process_peak_rss_kib": 135332
+            },
+            {
+              "nodes": 1000002,
+              "edges": 999746,
+              "build_ns": 57084076,
+              "queries_ns": 16480181,
+              "total_ns": 73564257,
+              "build_queries_cpu_ns": 73556441,
+              "input_rss_kib": 48608,
+              "process_peak_rss_kib": 135412
+            },
+            {
+              "nodes": 1000002,
+              "edges": 999746,
+              "build_ns": 62404084,
+              "queries_ns": 11214062,
+              "total_ns": 73618146,
+              "build_queries_cpu_ns": 73623429,
+              "input_rss_kib": 48608,
+              "process_peak_rss_kib": 135412
+            },
+            {
+              "nodes": 1000002,
+              "edges": 999746,
+              "build_ns": 52231095,
+              "queries_ns": 10939538,
+              "total_ns": 63170633,
+              "build_queries_cpu_ns": 63160378,
+              "input_rss_kib": 48612,
+              "process_peak_rss_kib": 135416
+            }
+          ]
+        },
+        "heap_sensitivity": {
+          "build_ns": 78598133,
+          "queries_ns": 9844053,
+          "total_ns": 88442186,
+          "build_queries_cpu_ns": 87951231,
+          "input_rss_kib": 48608,
+          "process_peak_rss_kib": 175604,
+          "trials": [
+            {
+              "nodes": 1000002,
+              "edges": 999746,
+              "build_ns": 86951670,
+              "queries_ns": 13282901,
+              "total_ns": 100234571,
+              "build_queries_cpu_ns": 99787115,
+              "input_rss_kib": 48612,
+              "process_peak_rss_kib": 175608
+            },
+            {
+              "nodes": 1000002,
+              "edges": 999746,
+              "build_ns": 67902876,
+              "queries_ns": 9064785,
+              "total_ns": 76967661,
+              "build_queries_cpu_ns": 75103887,
+              "input_rss_kib": 48608,
+              "process_peak_rss_kib": 175604
+            },
+            {
+              "nodes": 1000002,
+              "edges": 999746,
+              "build_ns": 104253082,
+              "queries_ns": 11188625,
+              "total_ns": 115441707,
+              "build_queries_cpu_ns": 115435326,
+              "input_rss_kib": 48612,
+              "process_peak_rss_kib": 175608
+            },
+            {
+              "nodes": 1000002,
+              "edges": 999746,
+              "build_ns": 445040588,
+              "queries_ns": 21481650,
+              "total_ns": 466522238,
+              "build_queries_cpu_ns": 466777729,
+              "input_rss_kib": 48608,
+              "process_peak_rss_kib": 175604
+            },
+            {
+              "nodes": 1000002,
+              "edges": 999746,
+              "build_ns": 78598133,
+              "queries_ns": 9844053,
+              "total_ns": 88442186,
+              "build_queries_cpu_ns": 87951231,
+              "input_rss_kib": 48612,
+              "process_peak_rss_kib": 175608
+            },
+            {
+              "nodes": 1000002,
+              "edges": 999746,
+              "build_ns": 67803328,
+              "queries_ns": 9466648,
+              "total_ns": 77269976,
+              "build_queries_cpu_ns": 77287081,
+              "input_rss_kib": 48608,
+              "process_peak_rss_kib": 175604
+            },
+            {
+              "nodes": 1000002,
+              "edges": 999746,
+              "build_ns": 71029362,
+              "queries_ns": 9720782,
+              "total_ns": 80750144,
+              "build_queries_cpu_ns": 80756264,
+              "input_rss_kib": 48608,
+              "process_peak_rss_kib": 175604
+            },
+            {
+              "nodes": 1000002,
+              "edges": 999746,
+              "build_ns": 67891619,
+              "queries_ns": 9176500,
+              "total_ns": 77068119,
+              "build_queries_cpu_ns": 76842601,
+              "input_rss_kib": 48608,
+              "process_peak_rss_kib": 175604
+            },
+            {
+              "nodes": 1000002,
+              "edges": 999746,
+              "build_ns": 82387782,
+              "queries_ns": 10355287,
+              "total_ns": 92743069,
+              "build_queries_cpu_ns": 92760089,
+              "input_rss_kib": 48612,
+              "process_peak_rss_kib": 175608
+            }
+          ]
+        }
+      }
+    }
+  ]
+}
