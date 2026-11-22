@@ -227,37 +227,30 @@ class BuildNativeLib(build_ext):
         if not getattr(compiler, "initialized", False):
             compiler.initialize()
 
-        def_path = build_temp / "causalsieve.def"
-        def_lines = ["LIBRARY causalsieve", "EXPORTS", *(f"    {sym}" for sym in _C99_EXPORTS)]
-        def_path.write_text("\n".join(def_lines) + "\n", encoding="utf-8")
-
-        obj_path = build_temp / "causalsieve.obj"
-        implib_path = build_temp / "causalsieve.lib"
-
-        flags: list[str] = [
-            "/nologo",
-            "/O2",
+        extra_compile_args: list[str] = [
             "/std:c++20",
-            "/LD",
-            "/EHsc",
             "/D__restrict__=__restrict",
-            f"/I{CSRC_DIR}",
         ]
         if arch == "x86_64" and not portable:
-            flags.extend(["/arch:AVX2", "/D__FMA__=1"])
+            extra_compile_args.extend(["/arch:AVX2", "/D__FMA__=1"])
 
-        cmd = [
-            compiler.cc,
-            *flags,
-            str(SOURCE_CPP),
-            f"/Fo:{obj_path}",
-            f"/Fe:{dest_path}",
-            "/link",
-            f"/DEF:{def_path}",
-            f"/IMPLIB:{implib_path}",
-        ]
-        self.announce(f"Compiling CausalSieve native core (MSVC {arch}, portable={portable})", level=2)
-        compiler.spawn(cmd)
+        self.announce(
+            f"Compiling CausalSieve native core (MSVC {arch}, portable={portable})",
+            level=2,
+        )
+        objects = compiler.compile(
+            [str(SOURCE_CPP)],
+            output_dir=str(build_temp),
+            include_dirs=[str(CSRC_DIR)],
+            extra_postargs=extra_compile_args,
+        )
+        compiler.link_shared_object(
+            objects,
+            str(dest_path),
+            export_symbols=list(_C99_EXPORTS),
+            build_temp=str(build_temp),
+            target_lang="c++",
+        )
 
     def get_outputs(self) -> list[str]:
         return list(self._built_outputs)
