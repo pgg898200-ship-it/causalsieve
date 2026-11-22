@@ -9,7 +9,8 @@
     "dist",
     ".git",
     "csrc",
-    "tests"
+    "tests",
+    "tools"
   ],
   "rules": [
     "Install with `pip install causalsieve` (zero runtime dependencies) or run the MCP server with `uvx --from causalsieve causalsieve-mcp`.",

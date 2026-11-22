@@ -284,6 +284,7 @@ class BuildNativeLib(build_ext):
         base_args: list[str] = [
             "/std:c++20",
             "/O2",
+            "/GL-",
             "/D__restrict__=__restrict",
         ]
         core_args = list(base_args)

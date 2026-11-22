@@ -25,5 +25,6 @@ recursive-include .claude-plugin *.json
 prune build
 prune dist
 prune benchmarks/data
+prune tools
 
 global-exclude *.pyc *.pyo __pycache__ *.so *.dylib *.dll .DS_Store
