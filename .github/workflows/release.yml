@@ -66,7 +66,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Build platform wheel via cibuildwheel
-        uses: pypa/cibuildwheel@v2.22.0
+        uses: pypa/cibuildwheel@v4.3.5
         env:
           CIBW_BUILD: "cp312-*"
           CIBW_ARCHS_LINUX: ${{ matrix.archs }}
@@ -74,7 +74,7 @@ jobs:
           CIBW_ARCHS_WINDOWS: ${{ matrix.archs }}
           CIBW_ENVIRONMENT: CAUSALSIEVE_PORTABLE=${{ matrix.portable }}
           CIBW_TEST_COMMAND: >
-            python -c "import causalsieve as cs; s, d = cs.analyze_dataframe({'a': [float(i%5) + (9.0 if i>=35 else 0.0) for i in range(50)], 'b': [float(i%3) for i in range(50)]}, lag=2); assert d.ticks == 50 and d.dim == 2; s.close(); print(cs.__version__, cs.simd_isa(), cs.library_path())"
+            python -c "import causalsieve as cs; s, d = cs.analyze_dataframe({'a': [float(i%5) + 9.0 * (i//35) for i in range(50)], 'b': [float(i%3) for i in range(50)]}, lag=2); assert d.ticks == 50 and d.dim == 2; s.close(); print(cs.__version__, cs.simd_isa(), cs.library_path())"
             && causalsieve info --json
 
       - name: Upload wheel artifact
