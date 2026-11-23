@@ -25,6 +25,7 @@ def evaluate(args):
             from .fleet import FleetBudget
 
             def runs():
+                cohort_unit = None
                 for line_number, line in enumerate(stream, 1):
                     if line.strip():
                         try:
@@ -32,6 +33,18 @@ def evaluate(args):
                             index = read_index(record)
                             if args.task not in record["durations"]:
                                 raise ValueError(f"missing task {args.task!r}")
+                            source = record.get("source")
+                            units = [record.get("time_unit")]
+                            if isinstance(source, dict):
+                                units.append(source.get("unit"))
+                            for unit in units:
+                                if isinstance(unit, str) and unit:
+                                    if cohort_unit is not None and unit != cohort_unit:
+                                        raise ValueError(
+                                            f"time unit {unit!r} conflicts with {cohort_unit!r}; "
+                                            "convert durations and deadlines to one unit"
+                                        )
+                                    cohort_unit = unit
                             deadline = record["deadline"]
                             if type(deadline) is not int or deadline < 0:
                                 raise ValueError("deadline must be a nonnegative integer")
