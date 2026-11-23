@@ -24,3 +24,26 @@ class CliTests(unittest.TestCase):
         failure = cli("fleet", "-", "s", "--required", "1", data='{"durations":{"s":9},"edges":[]}')
         self.assertEqual(failure.returncode, 2)
         self.assertIn("line 1", failure.stderr)
+
+    def test_fleet_capture_units(self):
+        row = {"durations": {"task": 1}, "edges": [], "deadline": 1}
+        seconds = dict(row, source={"unit": "seconds"})
+        micros = dict(row, durations={"task": 1000000}, deadline=1000000,
+                      time_unit="microseconds")
+
+        def run(*rows):
+            return cli("fleet", "-", "task", "--duration", "2",
+                       data="\n".join(map(json.dumps, rows)))
+
+        for rows, line in [((seconds, row, micros), 3), ((micros, seconds), 2),
+                           ((dict(seconds, time_unit="microseconds"),), 1)]:
+            with self.subTest(rows=rows):
+                result = run(*rows)
+                self.assertEqual(result.returncode, 2)
+                self.assertIn(f"line {line}", result.stderr)
+                self.assertIn("convert durations and deadlines", result.stderr)
+                self.assertEqual(result.stdout, "")
+
+        result = run(row, seconds, dict(row, time_unit="seconds"))
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(json.loads(result.stdout)["met"], 0)

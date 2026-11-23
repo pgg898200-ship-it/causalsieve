@@ -46,7 +46,7 @@ python -m pathprobe fleet examples/cohort.jsonl search --duration 30 --required 
 # {"task": "search", "runs": 3, "impossible": 1, "duration": 30, "met": 2, "required": 2, "limit": 40}
 ```
 
-Each JSON line contains one workflow graph and its integer `deadline`. Supply one time unit and the same logical task name across all rows. This three-run example is synthetic. Each historical run gets one vote. Counts are conditional on the supplied cohort and the other tasks retaining their durations. For repeated queries in a process, build `FleetBudget.from_runs((index, task_name, deadline) for ...)` once, then call `.met(duration)` or `.limit(required_runs)`.
+Each JSON line contains one workflow graph and its integer `deadline`. Supply one time unit and the same logical task name across all rows. The CLI checks declared unit labels in `time_unit` (Dask) and `source.unit` (GitHub Actions). Convert all durations and deadlines to the same unit and update the labels before combining captures. For rows without labels, supply values in the cohort unit. This three-run example is synthetic. Each historical run gets one vote. Counts are conditional on the supplied cohort and the other tasks retaining their durations. For repeated queries in a process, build `FleetBudget.from_runs((index, task_name, deadline) for ...)` once, then call `.met(duration)` or `.limit(required_runs)`.
 
 ### Three recorded SDK releases
 
