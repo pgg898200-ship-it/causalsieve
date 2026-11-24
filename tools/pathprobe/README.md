@@ -10,10 +10,10 @@ A planner takes 10 ms, launches an 80 ms search and a 40 ms lookup in parallel, 
 
 ![Before and after timelines. Cutting search from 80 to 30 ms moves workflow completion from 120 to 80 ms because lookup takes 40 ms.](art/parallel-finish.svg)
 
-Install the zero-dependency Python package from this repository (Python 3.10+).
+Install or upgrade the Python CLI (Python 3.10+, no runtime dependencies). Version 0.1.1 checks for conflicting time units when combining workflow captures.
 
 ```sh
-python -m pip install 'git+https://github.com/pgg898200-ship-it/causalsieve.git@pathprobe-dag#subdirectory=tools/pathprobe'
+python -m pip install --upgrade 'https://raw.githubusercontent.com/pgg898200-ship-it/causalsieve/main/tools/pathprobe/downloads/pathprobe_dag-0.1.1-py3-none-any.whl'
 ```
 
 ```python
