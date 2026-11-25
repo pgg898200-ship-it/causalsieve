@@ -48,6 +48,21 @@ python -m pathprobe fleet examples/cohort.jsonl search --duration 30 --required 
 
 Each JSON line contains one workflow graph and its integer `deadline`. Supply one time unit and the same logical task name across all rows. The CLI checks declared unit labels in `time_unit` (Dask) and `source.unit` (GitHub Actions). Convert all durations and deadlines to the same unit and update the labels before combining captures. For rows without labels, supply values in the cohort unit. This three-run example is synthetic. Each historical run gets one vote. Counts are conditional on the supplied cohort and the other tasks retaining their durations. For repeated queries in a process, build `FleetBudget.from_runs((index, task_name, deadline) for ...)` once, then call `.met(duration)` or `.limit(required_runs)`.
 
+### What if only one job matters?
+
+On November 25, 2026, we compared three ways to count how many archived runs meet their deadlines at a proposed duration for one named job. Each method started with the same parsed graphs and produced the same counts at every whole-second duration from zero through one second beyond the deadline. Times below are median microseconds for graph preparation and the entire batch.
+
+| Archived workflow and job | Replacement durations queried | Direct DAG replay | Two replays per run + sorted budgets | PathProbe all-task index + sorted budgets |
+| --- | ---: | ---: | ---: | ---: |
+| Python SDK CI, Python 3.10 test (12 runs) | 1 (289 s) | **63.1** | 74.5 | 193.6 |
+| Same cohort | 302 (0–301 s) | 4,241.0 | **135.5** | 258.8 |
+| Agents SDK releases, checks (3 runs) | 1 (845 s) | **8.3** | 10.5 | 25.6 |
+| Same cohort | 902 (0–901 s) | 1,682.3 | **157.4** | 175.0 |
+
+Direct replay won both single queries. For the sweeps, the fastest method first makes the target job instantaneous. If the run still misses, no duration can rescue it. Otherwise, every path bypassing the job fits the deadline. Setting the job duration to the deadline plus one forces a path through the job to determine completion. Subtracting that probe duration reveals the fixed time on the longest such path. Both indexed methods pass their budgets to the same `FleetBudget` query implementation. The all-task index pays to support later edits to other jobs.
+
+Reproduce offline from this directory with `python bench/fleet_compare.py`. Each of 21 trials builds fresh graphs per run, with method order rotated. Timings exclude JSON parsing and process startup. The replay baselines assume valid graphs, while PathProbe also validates input. These small, in-process measurements cover historical dependency graphs and modeled edits. [Benchmark source](bench/fleet_compare.py) · [Raw trials, environment and input hashes](bench/results-fleet.json) · [Original run URLs and workflow revisions](examples/actions/README.md)
+
 ### Three recorded SDK releases
 
 Three public [OpenAI Agents SDK release workflows](examples/actions/README.md) supply a small real cohort. On these inputs, the largest modeled duration for the checks job that keeps at least two of the three workflows within a hypothetical 900-second deadline is **849 seconds**.
