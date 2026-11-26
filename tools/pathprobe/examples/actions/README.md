@@ -39,3 +39,23 @@ python -m pathprobe fleet examples/actions/python-sdk-ci.jsonl 'test (Python 3.1
 At 289 seconds for the Python 3.10 test, **9 of 12** replays meet an illustrative 300-second dependency budget. At 290 seconds, only **6 of 12** meet it. Two runs miss even with an instantaneous Python 3.10 test, because lock validation plus the parallel Python 3.14 test took 314 and 307 seconds. All other recorded job durations remain fixed in these counterfactuals. The cohort covers successful runs over three calendar days.
 
 Each row contains its immutable commit, job IDs and UTC timestamps. To check the original records, open the run URL in the row or use `GET /repos/openai/openai-python/actions/runs/{run_id}/attempts/1/jobs?per_page=100` on the GitHub REST API. The SHA of the pinned `.github/workflows/ci.yml` blob is `69a810f97e3cb5249e313240a6f85e6f5bf01b2b` for all 12 commits. [Workflow at the oldest sampled commit](https://github.com/openai/openai-python/blob/642d6d4ac5ada8fc4c0a0211dc2ac883b176fdbe/.github/workflows/ci.yml) · [314-second competing path](https://github.com/openai/openai-python/actions/runs/44256794303) · [307-second competing path](https://github.com/openai/openai-python/actions/runs/44609511528)
+
+## Did the 289-second budget hold on later pushes?
+
+Yes for the same nine-of-twelve target. We held the job, five-minute modeled deadline and 289-second duration fixed before replaying a later cohort. Raising the duration by one second missed the target in both cohorts.
+
+| Successful main pushes | Met at 289 s | Met at 290 s | Miss even at 0 s | Largest duration meeting 9 of 12 |
+| --- | ---: | ---: | ---: | ---: |
+| November 18–20, 2026 | 9 of 12 | 6 of 12 | 2 | 289 s |
+| November 23–25, 2026 | 11 of 12 | 7 of 12 | 0 | 289 s |
+
+The later cohort's [one miss at 289 seconds](https://github.com/openai/openai-python/actions/runs/45468857904) spent 13 seconds on dependency lock freshness before the test could start, giving a modeled finish of 302 seconds. In the actual, unedited executions, six of the twelve runs spanned at most 300 seconds from first job start to last job completion. The table replaces one job duration and omits waiting between jobs.
+
+On November 26 we took the latest twelve of the fourteen [successful main-branch pushes returned for November 21–25 UTC](https://api.github.com/repos/openai/openai-python/actions/workflows/ci.yml/runs?branch=main&event=push&status=success&created=2026-11-21..2026-11-25&per_page=12). All were first attempts. Two used the [earlier workflow](https://github.com/openai/openai-python/blob/9d7f58e0a56eb2bf04984357d80f7409c0cf11eb/.github/workflows/ci.yml). The other ten used a [revised workflow](https://github.com/openai/openai-python/blob/66266569c6aad060ac1b184d2d593bb1e90f2de6/.github/workflows/ci.yml) that changed the examples job's commands and kept the same job dependencies. The [trace file](python-sdk-ci-nov23-25.jsonl) includes each run URL, commit, workflow blob, job IDs, UTC timestamps and skipped matrix placeholder. The sample covers successful pushes on one repository.
+
+Replay the later cohort offline from the PathProbe directory, or fetch the timings for the one miss with the same dependency manifest.
+
+```sh
+python -m pathprobe fleet examples/actions/python-sdk-ci-nov23-25.jsonl 'test (Python 3.10)' --duration 289 --required 9
+python examples/actions/capture.py openai/openai-python 45468857904 1 examples/actions/python-sdk-ci-needs.json --deadline 300
+```

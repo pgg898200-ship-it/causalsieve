@@ -1,0 +1,29 @@
+{
+  "Python support policy": [],
+  "browser demo types": [
+    "dependency lock freshness"
+  ],
+  "build": [
+    "dependency lock freshness"
+  ],
+  "compatibility (Python ${{ matrix.python-version }})": null,
+  "dependency lock freshness": [],
+  "examples": [
+    "dependency lock freshness"
+  ],
+  "lint": [
+    "dependency lock freshness"
+  ],
+  "optional provider types (browser)": [
+    "dependency lock freshness"
+  ],
+  "optional provider types (computer)": [
+    "dependency lock freshness"
+  ],
+  "test (Python 3.10)": [
+    "dependency lock freshness"
+  ],
+  "test (Python 3.14)": [
+    "dependency lock freshness"
+  ]
+}
