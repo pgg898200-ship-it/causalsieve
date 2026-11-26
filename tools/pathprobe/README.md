@@ -48,6 +48,8 @@ python -m pathprobe fleet examples/cohort.jsonl search --duration 30 --required 
 
 Each JSON line contains one workflow graph and its integer `deadline`. Supply one time unit and the same logical task name across all rows. The CLI checks declared unit labels in `time_unit` (Dask) and `source.unit` (GitHub Actions). Convert all durations and deadlines to the same unit and update the labels before combining captures. For rows without labels, supply values in the cohort unit. This three-run example is synthetic. Each historical run gets one vote. Counts are conditional on the supplied cohort and the other tasks retaining their durations. For repeated queries in a process, build `FleetBudget.from_runs((index, task_name, deadline) for ...)` once, then call `.met(duration)` or `.limit(required_runs)`.
 
+The published 289-second budget for the Python SDK test met a five-minute modeled deadline on 11 of 12 later pushes. At 290 seconds, only seven met it. [Replay the November 23–25 holdout](examples/actions/README.md#did-the-289-second-budget-hold-on-later-pushes).
+
 ### What if only one job matters?
 
 On November 25, 2026, we compared three ways to count how many archived runs meet their deadlines at a proposed duration for one named job. Each method started with the same parsed graphs and produced the same counts at every whole-second duration from zero through one second beyond the deadline. Times below are median microseconds for graph preparation and the entire batch.
