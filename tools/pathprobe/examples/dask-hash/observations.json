@@ -1,0 +1,1372 @@
+{
+  "python": "3.12.14",
+  "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+  "dask": "2026.11.0",
+  "distributed": "2026.11.0",
+  "pairs": [
+    {
+      "workers": 1,
+      "trial": 0,
+      "before": {
+        "candidate": "candidate-1-0-before",
+        "graph": {
+          "time_unit": "microseconds",
+          "durations": {
+            "finish-1-0-before": 28,
+            "sibling-1-0-before": 47657,
+            "candidate-1-0-before": 58112
+          },
+          "edges": [
+            [
+              "candidate-1-0-before",
+              "finish-1-0-before"
+            ],
+            [
+              "sibling-1-0-before",
+              "finish-1-0-before"
+            ]
+          ]
+        },
+        "leaf_intervals_ns": [
+          [
+            48502860,
+            106530361
+          ],
+          [
+            0,
+            47606014
+          ]
+        ],
+        "span_ns": 108519002
+      },
+      "after": {
+        "candidate": "candidate-1-0-after",
+        "graph": {
+          "time_unit": "microseconds",
+          "durations": {
+            "finish-1-0-after": 29,
+            "sibling-1-0-after": 49212,
+            "candidate-1-0-after": 23913
+          },
+          "edges": [
+            [
+              "candidate-1-0-after",
+              "finish-1-0-after"
+            ],
+            [
+              "sibling-1-0-after",
+              "finish-1-0-after"
+            ]
+          ]
+        },
+        "leaf_intervals_ns": [
+          [
+            49848832,
+            73718132
+          ],
+          [
+            0,
+            49127444
+          ]
+        ],
+        "span_ns": 76478695
+      }
+    },
+    {
+      "workers": 1,
+      "trial": 1,
+      "after": {
+        "candidate": "candidate-1-1-after",
+        "graph": {
+          "time_unit": "microseconds",
+          "durations": {
+            "finish-1-1-after": 28,
+            "sibling-1-1-after": 45746,
+            "candidate-1-1-after": 23211
+          },
+          "edges": [
+            [
+              "candidate-1-1-after",
+              "finish-1-1-after"
+            ],
+            [
+              "sibling-1-1-after",
+              "finish-1-1-after"
+            ]
+          ]
+        },
+        "leaf_intervals_ns": [
+          [
+            46599605,
+            69769610
+          ],
+          [
+            0,
+            45691301
+          ]
+        ],
+        "span_ns": 71603914
+      },
+      "before": {
+        "candidate": "candidate-1-1-before",
+        "graph": {
+          "time_unit": "microseconds",
+          "durations": {
+            "finish-1-1-before": 28,
+            "candidate-1-1-before": 64148,
+            "sibling-1-1-before": 49252
+          },
+          "edges": [
+            [
+              "candidate-1-1-before",
+              "finish-1-1-before"
+            ],
+            [
+              "sibling-1-1-before",
+              "finish-1-1-before"
+            ]
+          ]
+        },
+        "leaf_intervals_ns": [
+          [
+            0,
+            64088331
+          ],
+          [
+            65022273,
+            114226180
+          ]
+        ],
+        "span_ns": 116288050
+      }
+    },
+    {
+      "workers": 1,
+      "trial": 2,
+      "before": {
+        "candidate": "candidate-1-2-before",
+        "graph": {
+          "time_unit": "microseconds",
+          "durations": {
+            "finish-1-2-before": 27,
+            "candidate-1-2-before": 63315,
+            "sibling-1-2-before": 47764
+          },
+          "edges": [
+            [
+              "candidate-1-2-before",
+              "finish-1-2-before"
+            ],
+            [
+              "sibling-1-2-before",
+              "finish-1-2-before"
+            ]
+          ]
+        },
+        "leaf_intervals_ns": [
+          [
+            0,
+            63262685
+          ],
+          [
+            64052013,
+            111759376
+          ]
+        ],
+        "span_ns": 113764182
+      },
+      "after": {
+        "candidate": "candidate-1-2-after",
+        "graph": {
+          "time_unit": "microseconds",
+          "durations": {
+            "finish-1-2-after": 27,
+            "candidate-1-2-after": 23805,
+            "sibling-1-2-after": 47495
+          },
+          "edges": [
+            [
+              "candidate-1-2-after",
+              "finish-1-2-after"
+            ],
+            [
+              "sibling-1-2-after",
+              "finish-1-2-after"
+            ]
+          ]
+        },
+        "leaf_intervals_ns": [
+          [
+            0,
+            23759357
+          ],
+          [
+            24475006,
+            71918834
+          ]
+        ],
+        "span_ns": 74008323
+      }
+    },
+    {
+      "workers": 1,
+      "trial": 3,
+      "after": {
+        "candidate": "candidate-1-3-after",
+        "graph": {
+          "time_unit": "microseconds",
+          "durations": {
+            "finish-1-3-after": 29,
+            "candidate-1-3-after": 26640,
+            "sibling-1-3-after": 51178
+          },
+          "edges": [
+            [
+              "candidate-1-3-after",
+              "finish-1-3-after"
+            ],
+            [
+              "sibling-1-3-after",
+              "finish-1-3-after"
+            ]
+          ]
+        },
+        "leaf_intervals_ns": [
+          [
+            0,
+            26543716
+          ],
+          [
+            27326399,
+            78412140
+          ]
+        ],
+        "span_ns": 80299963
+      },
+      "before": {
+        "candidate": "candidate-1-3-before",
+        "graph": {
+          "time_unit": "microseconds",
+          "durations": {
+            "finish-1-3-before": 28,
+            "candidate-1-3-before": 67473,
+            "sibling-1-3-before": 49751
+          },
+          "edges": [
+            [
+              "candidate-1-3-before",
+              "finish-1-3-before"
+            ],
+            [
+              "sibling-1-3-before",
+              "finish-1-3-before"
+            ]
+          ]
+        },
+        "leaf_intervals_ns": [
+          [
+            0,
+            67420990
+          ],
+          [
+            68234053,
+            117937653
+          ]
+        ],
+        "span_ns": 120245124
+      }
+    },
+    {
+      "workers": 1,
+      "trial": 4,
+      "before": {
+        "candidate": "candidate-1-4-before",
+        "graph": {
+          "time_unit": "microseconds",
+          "durations": {
+            "finish-1-4-before": 27,
+            "sibling-1-4-before": 48126,
+            "candidate-1-4-before": 64813
+          },
+          "edges": [
+            [
+              "candidate-1-4-before",
+              "finish-1-4-before"
+            ],
+            [
+              "sibling-1-4-before",
+              "finish-1-4-before"
+            ]
+          ]
+        },
+        "leaf_intervals_ns": [
+          [
+            48876493,
+            113624316
+          ],
+          [
+            0,
+            48068197
+          ]
+        ],
+        "span_ns": 115779083
+      },
+      "after": {
+        "candidate": "candidate-1-4-after",
+        "graph": {
+          "time_unit": "microseconds",
+          "durations": {
+            "finish-1-4-after": 30,
+            "sibling-1-4-after": 46952,
+            "candidate-1-4-after": 24435
+          },
+          "edges": [
+            [
+              "candidate-1-4-after",
+              "finish-1-4-after"
+            ],
+            [
+              "sibling-1-4-after",
+              "finish-1-4-after"
+            ]
+          ]
+        },
+        "leaf_intervals_ns": [
+          [
+            47555223,
+            71950243
+          ],
+          [
+            0,
+            46907485
+          ]
+        ],
+        "span_ns": 75526336
+      }
+    },
+    {
+      "workers": 1,
+      "trial": 5,
+      "after": {
+        "candidate": "candidate-1-5-after",
+        "graph": {
+          "time_unit": "microseconds",
+          "durations": {
+            "finish-1-5-after": 28,
+            "sibling-1-5-after": 52082,
+            "candidate-1-5-after": 27002
+          },
+          "edges": [
+            [
+              "candidate-1-5-after",
+              "finish-1-5-after"
+            ],
+            [
+              "sibling-1-5-after",
+              "finish-1-5-after"
+            ]
+          ]
+        },
+        "leaf_intervals_ns": [
+          [
+            52979934,
+            79940484
+          ],
+          [
+            0,
+            52007745
+          ]
+        ],
+        "span_ns": 82283514
+      },
+      "before": {
+        "candidate": "candidate-1-5-before",
+        "graph": {
+          "time_unit": "microseconds",
+          "durations": {
+            "finish-1-5-before": 69,
+            "candidate-1-5-before": 63801,
+            "sibling-1-5-before": 50274
+          },
+          "edges": [
+            [
+              "candidate-1-5-before",
+              "finish-1-5-before"
+            ],
+            [
+              "sibling-1-5-before",
+              "finish-1-5-before"
+            ]
+          ]
+        },
+        "leaf_intervals_ns": [
+          [
+            0,
+            63747979
+          ],
+          [
+            64759643,
+            114980974
+          ]
+        ],
+        "span_ns": 117217447
+      }
+    },
+    {
+      "workers": 1,
+      "trial": 6,
+      "before": {
+        "candidate": "candidate-1-6-before",
+        "graph": {
+          "time_unit": "microseconds",
+          "durations": {
+            "finish-1-6-before": 26,
+            "candidate-1-6-before": 59841,
+            "sibling-1-6-before": 49113
+          },
+          "edges": [
+            [
+              "candidate-1-6-before",
+              "finish-1-6-before"
+            ],
+            [
+              "sibling-1-6-before",
+              "finish-1-6-before"
+            ]
+          ]
+        },
+        "leaf_intervals_ns": [
+          [
+            0,
+            59780849
+          ],
+          [
+            60732794,
+            109788585
+          ]
+        ],
+        "span_ns": 111943582
+      },
+      "after": {
+        "candidate": "candidate-1-6-after",
+        "graph": {
+          "time_unit": "microseconds",
+          "durations": {
+            "finish-1-6-after": 28,
+            "candidate-1-6-after": 24735,
+            "sibling-1-6-after": 48172
+          },
+          "edges": [
+            [
+              "candidate-1-6-after",
+              "finish-1-6-after"
+            ],
+            [
+              "sibling-1-6-after",
+              "finish-1-6-after"
+            ]
+          ]
+        },
+        "leaf_intervals_ns": [
+          [
+            0,
+            24610458
+          ],
+          [
+            25387632,
+            73504450
+          ]
+        ],
+        "span_ns": 76500598
+      }
+    },
+    {
+      "workers": 1,
+      "trial": 7,
+      "after": {
+        "candidate": "candidate-1-7-after",
+        "graph": {
+          "time_unit": "microseconds",
+          "durations": {
+            "finish-1-7-after": 28,
+            "sibling-1-7-after": 47770,
+            "candidate-1-7-after": 24762
+          },
+          "edges": [
+            [
+              "candidate-1-7-after",
+              "finish-1-7-after"
+            ],
+            [
+              "sibling-1-7-after",
+              "finish-1-7-after"
+            ]
+          ]
+        },
+        "leaf_intervals_ns": [
+          [
+            48658941,
+            73381826
+          ],
+          [
+            0,
+            47717884
+          ]
+        ],
+        "span_ns": 75401218
+      },
+      "before": {
+        "candidate": "candidate-1-7-before",
+        "graph": {
+          "time_unit": "microseconds",
+          "durations": {
+            "finish-1-7-before": 120,
+            "candidate-1-7-before": 62615,
+            "sibling-1-7-before": 47728
+          },
+          "edges": [
+            [
+              "candidate-1-7-before",
+              "finish-1-7-before"
+            ],
+            [
+              "sibling-1-7-before",
+              "finish-1-7-before"
+            ]
+          ]
+        },
+        "leaf_intervals_ns": [
+          [
+            0,
+            62563738
+          ],
+          [
+            63384975,
+            111064395
+          ]
+        ],
+        "span_ns": 113241670
+      }
+    },
+    {
+      "workers": 1,
+      "trial": 8,
+      "before": {
+        "candidate": "candidate-1-8-before",
+        "graph": {
+          "time_unit": "microseconds",
+          "durations": {
+            "finish-1-8-before": 31,
+            "sibling-1-8-before": 48186,
+            "candidate-1-8-before": 61539
+          },
+          "edges": [
+            [
+              "candidate-1-8-before",
+              "finish-1-8-before"
+            ],
+            [
+              "sibling-1-8-before",
+              "finish-1-8-before"
+            ]
+          ]
+        },
+        "leaf_intervals_ns": [
+          [
+            48884196,
+            110370370
+          ],
+          [
+            0,
+            48130942
+          ]
+        ],
+        "span_ns": 112638776
+      },
+      "after": {
+        "candidate": "candidate-1-8-after",
+        "graph": {
+          "time_unit": "microseconds",
+          "durations": {
+            "finish-1-8-after": 34,
+            "candidate-1-8-after": 23094,
+            "sibling-1-8-after": 50446
+          },
+          "edges": [
+            [
+              "candidate-1-8-after",
+              "finish-1-8-after"
+            ],
+            [
+              "sibling-1-8-after",
+              "finish-1-8-after"
+            ]
+          ]
+        },
+        "leaf_intervals_ns": [
+          [
+            0,
+            23042708
+          ],
+          [
+            23859518,
+            74202698
+          ]
+        ],
+        "span_ns": 76691431
+      }
+    },
+    {
+      "workers": 1,
+      "trial": 9,
+      "after": {
+        "candidate": "candidate-1-9-after",
+        "graph": {
+          "time_unit": "microseconds",
+          "durations": {
+            "finish-1-9-after": 31,
+            "sibling-1-9-after": 51039,
+            "candidate-1-9-after": 23907
+          },
+          "edges": [
+            [
+              "candidate-1-9-after",
+              "finish-1-9-after"
+            ],
+            [
+              "sibling-1-9-after",
+              "finish-1-9-after"
+            ]
+          ]
+        },
+        "leaf_intervals_ns": [
+          [
+            52006834,
+            75854212
+          ],
+          [
+            0,
+            50964719
+          ]
+        ],
+        "span_ns": 81033594
+      },
+      "before": {
+        "candidate": "candidate-1-9-before",
+        "graph": {
+          "time_unit": "microseconds",
+          "durations": {
+            "finish-1-9-before": 28,
+            "candidate-1-9-before": 61717,
+            "sibling-1-9-before": 48487
+          },
+          "edges": [
+            [
+              "candidate-1-9-before",
+              "finish-1-9-before"
+            ],
+            [
+              "sibling-1-9-before",
+              "finish-1-9-before"
+            ]
+          ]
+        },
+        "leaf_intervals_ns": [
+          [
+            0,
+            61609089
+          ],
+          [
+            63000445,
+            111421895
+          ]
+        ],
+        "span_ns": 113784498
+      }
+    },
+    {
+      "workers": 2,
+      "trial": 0,
+      "before": {
+        "candidate": "candidate-2-0-before",
+        "graph": {
+          "time_unit": "microseconds",
+          "durations": {
+            "finish-2-0-before": 33,
+            "candidate-2-0-before": 61851,
+            "sibling-2-0-before": 48284
+          },
+          "edges": [
+            [
+              "candidate-2-0-before",
+              "finish-2-0-before"
+            ],
+            [
+              "sibling-2-0-before",
+              "finish-2-0-before"
+            ]
+          ]
+        },
+        "leaf_intervals_ns": [
+          [
+            0,
+            61794943
+          ],
+          [
+            234923,
+            48461974
+          ]
+        ],
+        "span_ns": 65345285
+      },
+      "after": {
+        "candidate": "candidate-2-0-after",
+        "graph": {
+          "time_unit": "microseconds",
+          "durations": {
+            "finish-2-0-after": 36,
+            "sibling-2-0-after": 48665,
+            "candidate-2-0-after": 28795
+          },
+          "edges": [
+            [
+              "candidate-2-0-after",
+              "finish-2-0-after"
+            ],
+            [
+              "sibling-2-0-after",
+              "finish-2-0-after"
+            ]
+          ]
+        },
+        "leaf_intervals_ns": [
+          [
+            0,
+            28741235
+          ],
+          [
+            100963,
+            48709389
+          ]
+        ],
+        "span_ns": 52489466
+      }
+    },
+    {
+      "workers": 2,
+      "trial": 1,
+      "after": {
+        "candidate": "candidate-2-1-after",
+        "graph": {
+          "time_unit": "microseconds",
+          "durations": {
+            "finish-2-1-after": 37,
+            "sibling-2-1-after": 46673,
+            "candidate-2-1-after": 24895
+          },
+          "edges": [
+            [
+              "candidate-2-1-after",
+              "finish-2-1-after"
+            ],
+            [
+              "sibling-2-1-after",
+              "finish-2-1-after"
+            ]
+          ]
+        },
+        "leaf_intervals_ns": [
+          [
+            168700,
+            25005641
+          ],
+          [
+            0,
+            46621387
+          ]
+        ],
+        "span_ns": 49692640
+      },
+      "before": {
+        "candidate": "candidate-2-1-before",
+        "graph": {
+          "time_unit": "microseconds",
+          "durations": {
+            "finish-2-1-before": 163,
+            "sibling-2-1-before": 50726,
+            "candidate-2-1-before": 59631
+          },
+          "edges": [
+            [
+              "candidate-2-1-before",
+              "finish-2-1-before"
+            ],
+            [
+              "sibling-2-1-before",
+              "finish-2-1-before"
+            ]
+          ]
+        },
+        "leaf_intervals_ns": [
+          [
+            207347,
+            59782565
+          ],
+          [
+            0,
+            50661302
+          ]
+        ],
+        "span_ns": 63179801
+      }
+    },
+    {
+      "workers": 2,
+      "trial": 2,
+      "before": {
+        "candidate": "candidate-2-2-before",
+        "graph": {
+          "time_unit": "microseconds",
+          "durations": {
+            "finish-2-2-before": 34,
+            "candidate-2-2-before": 59924,
+            "sibling-2-2-before": 50294
+          },
+          "edges": [
+            [
+              "candidate-2-2-before",
+              "finish-2-2-before"
+            ],
+            [
+              "sibling-2-2-before",
+              "finish-2-2-before"
+            ]
+          ]
+        },
+        "leaf_intervals_ns": [
+          [
+            0,
+            59860425
+          ],
+          [
+            457166,
+            50669539
+          ]
+        ],
+        "span_ns": 62871860
+      },
+      "after": {
+        "candidate": "candidate-2-2-after",
+        "graph": {
+          "time_unit": "microseconds",
+          "durations": {
+            "finish-2-2-after": 37,
+            "sibling-2-2-after": 49373,
+            "candidate-2-2-after": 25497
+          },
+          "edges": [
+            [
+              "candidate-2-2-after",
+              "finish-2-2-after"
+            ],
+            [
+              "sibling-2-2-after",
+              "finish-2-2-after"
+            ]
+          ]
+        },
+        "leaf_intervals_ns": [
+          [
+            0,
+            25435407
+          ],
+          [
+            17627,
+            49336904
+          ]
+        ],
+        "span_ns": 52733358
+      }
+    },
+    {
+      "workers": 2,
+      "trial": 3,
+      "after": {
+        "candidate": "candidate-2-3-after",
+        "graph": {
+          "time_unit": "microseconds",
+          "durations": {
+            "finish-2-3-after": 27,
+            "candidate-2-3-after": 26486,
+            "sibling-2-3-after": 48997
+          },
+          "edges": [
+            [
+              "candidate-2-3-after",
+              "finish-2-3-after"
+            ],
+            [
+              "sibling-2-3-after",
+              "finish-2-3-after"
+            ]
+          ]
+        },
+        "leaf_intervals_ns": [
+          [
+            0,
+            26390999
+          ],
+          [
+            80850,
+            49015948
+          ]
+        ],
+        "span_ns": 52538389
+      },
+      "before": {
+        "candidate": "candidate-2-3-before",
+        "graph": {
+          "time_unit": "microseconds",
+          "durations": {
+            "finish-2-3-before": 45,
+            "sibling-2-3-before": 49254,
+            "candidate-2-3-before": 67331
+          },
+          "edges": [
+            [
+              "candidate-2-3-before",
+              "finish-2-3-before"
+            ],
+            [
+              "sibling-2-3-before",
+              "finish-2-3-before"
+            ]
+          ]
+        },
+        "leaf_intervals_ns": [
+          [
+            0,
+            67269526
+          ],
+          [
+            194378,
+            49233165
+          ]
+        ],
+        "span_ns": 70642646
+      }
+    },
+    {
+      "workers": 2,
+      "trial": 4,
+      "before": {
+        "candidate": "candidate-2-4-before",
+        "graph": {
+          "time_unit": "microseconds",
+          "durations": {
+            "finish-2-4-before": 30,
+            "candidate-2-4-before": 60357,
+            "sibling-2-4-before": 46932
+          },
+          "edges": [
+            [
+              "candidate-2-4-before",
+              "finish-2-4-before"
+            ],
+            [
+              "sibling-2-4-before",
+              "finish-2-4-before"
+            ]
+          ]
+        },
+        "leaf_intervals_ns": [
+          [
+            0,
+            60294007
+          ],
+          [
+            269023,
+            47116689
+          ]
+        ],
+        "span_ns": 64334905
+      },
+      "after": {
+        "candidate": "candidate-2-4-after",
+        "graph": {
+          "time_unit": "microseconds",
+          "durations": {
+            "finish-2-4-after": 31,
+            "candidate-2-4-after": 24407,
+            "sibling-2-4-after": 45696
+          },
+          "edges": [
+            [
+              "candidate-2-4-after",
+              "finish-2-4-after"
+            ],
+            [
+              "sibling-2-4-after",
+              "finish-2-4-after"
+            ]
+          ]
+        },
+        "leaf_intervals_ns": [
+          [
+            0,
+            24347467
+          ],
+          [
+            232388,
+            45873825
+          ]
+        ],
+        "span_ns": 50065421
+      }
+    },
+    {
+      "workers": 2,
+      "trial": 5,
+      "after": {
+        "candidate": "candidate-2-5-after",
+        "graph": {
+          "time_unit": "microseconds",
+          "durations": {
+            "finish-2-5-after": 31,
+            "candidate-2-5-after": 27008,
+            "sibling-2-5-after": 48607
+          },
+          "edges": [
+            [
+              "candidate-2-5-after",
+              "finish-2-5-after"
+            ],
+            [
+              "sibling-2-5-after",
+              "finish-2-5-after"
+            ]
+          ]
+        },
+        "leaf_intervals_ns": [
+          [
+            0,
+            26949586
+          ],
+          [
+            218463,
+            48771066
+          ]
+        ],
+        "span_ns": 52264924
+      },
+      "before": {
+        "candidate": "candidate-2-5-before",
+        "graph": {
+          "time_unit": "microseconds",
+          "durations": {
+            "finish-2-5-before": 30,
+            "candidate-2-5-before": 65433,
+            "sibling-2-5-before": 45891
+          },
+          "edges": [
+            [
+              "candidate-2-5-before",
+              "finish-2-5-before"
+            ],
+            [
+              "sibling-2-5-before",
+              "finish-2-5-before"
+            ]
+          ]
+        },
+        "leaf_intervals_ns": [
+          [
+            0,
+            65367688
+          ],
+          [
+            303158,
+            46094136
+          ]
+        ],
+        "span_ns": 69294366
+      }
+    },
+    {
+      "workers": 2,
+      "trial": 6,
+      "before": {
+        "candidate": "candidate-2-6-before",
+        "graph": {
+          "time_unit": "microseconds",
+          "durations": {
+            "finish-2-6-before": 27,
+            "candidate-2-6-before": 64894,
+            "sibling-2-6-before": 45403
+          },
+          "edges": [
+            [
+              "candidate-2-6-before",
+              "finish-2-6-before"
+            ],
+            [
+              "sibling-2-6-before",
+              "finish-2-6-before"
+            ]
+          ]
+        },
+        "leaf_intervals_ns": [
+          [
+            0,
+            64834960
+          ],
+          [
+            223411,
+            45547658
+          ]
+        ],
+        "span_ns": 68829008
+      },
+      "after": {
+        "candidate": "candidate-2-6-after",
+        "graph": {
+          "time_unit": "microseconds",
+          "durations": {
+            "finish-2-6-after": 31,
+            "sibling-2-6-after": 49014,
+            "candidate-2-6-after": 25137
+          },
+          "edges": [
+            [
+              "candidate-2-6-after",
+              "finish-2-6-after"
+            ],
+            [
+              "sibling-2-6-after",
+              "finish-2-6-after"
+            ]
+          ]
+        },
+        "leaf_intervals_ns": [
+          [
+            7542,
+            25098869
+          ],
+          [
+            0,
+            48931003
+          ]
+        ],
+        "span_ns": 52927004
+      }
+    },
+    {
+      "workers": 2,
+      "trial": 7,
+      "after": {
+        "candidate": "candidate-2-7-after",
+        "graph": {
+          "time_unit": "microseconds",
+          "durations": {
+            "finish-2-7-after": 45,
+            "candidate-2-7-after": 25097,
+            "sibling-2-7-after": 49037
+          },
+          "edges": [
+            [
+              "candidate-2-7-after",
+              "finish-2-7-after"
+            ],
+            [
+              "sibling-2-7-after",
+              "finish-2-7-after"
+            ]
+          ]
+        },
+        "leaf_intervals_ns": [
+          [
+            0,
+            25049215
+          ],
+          [
+            635269,
+            49587383
+          ]
+        ],
+        "span_ns": 53310942
+      },
+      "before": {
+        "candidate": "candidate-2-7-before",
+        "graph": {
+          "time_unit": "microseconds",
+          "durations": {
+            "finish-2-7-before": 27,
+            "sibling-2-7-before": 46308,
+            "candidate-2-7-before": 61921
+          },
+          "edges": [
+            [
+              "candidate-2-7-before",
+              "finish-2-7-before"
+            ],
+            [
+              "sibling-2-7-before",
+              "finish-2-7-before"
+            ]
+          ]
+        },
+        "leaf_intervals_ns": [
+          [
+            200837,
+            62074636
+          ],
+          [
+            0,
+            46222396
+          ]
+        ],
+        "span_ns": 65178718
+      }
+    },
+    {
+      "workers": 2,
+      "trial": 8,
+      "before": {
+        "candidate": "candidate-2-8-before",
+        "graph": {
+          "time_unit": "microseconds",
+          "durations": {
+            "finish-2-8-before": 28,
+            "sibling-2-8-before": 45406,
+            "candidate-2-8-before": 82356
+          },
+          "edges": [
+            [
+              "candidate-2-8-before",
+              "finish-2-8-before"
+            ],
+            [
+              "sibling-2-8-before",
+              "finish-2-8-before"
+            ]
+          ]
+        },
+        "leaf_intervals_ns": [
+          [
+            136332,
+            82442962
+          ],
+          [
+            0,
+            45325840
+          ]
+        ],
+        "span_ns": 85518962
+      },
+      "after": {
+        "candidate": "candidate-2-8-after",
+        "graph": {
+          "time_unit": "microseconds",
+          "durations": {
+            "finish-2-8-after": 32,
+            "sibling-2-8-after": 46332,
+            "candidate-2-8-after": 25724
+          },
+          "edges": [
+            [
+              "candidate-2-8-after",
+              "finish-2-8-after"
+            ],
+            [
+              "sibling-2-8-after",
+              "finish-2-8-after"
+            ]
+          ]
+        },
+        "leaf_intervals_ns": [
+          [
+            0,
+            25647274
+          ],
+          [
+            203506,
+            46453633
+          ]
+        ],
+        "span_ns": 50360447
+      }
+    },
+    {
+      "workers": 2,
+      "trial": 9,
+      "after": {
+        "candidate": "candidate-2-9-after",
+        "graph": {
+          "time_unit": "microseconds",
+          "durations": {
+            "finish-2-9-after": 37,
+            "sibling-2-9-after": 45428,
+            "candidate-2-9-after": 23468
+          },
+          "edges": [
+            [
+              "candidate-2-9-after",
+              "finish-2-9-after"
+            ],
+            [
+              "sibling-2-9-after",
+              "finish-2-9-after"
+            ]
+          ]
+        },
+        "leaf_intervals_ns": [
+          [
+            302768,
+            23730244
+          ],
+          [
+            0,
+            45347852
+          ]
+        ],
+        "span_ns": 48748352
+      },
+      "before": {
+        "candidate": "candidate-2-9-before",
+        "graph": {
+          "time_unit": "microseconds",
+          "durations": {
+            "finish-2-9-before": 27,
+            "sibling-2-9-before": 46009,
+            "candidate-2-9-before": 62697
+          },
+          "edges": [
+            [
+              "candidate-2-9-before",
+              "finish-2-9-before"
+            ],
+            [
+              "sibling-2-9-before",
+              "finish-2-9-before"
+            ]
+          ]
+        },
+        "leaf_intervals_ns": [
+          [
+            129722,
+            62744657
+          ],
+          [
+            0,
+            45934270
+          ]
+        ],
+        "span_ns": 66027484
+      }
+    }
+  ],
+  "digests": [
+    "e09320c5b00b34bb704802136c599a95b3996332ba84d7c7f21112b6231b6bd0",
+    "281e519df3077b557c6b03f5da83c4e8d397219259615dd7c3308f89cae8f2a6"
+  ]
+}

@@ -92,6 +92,8 @@ python examples/dask_capture.py | python -m pathprobe rank - --top 5
 
 For an existing workload, call `capture(client, collection)` from [the Dask example](examples/dask_capture.py). The return value contains the computed result and a graph record.
 
+In a measured two-file SHA-256 workflow, increasing one reader's chunk size saved 15.09 ms with two workers and 36.89 ms with one. The dependency-only model was closer when the reads overlapped. Subtracting the full task saving was closer when they ran serially. [Replay both worker configurations](examples/dask-hash/README.md).
+
 ## Native kernel
 
 Copy [pathprobe.hpp](native/pathprobe.hpp) into a C++17 project. Supply dense integer task IDs and signed 64-bit durations. Construction checks for cycles, invalid endpoints and overflow. Concurrent read-only queries on the finished index are safe.
